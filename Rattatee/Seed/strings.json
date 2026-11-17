@@ -689,6 +689,66 @@
     "et": "Proovi kohe",
     "ru": "Попробовать сейчас"
   },
+  "turnAround": {
+    "en": "Turn around",
+    "et": "Pööra ümber",
+    "ru": "Развернитесь"
+  },
+  "turnArrive": {
+    "en": "You have arrived",
+    "et": "Oled kohal",
+    "ru": "Вы на месте"
+  },
+  "turnKeepLeft": {
+    "en": "Keep left",
+    "et": "Hoia vasakule",
+    "ru": "Держитесь левее"
+  },
+  "turnKeepRight": {
+    "en": "Keep right",
+    "et": "Hoia paremale",
+    "ru": "Держитесь правее"
+  },
+  "turnLeft": {
+    "en": "Turn left",
+    "et": "Pööra vasakule",
+    "ru": "Поверните налево"
+  },
+  "turnRight": {
+    "en": "Turn right",
+    "et": "Pööra paremale",
+    "ru": "Поверните направо"
+  },
+  "turnRoundabout": {
+    "en": "Roundabout",
+    "et": "Ringristmik",
+    "ru": "Круговое движение"
+  },
+  "turnRoundaboutExit": {
+    "en": "Roundabout, exit {n}",
+    "et": "Ringristmik, {n}. väljasõit",
+    "ru": "Круговое движение, съезд {n}"
+  },
+  "turnSoon": {
+    "en": "In 200 metres",
+    "et": "200 meetri pärast",
+    "ru": "Через 200 метров"
+  },
+  "turnStraight": {
+    "en": "Go straight",
+    "et": "Sõida otse",
+    "ru": "Езжайте прямо"
+  },
+  "voiceOff": {
+    "en": "Voice is off",
+    "et": "Hääl on väljas",
+    "ru": "Голос выключен"
+  },
+  "voiceOn": {
+    "en": "Voice is on",
+    "et": "Hääl on sees",
+    "ru": "Голос включён"
+  },
   "whyFast": {
     "en": "too fast",
     "et": "liiga kiire",

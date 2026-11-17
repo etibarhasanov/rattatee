@@ -39,14 +39,116 @@ struct Spot: Identifiable, Equatable, Codable {
     var onRoll: Bool { [.mine, .place, .google].contains(kind) }
 }
 
+/// Which way a way bends at a corner: the website's own eight words, under
+/// `steps` in /api/route. Each is one recording in `Voice/`, so a word the
+/// website adds later is one this build does not know, and it is left out
+/// rather than guessed at.
+enum Turn: String {
+    case left, right, straight, around, roundabout, arrive
+    case keepLeft = "keep-left"
+    case keepRight = "keep-right"
+
+    /// The arrow in the row.
+    var symbol: String {
+        switch self {
+        case .left: return "arrow.turn.up.left"
+        case .right: return "arrow.turn.up.right"
+        case .keepLeft: return "arrow.up.left"
+        case .keepRight: return "arrow.up.right"
+        case .straight: return "arrow.up"
+        case .around: return "arrow.uturn.down"
+        case .roundabout: return "arrow.triangle.2.circlepath"
+        case .arrive: return "flag.checkered"
+        }
+    }
+}
+
+/// One corner of a way: which way it bends, the street it is onto, the exit
+/// of a roundabout where the router counted one (nought where it did not),
+/// and how far along the way's own line the corner is.
+struct Step: Equatable {
+    let turn: Turn
+    let name: String
+    let exit: Int
+    let along: Double
+
+    /// What the row says, and what is said aloud where there is no
+    /// recording. Key by key, so the strings check in CI sees each.
+    var words: String {
+        switch turn {
+        case .left: return L.t("turnLeft")
+        case .right: return L.t("turnRight")
+        case .keepLeft: return L.t("turnKeepLeft")
+        case .keepRight: return L.t("turnKeepRight")
+        case .straight: return L.t("turnStraight")
+        case .around: return L.t("turnAround")
+        case .roundabout: return exit > 0 ? L.t("turnRoundaboutExit", ["n": "\(exit)"]) : L.t("turnRoundabout")
+        case .arrive: return L.t("turnArrive")
+        }
+    }
+}
+
 /// A suggested way by bike, from /api/route.
 struct Way: Equatable {
     let metres: Double
     let seconds: Int
     let line: [CLLocationCoordinate2D]
+    /// Where it turns, in the order the corners come. Empty for a way the
+    /// website answered before it sent any, which is then a line and silent.
+    var steps: [Step] = []
+
+    /// Further than this from the line is not on it: the row goes away and
+    /// nothing is said until the rider is back.
+    static let astray: Double = 60
+
+    /// Where a point is on the way: how far along the line the nearest spot
+    /// on it is, and how far off the point is from that spot. Measured to
+    /// the segments and not the vertices, because a straight street is two
+    /// vertices however long it is.
+    func place(of here: CLLocationCoordinate2D) -> (along: Double, off: Double) {
+        guard line.count > 1 else { return (0, .infinity) }
+        // Flat metres around the point: good to a few centimetres across a city.
+        let north = 111_320.0, east = 111_320.0 * cos(here.latitude * .pi / 180)
+        func flat(_ p: CLLocationCoordinate2D) -> (x: Double, y: Double) {
+            ((p.longitude - here.longitude) * east, (p.latitude - here.latitude) * north)
+        }
+        var best = (along: 0.0, off: Double.infinity)
+        var run = 0.0
+        var a = flat(line[0])
+        for i in 1..<line.count {
+            let b = flat(line[i])
+            let dx = b.x - a.x, dy = b.y - a.y
+            let length = (dx * dx + dy * dy).squareRoot()
+            let t = length > 0 ? min(1, max(0, -(a.x * dx + a.y * dy) / (length * length))) : 0
+            let px = a.x + t * dx, py = a.y + t * dy
+            let off = (px * px + py * py).squareRoot()
+            if off < best.off { best = (run + t * length, off) }
+            run += length
+            a = b
+        }
+        return best
+    }
+
+    /// The corner coming up from a point, and how far along the way it is —
+    /// or nothing off the way, past the last corner, or on a way with none.
+    func next(from here: CLLocationCoordinate2D) -> (step: Step, metres: Double)? {
+        guard !steps.isEmpty else { return nil }
+        let spot = place(of: here)
+        guard spot.off <= Self.astray, let step = steps.first(where: { $0.along > spot.along }) else { return nil }
+        return (step, step.along - spot.along)
+    }
+
+    /// One of the website's steps, placed on this way's line.
+    func step(_ raw: [String: Any]) -> Step? {
+        guard let word = raw["turn"] as? String, let turn = Turn(rawValue: word),
+              let at = raw["at"] as? [Double], at.count > 1 else { return nil }
+        let spot = place(of: CLLocationCoordinate2D(latitude: at[0], longitude: at[1]))
+        guard spot.off <= Self.astray else { return nil }
+        return Step(turn: turn, name: raw["name"] as? String ?? "", exit: raw["exit"] as? Int ?? 0, along: spot.along)
+    }
 
     static func == (a: Way, b: Way) -> Bool {
-        a.metres == b.metres && a.seconds == b.seconds && a.line.count == b.line.count
+        a.metres == b.metres && a.seconds == b.seconds && a.line.count == b.line.count && a.steps == b.steps
     }
 
     /// How much of the way is left from a point: the way from its vertex
@@ -90,7 +192,7 @@ struct Goal: Equatable {
 ///
 /// Nothing here is Rattatee's. The places are `GET /api/places?q=`, the one
 /// search of the city the website's find bar and the map app use; the streets
-/// are `GET /api/geocode?q=`; the way is `GET /api/route` with `mode=bike`;
+/// are `GET /api/geocode?q=`; the way and its turns are `GET /api/route` with `mode=bike`;
 /// and what none of them knows is `POST /api/lookup`, the website's **Look
 /// for it on Google Maps**, offered from five letters as it is there. A place
 /// Google answers with is kept by the site, so the next search finds it
@@ -198,7 +300,12 @@ enum Search {
     private static func way(_ object: [String: Any]) -> Way? {
         guard let metres = object["meters"] as? Double,
               let line = object["line"] as? [[Double]], line.count > 1 else { return nil }
-        return Way(metres: metres, seconds: Int(object["seconds"] as? Double ?? 0),
-                   line: line.compactMap { $0.count > 1 ? CLLocationCoordinate2D(latitude: $0[0], longitude: $0[1]) : nil })
+        var way = Way(metres: metres, seconds: Int(object["seconds"] as? Double ?? 0),
+                      line: line.compactMap { $0.count > 1 ? CLLocationCoordinate2D(latitude: $0[0], longitude: $0[1]) : nil })
+        // Where it turns, for the row while riding and the voice. A website
+        // from before it sent any answers none, and the way is still a way.
+        let steps = (object["steps"] as? [[String: Any]] ?? []).compactMap { way.step($0) }
+        way.steps = steps.sorted { $0.along < $1.along }
+        return way
     }
 }

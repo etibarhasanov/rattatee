@@ -49,7 +49,14 @@ enum LaunchScript {
         var goal = Goal(spot: Spot(id: "paper-mill-coffee", name: "Paper Mill Coffee",
                                    detail: "Masina 20 · Coffee roastery",
                                    lat: ahead.last?.lat ?? 59.44, lng: ahead.last?.lng ?? 24.76, kind: .mine))
-        let way = Way(metres: 2400, seconds: 540, line: ahead.map(\.coordinate))
+        // It bends every forty points, right and then left, so the staged
+        // ride has a turn coming up and the row is in the picture.
+        var way = Way(metres: 2400, seconds: 540, line: ahead.map(\.coordinate))
+        let streets = ["Narva maantee", "Pronksi", "Tartu maantee", "Liivalaia"]
+        way.steps = stride(from: 40, to: ahead.count, by: 40).enumerated().map { n, i in
+            Step(turn: n % 2 == 0 ? .right : .left, name: streets[n % streets.count], exit: 0,
+                 along: way.place(of: ahead[i].coordinate).along)
+        }
         // And a second way to choose from, bowed out to one side of the
         // first, so the card's row of ways can be photographed.
         let bowed = ahead.enumerated().map { i, point in
