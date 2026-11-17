@@ -142,11 +142,16 @@ jobs:
           shot 17-going -kDemo going
           shot 18-search -kSheet search
           shot 09-rides-empty -kDemo none -kTab 1
-          shot 10-account -kTab 1 -kSheet account -kDoors YES
+          shot 10-account -kTab 2 -kDoors YES
           # The other two languages, and the night style.
           shot 11-recording-et -kDemo recording -AppleLanguages '(et)'
           shot 12-save-ru -kDemo save -AppleLanguages '(ru)'
           shot 13-rides-et -kDemo rides -kTab 1 -AppleLanguages '(et)'
+          # The colours: each of the four, light and dark.
+          shot 19-red-light -kDemo save -hue red
+          shot 20-plum-light -kDemo going -hue plum
+          shot 21-account-dark -kTab 2 -kDoors YES -look dark -hue green
+          shot 22-blue-dark -kDemo recording -look dark
           xcrun simctl ui "$dev" appearance dark
           shot 14-recording-dark -kDemo recording
           shot 15-rides-dark -kDemo rides -kTab 1

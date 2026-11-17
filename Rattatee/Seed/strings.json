@@ -49,11 +49,6 @@
     "et": "Konto, mis on tehtud Google’i või Apple’iga ja millel pole parooli: kirjuta parooli asemel oma kasutajanimi.",
     "ru": "Если аккаунт создан через Google или Apple и пароля у него нет, введите вместо него имя пользователя."
   },
-  "appSameAccount": {
-    "en": "Your Tallinn Tastebuds account — the same one as the website and Kohuke.",
-    "et": "Sinu Tallinn Tastebudsi konto — sama, mis veebilehel ja Kohukes.",
-    "ru": "Ваш аккаунт Tallinn Tastebuds — тот же, что на сайте и в Kohuke."
-  },
   "badgeNotKept": {
     "en": "Not kept · {why}",
     "et": "Ei jäänud alles · {why}",
@@ -174,6 +169,51 @@
     "et": "Rattatee teab ainult umbkaudu, kus telefon on, ja sellest ei piisa sõidu joonistamiseks. Lülita seadetes asukoha all sisse „Täpne asukoht“.",
     "ru": "Rattatee знает лишь приблизительно, где находится телефон, а этого мало, чтобы нарисовать поездку. В Настройках, в разделе «Геопозиция», включите «Точная геопозиция»."
   },
+  "lookBackground": {
+    "en": "Background",
+    "et": "Taust",
+    "ru": "Фон"
+  },
+  "lookBlue": {
+    "en": "Blue",
+    "et": "Sinine",
+    "ru": "Синий"
+  },
+  "lookDark": {
+    "en": "Dark",
+    "et": "Tume",
+    "ru": "Тёмный"
+  },
+  "lookGreen": {
+    "en": "Green",
+    "et": "Roheline",
+    "ru": "Зелёный"
+  },
+  "lookLight": {
+    "en": "Light",
+    "et": "Hele",
+    "ru": "Светлый"
+  },
+  "lookPhone": {
+    "en": "Like the phone",
+    "et": "Nagu telefonis",
+    "ru": "Как в телефоне"
+  },
+  "lookPlum": {
+    "en": "Plum",
+    "et": "Ploom",
+    "ru": "Сливовый"
+  },
+  "lookRed": {
+    "en": "Red",
+    "et": "Punane",
+    "ru": "Красный"
+  },
+  "lookTitle": {
+    "en": "Look",
+    "et": "Välimus",
+    "ru": "Оформление"
+  },
   "openSettings": {
     "en": "Open Settings",
     "et": "Ava seaded",
@@ -183,16 +223,6 @@
     "en": "Privacy",
     "et": "Privaatsus",
     "ru": "Конфиденциальность"
-  },
-  "readyTitle": {
-    "en": "Ready to ride",
-    "et": "Valmis sõitma",
-    "ru": "Можно ехать"
-  },
-  "readyWhy": {
-    "en": "Put the phone in your pocket — it keeps recording with the screen locked. GPS in the background uses battery: about as much as a navigation app.",
-    "et": "Pane telefon taskusse — salvestamine jätkub ka lukus ekraaniga. Taustal töötav GPS kulutab akut, umbes sama palju kui navigeerimisrakendus.",
-    "ru": "Положите телефон в карман — запись продолжится и с заблокированным экраном. GPS в фоне расходует батарею — примерно как навигатор."
   },
   "rideFast": {
     "en": "That was faster than a bike rides, so it cannot be kept.",
@@ -214,6 +244,11 @@
     "et": "Nimi (valikuline)",
     "ru": "Название (необязательно)"
   },
+  "rideNice": {
+    "en": "Nice ride",
+    "et": "Tubli sõit",
+    "ru": "Хорошая поездка"
+  },
   "rideOften": {
     "en": "That is twenty rides today, the most one account can save in a day. The ride is kept on this phone for tomorrow.",
     "et": "Täna on juba kakskümmend sõitu — rohkem ei saa üks konto päevas salvestada. Sõit jääb homseks selles telefonis alles.",
@@ -234,10 +269,10 @@
     "et": "Peatatud · midagi ei salvestata",
     "ru": "Пауза · ничего не записывается"
   },
-  "rideRecordingLock": {
-    "en": "Recording · fine to lock the screen",
-    "et": "Salvestan · ekraani võib lukustada",
-    "ru": "Идёт запись · экран можно заблокировать"
+  "rideRecording": {
+    "en": "Recording",
+    "et": "Salvestan",
+    "ru": "Идёт запись"
   },
   "rideRemove": {
     "en": "Remove from this phone",
@@ -253,11 +288,6 @@
     "en": "Save ride",
     "et": "Salvesta sõit",
     "ru": "Сохранить"
-  },
-  "rideSaveTitle": {
-    "en": "Save this ride?",
-    "et": "Kas salvestada see sõit?",
-    "ru": "Сохранить поездку?"
   },
   "rideSaveWhyApp": {
     "en": "It becomes a confirmed bike route. Your name is never shown with it, and the first and last 200 m are left off.",
@@ -313,11 +343,6 @@
     "en": "Waiting for your location…",
     "et": "Ootan sinu asukohta…",
     "ru": "Ждём ваше местоположение…"
-  },
-  "ridesAccount": {
-    "en": "Account",
-    "et": "Konto",
-    "ru": "Аккаунт"
   },
   "ridesEmptyTitle": {
     "en": "No rides yet",
@@ -390,24 +415,49 @@
     "ru": "Не получилось. Попробуйте ещё раз чуть позже."
   },
   "signInWhy": {
-    "en": "You do not need an account: a ride is saved without one. Signed in, your rides are also listed on your account page on tallinntastebuds.ee. Nobody else sees whose ride it is.",
-    "et": "Kontot pole vaja: sõit salvestatakse ka ilma. Sisse logituna on sinu sõidud näha ka sinu kontolehel saidil tallinntastebuds.ee. Keegi teine ei näe, kelle sõit see on.",
-    "ru": "Аккаунт не нужен: поездка сохраняется и без него. Если войти, ваши поездки будут также видны на странице вашего аккаунта на tallinntastebuds.ee. Никто другой не видит, чья это поездка."
+    "en": "Not needed to ride. Signed in, your rides are also on your page on tallinntastebuds.ee.",
+    "et": "Sõitmiseks pole vaja. Sisse logituna on sinu sõidud ka sinu lehel saidil tallinntastebuds.ee.",
+    "ru": "Для поездок не нужно. Если войти, ваши поездки будут и на вашей странице на tallinntastebuds.ee."
+  },
+  "statAverage": {
+    "en": "average",
+    "et": "keskmine",
+    "ru": "в среднем"
   },
   "statAvg": {
     "en": "km/h avg",
     "et": "km/h keskm.",
     "ru": "км/ч в ср."
   },
+  "statDistance": {
+    "en": "distance",
+    "et": "vahemaa",
+    "ru": "расстояние"
+  },
   "statKm": {
     "en": "km",
     "et": "km",
     "ru": "км"
   },
+  "statRidingTime": {
+    "en": "riding time",
+    "et": "sõiduaeg",
+    "ru": "время в пути"
+  },
   "statTime": {
     "en": "time",
     "et": "aeg",
     "ru": "время"
+  },
+  "statTop": {
+    "en": "top speed",
+    "et": "tippkiirus",
+    "ru": "макс. скорость"
+  },
+  "tabAccount": {
+    "en": "Account",
+    "et": "Konto",
+    "ru": "Аккаунт"
   },
   "tabRecord": {
     "en": "Record",
@@ -418,6 +468,11 @@
     "en": "My rides",
     "et": "Minu sõidud",
     "ru": "Мои поездки"
+  },
+  "today": {
+    "en": "Today",
+    "et": "Täna",
+    "ru": "Сегодня"
   },
   "tryNow": {
     "en": "Try now",

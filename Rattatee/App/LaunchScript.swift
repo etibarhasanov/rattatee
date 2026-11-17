@@ -8,11 +8,13 @@ import Foundation
 /// recording` puts a ride through Tallinn on the Record tab, mid-ride.
 /// Launch arguments land in UserDefaults' argument domain, so nothing is
 /// stored, and a staged ride is never written to disk or sent
-/// (`Store.pretend`). Nothing here runs for a rider, who never launches the
+/// (`Store.pretend`). `-hue plum` and `-look dark` are the keys the
+/// colour and the background are kept under, so they need nothing here.
+/// Nothing here runs for a rider, who never launches the
 /// app with arguments.
 enum LaunchScript {
     static var tab: Int { UserDefaults.standard.integer(forKey: "kTab") }
-    /// `-kSheet account` opens the Account sheet.
+    /// `-kSheet search` opens the search over the Record tab.
     static var sheet: String? { UserDefaults.standard.string(forKey: "kSheet") }
 
     #if DEBUG

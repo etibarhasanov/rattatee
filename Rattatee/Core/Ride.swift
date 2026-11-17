@@ -88,6 +88,44 @@ struct Ride: Codable, Identifiable, Equatable {
 
     var metres: Double { Geo.length(points) }
 
+    /// Average speed over the riding time, in km/h, once there is enough of
+    /// a ride for one to mean anything.
+    var average: Double? {
+        let s = seconds()
+        guard s >= 10, metres >= 50 else { return nil }
+        return metres / 1000 / (Double(s) / 3600)
+    }
+
+    /// The fastest stretch of half a minute or more, in km/h.
+    ///
+    /// Not the fastest pair of points: one fix that lands thirty metres off
+    /// makes a twelve-metre gap read 60 km/h for a second, and a top speed
+    /// is the one number people would believe. Over thirty seconds a jump
+    /// like that is averaged with everything round it. A stretch that crosses
+    /// a pause is skipped, since its time includes standing still.
+    var topSpeed: Double? {
+        let window = 30.0
+        var best = 0.0
+        var j = 0
+        var run = [0.0]
+        for k in 1..<max(points.count, 1) { run.append(run[k - 1] + Geo.metres(points[k - 1], points[k])) }
+        for i in points.indices {
+            if j < i { j = i }
+            while j < points.count - 1 && points[j].t - points[i].t < window { j += 1 }
+            let dt = points[j].t - points[i].t
+            // Longer than twice the window is a pause in the middle of it.
+            guard dt >= window, dt <= window * 2 else { continue }
+            best = max(best, (run[j] - run[i]) / dt * 3.6)
+        }
+        return best > 0 ? best : nil
+    }
+
+    /// When the ride began and ended: its first and last points.
+    var span: (Date, Date)? {
+        guard let first = points.first, let last = points.last else { return nil }
+        return (Date(timeIntervalSince1970: first.t), Date(timeIntervalSince1970: last.t))
+    }
+
     /// The name, or "Ride · Fri 14 Nov" when it was not given one.
     var title: String {
         name.isEmpty ? L.t("rideUntitled", ["date": L.date(started)]) : name

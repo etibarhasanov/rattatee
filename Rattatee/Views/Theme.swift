@@ -1,29 +1,132 @@
 import SwiftUI
+import Observation
 import UIKit
 
-/// The website's colours: its blue style by day and its green style by
-/// night, following the phone's own light and dark. The values are the tokens
-/// of the `[data-style]` blocks in `assets/styles.css` in the website repo,
-/// copied from Kohuke's `Views/Theme.swift`. Kohuke lets you pick one of four
-/// styles; Rattatee has no settings screen to put that on yet, and a
-/// night ride wants the dark one without asking.
+/// One of the website's four colours. The site gives each one a single
+/// look — Red and Blue by day, Green and Plum by night — and here each has a
+/// day and a night, so the colour and the background are two choices.
+enum Hue: String, CaseIterable, Identifiable {
+    case red, green, blue, plum
+
+    var id: String { rawValue }
+
+    /// Its name. Written out key by key so the strings check in CI can see
+    /// every key the app asks for.
+    var name: String {
+        switch self {
+        case .red: return L.t("lookRed")
+        case .green: return L.t("lookGreen")
+        case .blue: return L.t("lookBlue")
+        case .plum: return L.t("lookPlum")
+        }
+    }
+}
+
+/// Light, dark, or as the phone is set, which is where a new install starts.
+enum Look: String, CaseIterable, Identifiable {
+    case phone, light, dark
+
+    var id: String { rawValue }
+
+    /// What SwiftUI is told to draw in: nothing, for the phone's own.
+    var scheme: ColorScheme? {
+        switch self {
+        case .phone: return nil
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
+}
+
+/// The values of one colour on one background.
+///
+/// Red by day, Blue by day, Green by night and Plum by night are the website's
+/// `[data-style]` tokens in `assets/styles.css` to the value, as Kohuke's are.
+/// The other four were drawn for this app to sit beside them: the same hue
+/// for the accent, its ground tinted the way the site's own pair is.
+struct Palette {
+    let ink, muted, paper, wash, hairline, accent, here, card, onAccent: UInt32
+
+    static func of(_ hue: Hue, dark: Bool) -> Palette {
+        switch (hue, dark) {
+        case (.red, false):
+            return Palette(ink: 0x27141A, muted: 0x7D5754, paper: 0xFFF0EA, wash: 0xF7DDD4, hairline: 0xF0CEC3,
+                           accent: 0xA81E28, here: 0x0B62C4, card: 0xFFFFFF, onAccent: 0xFFFFFF)
+        case (.red, true):
+            return Palette(ink: 0xF6E8E6, muted: 0xC9A9A6, paper: 0x1C1012, wash: 0x3A2428, hairline: 0x4A3034,
+                           accent: 0xF08A7E, here: 0x5AA2F0, card: 0x2A1A1D, onAccent: 0x1C1012)
+        case (.green, false):
+            return Palette(ink: 0x13261B, muted: 0x4F6A58, paper: 0xEEF6F0, wash: 0xD8EADD, hairline: 0xC7DECD,
+                           accent: 0x1E7A46, here: 0xC05A12, card: 0xFFFFFF, onAccent: 0xFFFFFF)
+        case (.green, true):
+            return Palette(ink: 0xE7F1EA, muted: 0xA2B7A9, paper: 0x101A15, wash: 0x25332C, hairline: 0x354740,
+                           accent: 0x6FD39A, here: 0xE0873A, card: 0x1D2A23, onAccent: 0x101A15)
+        case (.blue, false):
+            return Palette(ink: 0x0F1D31, muted: 0x4D6079, paper: 0xEDF3FB, wash: 0xD6E3F2, hairline: 0xC6D6EA,
+                           accent: 0x1B4A8C, here: 0xC0267E, card: 0xFFFFFF, onAccent: 0xFFFFFF)
+        case (.blue, true):
+            return Palette(ink: 0xE6EEF8, muted: 0xA3B3C7, paper: 0x0E1620, wash: 0x223044, hairline: 0x30415A,
+                           accent: 0x8DB4F0, here: 0xE05AA8, card: 0x18222F, onAccent: 0x0E1620)
+        case (.plum, false):
+            return Palette(ink: 0x22152C, muted: 0x6E5A7D, paper: 0xF6F0FA, wash: 0xE8DCF1, hairline: 0xDCCDE8,
+                           accent: 0x6B3FA0, here: 0xC05A12, card: 0xFFFFFF, onAccent: 0xFFFFFF)
+        case (.plum, true):
+            return Palette(ink: 0xF1E9F6, muted: 0xB9A8C6, paper: 0x16111C, wash: 0x2E2638, hairline: 0x43384F,
+                           accent: 0xC9A6F2, here: 0xE0873A, card: 0x271F30, onAccent: 0x16111C)
+        }
+    }
+}
+
+/// The colour and the background chosen under Account, kept on the phone as
+/// the website keeps its style in the browser. Blue, as the phone is set,
+/// until somebody chooses. Observable, and every colour below is read through
+/// it, so the whole app is redrawn the moment either changes.
+@Observable
+final class StyleStore {
+    static let shared = StyleStore()
+
+    var hue: Hue {
+        didSet { UserDefaults.standard.set(hue.rawValue, forKey: "hue") }
+    }
+    var look: Look {
+        didSet { UserDefaults.standard.set(look.rawValue, forKey: "look") }
+    }
+
+    private init() {
+        hue = UserDefaults.standard.string(forKey: "hue").flatMap(Hue.init(rawValue:)) ?? .blue
+        look = UserDefaults.standard.string(forKey: "look").flatMap(Look.init(rawValue:)) ?? .phone
+    }
+}
+
+/// The colours in use. Each is the chosen colour's day and night values, and
+/// iOS picks between them by whether the screen is being drawn dark — which
+/// is the phone's own setting, or Light or Dark where the root view forces
+/// one (`preferredColorScheme` in RattateeApp.swift).
 enum Theme {
+    private static func token(_ pick: @escaping (Palette) -> UInt32) -> Color {
+        let hue = StyleStore.shared.hue
+        return Color(UIColor { traits in
+            UIColor(hex: pick(Palette.of(hue, dark: traits.userInterfaceStyle == .dark)))
+        })
+    }
+
     private static func pair(_ day: UInt32, _ night: UInt32) -> Color {
         Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(hex: night) : UIColor(hex: day) })
     }
 
-    static let ink = pair(0x0F1D31, 0xE7F1EA)
-    static let muted = pair(0x4D6079, 0xA2B7A9)
-    static let paper = pair(0xEDF3FB, 0x101A15)
-    static let wash = pair(0xD6E3F2, 0x25332C)
-    static let hairline = pair(0xC6D6EA, 0x354740)
-    static let accent = pair(0x1B4A8C, 0x6FD39A)
+    static var ink: Color { token(\.ink) }
+    static var muted: Color { token(\.muted) }
+    static var paper: Color { token(\.paper) }
+    static var wash: Color { token(\.wash) }
+    static var hairline: Color { token(\.hairline) }
+    static var accent: Color { token(\.accent) }
     /// The site's "you are here" colour, which is what a ride line is.
-    static let here = pair(0xC0267E, 0xE0873A)
-    static let card = pair(0xFFFFFF, 0x1D2A23)
+    static var here: Color { token(\.here) }
+    static var card: Color { token(\.card) }
     /// What is written on the accent: white by day, the ground by night.
-    static let onAccent = pair(0xFFFFFF, 0x101A15)
+    static var onAccent: Color { token(\.onAccent) }
 
+    // Saved, waiting and not kept read the same whatever the colour.
     static let good = pair(0x1E7A46, 0x6FD39A)
     static let goodWash = pair(0xDDEFE2, 0x1F3A2A)
     static let wait = pair(0x8A5300, 0xF0B45A)

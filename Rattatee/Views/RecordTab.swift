@@ -5,7 +5,7 @@ import SwiftUI
 /// ride goes through — the same five the website's recorder has, in the same
 /// order, plus what only an app needs to say.
 ///
-///   Ready            Start, and the line about the pocket and the battery;
+///   Ready            Start, and nothing else to read;
 ///                    "Where to?" over the map opens the search
 ///   Going somewhere  the place, the suggested way in blue, and Go
 ///   Location is off  what to choose in Settings (or Precise Location is)
@@ -149,8 +149,7 @@ struct ReadyCard: View {
 
     var body: some View {
         SheetCard {
-            Text(L.t("readyTitle")).font(.title2.bold()).foregroundStyle(Theme.ink)
-            Note(text: L.t("readyWhy")).padding(.top, 4).padding(.bottom, 14)
+            // Nothing to read: the map says where, and the button what.
             Button(L.t("rideStart")) { store.start() }
                 .buttonStyle(.big)
         }
@@ -259,7 +258,7 @@ struct RecordingCard: View {
 
     private func line(_ recording: Bool) -> String {
         if !recording { return L.t("ridePausedLine") }
-        return ride.points.isEmpty ? L.t("rideWaiting") : L.t("rideRecordingLock")
+        return ride.points.isEmpty ? L.t("rideWaiting") : L.t("rideRecording")
     }
 }
 

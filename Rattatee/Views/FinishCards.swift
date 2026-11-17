@@ -7,6 +7,48 @@ private func summary(_ ride: Ride) -> String {
     L.distance(ride.metres) + " · " + L.duration(ride.seconds())
 }
 
+/// "Today 08:12 – 08:49" under a card's title: when the ride began and ended.
+private func when(_ ride: Ride) -> String {
+    guard let (from, to) = ride.span else { return L.date(ride.started) }
+    let day = Calendar.current.isDateInToday(from) ? L.t("today") : L.date(from)
+    return "\(day) \(L.time(from)) – \(L.time(to))"
+}
+
+/// What one ride came to: how far, how long, how fast on average, and the
+/// fastest half-minute — a ride's own numbers and no totals, since the point
+/// of the app is the ride and nothing round it. A number there is not enough
+/// of the ride for is a dash.
+struct RideNumbers: View {
+    let ride: Ride
+
+    var body: some View {
+        Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 12) {
+            GridRow {
+                cell(L.distance(ride.metres), L.t("statDistance"))
+                cell(L.clock(ride.seconds()), L.t("statRidingTime"))
+            }
+            GridRow {
+                cell(ride.average.map { String(format: "%.1f km/h", $0) } ?? "–", L.t("statAverage"))
+                cell(ride.topSpeed.map { String(format: "%.0f km/h", $0) } ?? "–", L.t("statTop"))
+            }
+        }
+        .padding(.vertical, 12)
+    }
+
+    private func cell(_ value: String, _ label: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(value)
+                .font(.system(size: 26, weight: .bold))
+                .monospacedDigit()
+                .foregroundStyle(Theme.ink)
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
+            Text(label.uppercased()).font(.caption).foregroundStyle(Theme.muted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 // MARK: Save this ride?
 
 struct SaveCard: View {
@@ -19,8 +61,9 @@ struct SaveCard: View {
 
     var body: some View {
         SheetCard {
-            Text(L.t("rideSaveTitle")).font(.title2.bold()).foregroundStyle(Theme.ink)
-            Text(summary(ride)).font(.subheadline).foregroundStyle(Theme.muted)
+            Text(L.t("rideNice")).font(.title2.bold()).foregroundStyle(Theme.ink)
+            Text(when(ride)).font(.subheadline).foregroundStyle(Theme.muted)
+            RideNumbers(ride: ride)
 
             HStack {
                 TextField(L.t("rideName"), text: $name)
@@ -40,10 +83,9 @@ struct SaveCard: View {
             .frame(height: 48)
             .background(Theme.paper, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.hairline))
-            .padding(.top, 10)
 
             // The two things somebody wants to know before pressing Save.
-            Note(text: L.t("rideSaveWhyApp")).padding(.top, 10).padding(.bottom, 14)
+            Note(text: L.t("rideSaveWhyApp")).padding(.top, 8).padding(.bottom, 12)
 
             Button(L.t("rideSave")) {
                 typing = false
@@ -106,8 +148,11 @@ struct OutcomeCard: View {
         SheetCard {
             switch ride.status {
             case .saved:
-                head(L.t("rideSaved"))
-                Note(text: L.t("rideSavedWhyApp")).padding(.top, 10).padding(.bottom, 14)
+                Text(L.t("rideSaved")).font(.title2.bold()).foregroundStyle(Theme.ink)
+                Text(ride.name.isEmpty ? when(ride) : ride.name + " · " + when(ride))
+                    .font(.subheadline).foregroundStyle(Theme.muted)
+                RideNumbers(ride: ride)
+                Note(text: L.t("rideSavedWhyApp")).padding(.bottom, 14)
                 done
             case .refused:
                 head(L.t("badgeNotKept", ["why": why(ride.problem)]))

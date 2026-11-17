@@ -1,51 +1,87 @@
 import SwiftUI
 
-/// Account, from the top of My rides: signing in, which nobody has to do,
-/// and what it is for; signing out; deleting the account; and the link to
+/// The Account tab: signing in with Apple or Google, which nobody has to do;
+/// signing out and deleting the account; the colour and the background; and
 /// the privacy page.
-struct AccountView: View {
+struct AccountTab: View {
     @Environment(Store.self) private var store
-    @Environment(\.dismiss) private var dismiss
     @State private var deleting = false
 
     var body: some View {
+        @Bindable var style = StyleStore.shared
         NavigationStack {
             Form {
                 if let user = store.user {
                     Section {
                         Text(L.t("accountSignedIn", ["name": user])).foregroundStyle(Theme.ink)
                         Button(L.t("accountSignOut")) { Task { await store.signOut() } }
-                    }
-                    Section {
                         Button(L.t("accountDelete"), role: .destructive) { deleting = true }
                     }
+                    .listRowBackground(Theme.card)
                 } else {
                     Section {
-                        SignInDoors(entered: { dismiss() })
+                        SignInDoors()
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
                     } header: {
                         Text(L.t("signInWhy")).textCase(nil)
-                    } footer: {
-                        Text(L.t("appSameAccount"))
                     }
                 }
+
+                Section {
+                    HStack {
+                        ForEach(Hue.allCases) { hue in
+                            HueSwatch(hue: hue, chosen: style.hue == hue) { style.hue = hue }
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .padding(.vertical, 6)
+                    Picker(L.t("lookBackground"), selection: $style.look) {
+                        Text(L.t("lookPhone")).tag(Look.phone)
+                        Text(L.t("lookLight")).tag(Look.light)
+                        Text(L.t("lookDark")).tag(Look.dark)
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.vertical, 4)
+                } header: {
+                    Text(L.t("lookTitle"))
+                }
+                .listRowBackground(Theme.card)
+
                 Section {
                     Link(L.t("privacyLink"), destination: API.privacy)
-                } footer: {
-                    // Said plainly, once, where somebody looking for it would look.
-                    Text(L.t("readyWhy"))
                 }
+                .listRowBackground(Theme.card)
             }
             .scrollContentBackground(.hidden)
             .background(Theme.paper.ignoresSafeArea())
-            .navigationTitle(L.t("ridesAccount"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button(L.t("close")) { dismiss() } }
-            }
+            .navigationTitle(L.t("tabAccount"))
             .sheet(isPresented: $deleting) { DeleteAccountView() }
         }
+    }
+}
+
+/// One colour to choose: a dot in its daytime accent, ringed when chosen,
+/// with its name under it.
+private struct HueSwatch: View {
+    let hue: Hue
+    let chosen: Bool
+    let choose: () -> Void
+
+    var body: some View {
+        Button(action: choose) {
+            VStack(spacing: 6) {
+                Circle()
+                    .fill(Color(UIColor(hex: Palette.of(hue, dark: false).accent)))
+                    .frame(width: 32, height: 32)
+                    .overlay { if chosen { Image(systemName: "checkmark").font(.caption.bold()).foregroundStyle(.white) } }
+                    .padding(3)
+                    .overlay(Circle().stroke(chosen ? Theme.ink : .clear, lineWidth: 2))
+                Text(hue.name).font(.caption).foregroundStyle(chosen ? Theme.ink : Theme.muted)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(chosen ? .isSelected : [])
     }
 }
 

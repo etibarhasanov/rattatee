@@ -10,7 +10,6 @@ import SwiftUI
 /// an account to a new phone, is the next thing this tab would grow.
 struct RidesTab: View {
     @Environment(Store.self) private var store
-    @Binding var account: Bool
 
     var body: some View {
         NavigationStack {
@@ -28,11 +27,6 @@ struct RidesTab: View {
             }
             .background(Theme.paper.ignoresSafeArea())
             .navigationTitle(L.t("tabRides"))
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(L.t("ridesAccount")) { account = true }
-                }
-            }
         }
     }
 

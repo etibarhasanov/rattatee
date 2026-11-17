@@ -28,34 +28,43 @@ sign-in and networking are copied from Kohuke.
 
 **Nobody has to sign in.** What the rides are for is their points. People
 ride, press Save, and that is it: the ride is kept with no account on it.
-Signing in is there for whoever wants it, under **Account**, and buys one
+Signing in is there for whoever wants it, on the **Account** tab, and buys one
 thing — the ride is also listed on their account page on the website.
 
 ## What it does
 
-Two tabs.
+Three tabs.
 
 - **Record.** A map and a card at its foot, which is one of:
-  - *Ready to ride* — one big **Start**, and the line that says the phone
-    can go in a pocket and that GPS in the background uses battery.
-    **Where to?** over the map is optional: see **Search and go** below.
+  - *Ready* — one big **Start** and nothing to read. **Where to?** over
+    the map is optional: see **Search and go** below.
   - *Location is off* — what to choose in Settings, and a button to it.
-  - *Recording* — distance, time, average speed, the line drawn so far,
-    **Pause** and **Finish**. It carries on with the screen off and the app
+  - *Recording* — the one word, then distance, time, average speed, the line
+    drawn so far, **Pause** and **Finish**. It carries on with the screen off and the app
     in the background; iOS shows its blue location pill while it does.
   - *Paused* — nothing is recorded and the clock stops. **Resume**, Finish.
-  - *Save this ride?* — an optional name (60 characters), **Save ride**,
-    **Throw it away** (asked twice). It says the two things worth knowing
-    first: no name is ever shown with a ride, and the first and last 200 m
-    are left off.
+  - *Nice ride* — when it began and ended, and the ride's own numbers:
+    distance, riding time, average speed and top speed. Then an optional
+    name (60 characters), **Save ride** and **Throw it away** (asked twice),
+    and the two things worth knowing first: no name is ever shown with a
+    ride, and the first and last 200 m are left off. There are no totals
+    across rides, on purpose: the app is for recording a ride and sending
+    it. Top speed is the fastest half-minute, not the fastest pair of
+    points, so one GPS jump cannot claim 60 km/h.
   - *Too short to keep* — under 700 m, with **Keep riding**.
-  - *Saved*, or *Kept on this phone* when the server could not be reached,
+  - *Saved*, with the same numbers, or *Kept on this phone* when the server could not be reached,
     or *Not kept* when it refused the ride for good.
 - **My rides.** Every ride recorded on this phone, newest first, under the
   month it was ridden in: name, distance, time, date, and **Saved**,
   **Waiting** or **Not kept · why**. A banner says how many are waiting,
   with **Try now**. A ride the server has answered can be swiped off the
-  phone; a waiting one cannot. **Account** is at the top.
+  phone; a waiting one cannot.
+- **Account.** Continue with Apple or Google where the website offers them
+  — the same accounts as the site and Kohuke, made on the spot the first
+  time — or, signed in, sign out and delete the account. Under **Look**,
+  the colour, one of the website's four (Red, Green, Blue, Plum), and the
+  background: **Like the phone**, which is where a new install starts,
+  **Light** or **Dark**. Then Privacy.
 
 ### Search and go
 
@@ -79,8 +88,12 @@ Search needs a connection and says so when there is none. Recording never
 does.
 
 English, Estonian and Russian, following the phone's language or the one
-chosen for the app in Settings. Blue by day and green by night, the
-website's two styles of those names.
+chosen for the app in Settings.
+
+Every colour has a day and a night. Red and Blue by day, and Green and Plum
+by night, are the website's own styles to the value; the other four were
+drawn to sit beside them (`Palette` in `Views/Theme.swift`). The choice is
+kept on the phone, as the website keeps its style in the browser.
 
 ## The rules of a recording
 
@@ -185,7 +198,7 @@ Rattatee/
             SearchSheet.swift   Where to?
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
-            AccountView.swift   Account, and deleting one
+            AccountView.swift   the Account tab, the colours, deleting an account
             SignIn.swift        the two sign-in buttons
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et and ru

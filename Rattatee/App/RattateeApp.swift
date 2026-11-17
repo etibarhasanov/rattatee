@@ -45,22 +45,26 @@ struct RattateeApp: App {
     }
 }
 
-/// The two tabs. The app opens on Record: there is no first screen and no
+/// The three tabs. The app opens on Record: there is no first screen and no
 /// sign-in in the way of a ride.
 struct RootView: View {
     @State private var tab = LaunchScript.tab
-    @State private var account = LaunchScript.sheet == "account"
 
     var body: some View {
         TabView(selection: $tab) {
             RecordTab()
                 .tabItem { Label(L.t("tabRecord"), systemImage: "record.circle") }
                 .tag(0)
-            RidesTab(account: $account)
+            RidesTab()
                 .tabItem { Label(L.t("tabRides"), systemImage: "list.bullet") }
                 .tag(1)
+            AccountTab()
+                .tabItem { Label(L.t("tabAccount"), systemImage: "person.crop.circle") }
+                .tag(2)
         }
+        // The colour chosen under Account on every control, and the
+        // background: the phone's own, or Light or Dark whatever it says.
         .tint(Theme.accent)
-        .sheet(isPresented: $account) { AccountView() }
+        .preferredColorScheme(StyleStore.shared.look.scheme)
     }
 }
