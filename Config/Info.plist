@@ -18,7 +18,7 @@
 	     background only with this. Nothing plays for a ride with nowhere to
 	     go, or with the voice switched off.
 
-	     CFBundleLocalizations tells iOS the app speaks Estonian and Russian as
+	     CFBundleLocalizations tells iOS the app speaks Estonian, Russian and Azerbaijani as
 	     well as English, so the permission prompt is asked in the phone's
 	     language (the texts are in Rattatee/<lang>.lproj/InfoPlist.strings)
 	     and Settings offers a per-app language.
@@ -35,6 +35,7 @@
 		<string>en</string>
 		<string>et</string>
 		<string>ru</string>
+		<string>az</string>
 	</array>
 </dict>
 </plist>

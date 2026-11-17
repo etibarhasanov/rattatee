@@ -12,7 +12,7 @@ import Observation
 ///
 /// WHOSE VOICE
 ///
-/// The owner's, recorded: one short file a phrase, in each of the app's three
+/// The owner's, recorded: one short file a phrase, in each of the app's four
 /// languages, under `Rattatee/Voice/` as `<lang>-<clip>.m4a` — `et-left.m4a`,
 /// `ru-roundabout-2.m4a`. `docs/voice.md` is the list of them and what each
 /// says. That is why the phrases are few and carry no street name and no
@@ -21,7 +21,8 @@ import Observation
 ///
 /// Where a recording is missing — all of them, until they are made — the
 /// phone's own voice reads the row's words instead, in English and Russian.
-/// iOS has no Estonian voice, so in Estonian a missing recording is silence.
+/// iOS has no Estonian or Azerbaijani voice, so in those a missing recording
+/// is silence.
 /// That is a stand-in for trying the thing out, not the plan.
 ///
 /// IN A POCKET, OVER MUSIC

@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The app's words come in three languages. A key missing one of them is
+      # The app's words come in four languages. A key missing one of them is
       # a sentence that falls back to English in the middle of an Estonian
       # screen; a key the code asks for and the file lacks is a screen that
       # prints the key.
@@ -31,16 +31,16 @@ jobs:
           python3 - <<'PY'
           import glob, json, re, sys
           strings = json.load(open('Rattatee/Seed/strings.json'))
-          bad = [k for k, v in strings.items() if sorted(v) != ['en', 'et', 'ru'] or not all(v.values())]
+          bad = [k for k, v in strings.items() if sorted(v) != ['az', 'en', 'et', 'ru'] or not all(v.values())]
           if bad:
-              sys.exit('strings.json: not in all three languages: ' + ', '.join(bad))
+              sys.exit('strings.json: not in all four languages: ' + ', '.join(bad))
           source = ''.join(open(f).read() for f in glob.glob('Rattatee/**/*.swift', recursive=True))
           used = set(re.findall(r'L\.t\("(\w+)"', source))
           if used - set(strings):
               sys.exit('asked for in the code and not in strings.json: ' + ', '.join(sorted(used - set(strings))))
           if set(strings) - used:
               sys.exit('in strings.json and never asked for: ' + ', '.join(sorted(set(strings) - used)))
-          print(len(strings), 'strings, each in en, et and ru, each used')
+          print(len(strings), 'strings, each in az, en, et and ru, each used')
           PY
 
       - name: Show the selected Xcode
@@ -91,7 +91,7 @@ jobs:
           check "location permission" '"NSLocationWhenInUseUsageDescription"'
           check "background location" '0 => "location"'
           check "background audio"    '1 => "audio"'
-          for f in PrivacyInfo.xcprivacy strings.json et.lproj/InfoPlist.strings ru.lproj/InfoPlist.strings; do
+          for f in PrivacyInfo.xcprivacy strings.json et.lproj/InfoPlist.strings ru.lproj/InfoPlist.strings az.lproj/InfoPlist.strings; do
             if [ -e "$app/$f" ]; then echo "ok: $f is in the bundle"; else echo "::error::$f is missing from the bundle"; fail=1; fi
           done
           exit $fail
@@ -148,6 +148,7 @@ jobs:
           shot 11-recording-et -kDemo recording -AppleLanguages '(et)'
           shot 12-save-ru -kDemo save -AppleLanguages '(ru)'
           shot 13-rides-et -kDemo rides -kTab 1 -AppleLanguages '(et)'
+          shot 23-going-az -kDemo going -AppleLanguages '(az)'
           # The colours: each of the four, light and dark.
           shot 19-red-light -kDemo save -hue red
           shot 20-plum-light -kDemo going -hue plum
