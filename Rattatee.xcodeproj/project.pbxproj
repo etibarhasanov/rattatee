@@ -11,7 +11,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B2C3D4E500000000000000A2 /* Rattatee */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Rattatee; sourceTree = "<group>"; };
+		B2C3D4E500000000000000A2 /* Rattatee */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Rattatee;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
