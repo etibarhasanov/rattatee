@@ -88,6 +88,7 @@ jobs:
           check "display name"        '"CFBundleDisplayName" => "Rattatee"'
           check "bundle id"           '"CFBundleIdentifier" => "ee.tallinntastebuds.rattatee"'
           check "encryption answer"   '"ITSAppUsesNonExemptEncryption"'
+          check "launch screen colour" '"UIColorName" => "LaunchPaper"'
           check "location permission" '"NSLocationWhenInUseUsageDescription"'
           check "background location" '0 => "location"'
           check "background audio"    '1 => "audio"'

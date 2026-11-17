@@ -4,7 +4,7 @@
 <dict>
 	<!-- Most keys the app needs are build settings (INFOPLIST_KEY_* in the
 	     project), which Xcode merges into the Info.plist it generates. This
-	     file holds the two Xcode has no build setting for.
+	     file holds the three Xcode has no build setting for.
 
 	     UIBackgroundModes `location` is the whole reason the app exists: with
 	     it, and `allowsBackgroundLocationUpdates` set in Core/Recorder.swift,
@@ -24,7 +24,21 @@
 	     and Settings offers a per-app language.
 
 	     It lives outside Rattatee/ because that folder is a synchronised
-	     group: a plist inside it would also be copied into the bundle. -->
+	     group: a plist inside it would also be copied into the bundle.
+
+	     UILaunchScreen is what iOS draws while the app starts, before any of
+	     its code has run. Xcode's generated one is empty, which iOS draws in
+	     the system background: plain black on a phone set to dark. LaunchPaper
+	     (Assets.xcassets) is the paper of the colour a new install opens in,
+	     Blue, by day and by night as the phone is set, so the start is the
+	     app's own ground and the map arrives on it. Somebody who chose
+	     another colour or fixed Light or Dark sees Blue's for a moment: the
+	     launch screen is fixed at build time and cannot know. -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchPaper</string>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
