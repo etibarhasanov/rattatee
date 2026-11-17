@@ -210,11 +210,21 @@ final class Store {
 
     func findWay() async {
         guard !demo, let goal, goal.way == .looking, let here = recorder.here else { return }
-        let way = await Search.way(from: here, to: goal.spot.coordinate)
+        let ways = await Search.ways(from: here, to: goal.spot.coordinate)
         // Only if it is still the place that was asked about.
         // By id: a pin's address may have arrived meanwhile.
         guard self.goal?.spot.id == goal.spot.id else { return }
-        if let way { self.goal?.way = .found(way) } else { self.goal?.way = .missing }
+        guard let first = ways.first else { self.goal?.way = .missing; return }
+        self.goal?.ways = ways
+        self.goal?.chosen = 0
+        self.goal?.way = .found(first)
+    }
+
+    /// Go by another of the ways on offer: the card's row of them.
+    func choose(way index: Int) {
+        guard let goal, goal.ways.indices.contains(index) else { return }
+        self.goal?.chosen = index
+        self.goal?.way = .found(goal.ways[index])
     }
 
     /// Save: on disk as waiting first, then sent.

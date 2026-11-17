@@ -219,6 +219,11 @@
     "et": "{dist} · rattaga umbes {min} min",
     "ru": "{dist} · на велосипеде около {min} мин"
   },
+  "goalWayChip": {
+    "en": "{min} min · {dist}",
+    "et": "{min} min · {dist}",
+    "ru": "{min} мин · {dist}"
+  },
   "keptTitle": {
     "en": "Kept on this phone",
     "et": "Telefonis alles",

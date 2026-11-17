@@ -75,7 +75,13 @@ struct Way: Equatable {
 struct Goal: Equatable {
     enum Finding: Equatable { case looking, found(Way), missing }
     var spot: Spot
+    /// The way the rider is going by: the one chosen of `ways`.
     var way: Finding = .looking
+    /// Every way the website answered, its first first: up to three, and
+    /// mostly one. More than one is a choice on the card.
+    var ways: [Way] = []
+    /// Which of `ways` is chosen.
+    var chosen = 0
 }
 
 /// Search and go, on the website's own search.
@@ -160,15 +166,25 @@ enum Search {
         return object["why"] as? String == "no-key" ? .off : .resting
     }
 
-    /// The suggested way by bike, or nil where the site finds none.
-    static func way(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) async -> Way? {
+    /// The suggested ways by bike, the website's first first and then its
+    /// `others` — up to two more, and mostly none — or nothing where the
+    /// site finds no way at all.
+    static func ways(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) async -> [Way] {
         let query = [
             "from": "\(Geo.round5(from.latitude)),\(Geo.round5(from.longitude))",
             "to": "\(Geo.round5(to.latitude)),\(Geo.round5(to.longitude))",
             "mode": "bike"
         ]
         guard let object = try? await rows("api/route", query) as? [String: Any],
-              let metres = object["meters"] as? Double,
+              let first = way(object) else { return [] }
+        // An answer from before the website offered others has no such
+        // field, and is the one way.
+        return [first] + (object["others"] as? [[String: Any]] ?? []).compactMap { way($0) }
+    }
+
+    /// One way as the website sends it: `meters`, `seconds` and `line`.
+    private static func way(_ object: [String: Any]) -> Way? {
+        guard let metres = object["meters"] as? Double,
               let line = object["line"] as? [[Double]], line.count > 1 else { return nil }
         return Way(metres: metres, seconds: Int(object["seconds"] as? Double ?? 0),
                    line: line.compactMap { $0.count > 1 ? CLLocationCoordinate2D(latitude: $0[0], longitude: $0[1]) : nil })
