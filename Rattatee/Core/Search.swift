@@ -97,8 +97,9 @@ struct Way: Equatable {
     /// website answered before it sent any, which is then a line and silent.
     var steps: [Step] = []
 
-    /// Further than this from the line is not on it: the row goes away and
-    /// nothing is said until the rider is back.
+    /// Further than this from the line is not on it: the turns stop, and
+    /// `Store.follow` says the rider is off the way and, if they stay off,
+    /// finds a new one.
     static let astray: Double = 60
 
     /// Where a point is on the way: how far along the line the nearest spot
@@ -186,6 +187,39 @@ struct Goal: Equatable {
     var ways: [Way] = []
     /// Which of `ways` is chosen.
     var chosen = 0
+    /// Whether the rider has left the way, and how: nil while they are on
+    /// it. `Store.follow` keeps it.
+    var lost: Lost?
+    /// What `Store.follow` remembers between points about the way being
+    /// ridden: where along it the last point was, how far of it has been
+    /// ridden backwards in a row, and how many points in a row were off it.
+    /// Started again with every new way.
+    var along = 0.0
+    var back = 0.0
+    var astray = 0
+}
+
+/// The rider has left the way to `Goal`, in one of two ways, and the row on
+/// the riding screen says which in place of the next turn.
+///
+/// First it is only said: off by a street or turned round for a few dozen
+/// metres is often on purpose — a shop, a shortcut, a closed path. Ridden
+/// on until it is plainly not that, the app asks the website for a new way
+/// from where the rider is, by itself and with no button, since the phone
+/// is in a pocket. That is the owner's word: say it, then recalculate once
+/// the rider is really going wrong.
+struct Lost: Equatable {
+    enum Kind: Equatable { case off, back }
+    var kind: Kind
+    /// How far the ride was, in metres, when it was first said.
+    let since: Double
+    /// How far from the way the rider is, for "80 m from it".
+    var metres: Double
+    /// Asking the website for a new way right now.
+    var finding = false
+    /// The last time it was asked and answered nothing: tried again after
+    /// `Store.rerouteEvery`.
+    var failed: Date?
 }
 
 /// Search and go, on the website's own search.

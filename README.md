@@ -132,15 +132,30 @@ a pocket — "In 200 metres, turn right" about two hundred metres before, and
 "Turn right" at the corner — over music, which is turned down for the
 second it takes, and with the screen locked. The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
-recorded: eight phrases in each language, listed in `docs/voice.md`,
+recorded: ten phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
-Azerbaijani and English are recorded; Estonian and Russian are not yet.
+Azerbaijani and English are recorded, all but the two said off the way;
+Estonian and Russian are not yet.
 Until a phrase is recorded the phone's own voice reads it, in Russian;
 iOS has no Estonian or Azerbaijani voice. A roundabout is in the row and
-is not said: a bike is mostly on the path beside one. Further than sixty metres from the way the row
-goes and the voice is quiet until the rider is back on it: nothing looks
-for a new way. A ride with nowhere to go has no row and no voice
-(`Core/Guide.swift`).
+is not said: a bike is mostly on the path beside one. A ride with nowhere
+to go has no row and no voice (`Core/Guide.swift`).
+
+**Off the way, a new one.** It says first, and only then recalculates, at
+the owner's word. More than sixty metres from the way for two points in a
+row, the row says "You're off the way · 80 m from it" in place of the next
+turn, and the voice says it once; riding the way backwards for forty
+metres, it says "Going the wrong way". A few dozen metres off is often on
+purpose — a shop, a shortcut, a closed path — so nothing more happens yet,
+and back on the way the turns come back. Once the rider is plainly going
+wrong — 150 m from the way, 150 m ridden backwards along it, or 250 m
+ridden since it was said — the app asks the website for a new way from
+where they are, by itself and with no button, since the phone is in a
+pocket. The new way takes the old one's place and its first turn is said
+as any way's is. With no signal the row says "No new way yet" and it asks
+again thirty seconds later. The website's route knows nothing of which way
+the rider is facing, so a new way can still begin "Turn around" where that
+really is the shortest (`Store.follow`).
 
 **Add to a list.** Signed in, the card of somewhere to go has **Add to a
 list** beside Go: the rider's lists on the website, a press each, and a new

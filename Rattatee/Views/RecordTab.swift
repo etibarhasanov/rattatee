@@ -427,7 +427,10 @@ struct RideDash: View {
                     .padding(.top, 8)
             }
 
-            if let next {
+            if let lost = store.goal?.lost {
+                Divider().overlay(Theme.hairline).padding(.top, 10)
+                LostRow(lost: lost).padding(.top, 10)
+            } else if let next {
                 Divider().overlay(Theme.hairline).padding(.top, 10)
                 TurnRow(step: next.step, metres: next.metres).padding(.top, 10)
             }
@@ -463,11 +466,15 @@ struct RideDash: View {
 
     /// "To Paper Mill Coffee · 1.1 km left", where the rider said where they
     /// are going: along the suggested way where there is one, and as the
-    /// crow flies where there is not.
+    /// crow flies where there is not — or where the rider is off it, when
+    /// what is left of a way they are not on means nothing, and the line
+    /// says "away" instead of "left".
     private var toGo: String? {
         guard let goal = store.goal else { return nil }
         guard let last = ride.points.last else { return L.t("goalTo", ["name": goal.spot.name]) }
-        var left = Geo.metres(last, Point(lat: goal.spot.lat, lng: goal.spot.lng, t: 0, acc: 0))
+        let crow = Geo.metres(last, Point(lat: goal.spot.lat, lng: goal.spot.lng, t: 0, acc: 0))
+        if goal.lost?.kind == .off { return L.t("goalAway", ["name": goal.spot.name, "dist": L.distance(crow)]) }
+        var left = crow
         if case .found(let way) = goal.way { left = way.left(from: last.coordinate) }
         return L.t("goalLeft", ["name": goal.spot.name, "dist": L.distance(left)])
     }
@@ -516,6 +523,54 @@ struct TurnRow: View {
                     .background(Theme.wash, in: Circle())
             }
             .accessibilityLabel(voice ? L.t("voiceOn") : L.t("voiceOff"))
+        }
+    }
+}
+
+/// In the turn row's place while the rider is off the way or riding it
+/// backwards: what has happened, and then that a new way is being looked
+/// for — which happens by itself, so there is nothing to press but the
+/// speaker. The icon is on the quiet ground rather than the accent: it is
+/// news, not an instruction.
+struct LostRow: View {
+    @Environment(Store.self) private var store
+    let lost: Lost
+
+    var body: some View {
+        let voice = store.guide.voice
+        HStack(spacing: 12) {
+            Image(systemName: symbol)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(Theme.accent)
+                .frame(width: 44, height: 44)
+                .background(Theme.wash, in: RoundedRectangle(cornerRadius: 12))
+            VStack(alignment: .leading, spacing: 0) {
+                Text(words.0).font(.title3.weight(.bold)).foregroundStyle(Theme.ink).lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Text(words.1).font(.subheadline).foregroundStyle(Theme.muted).lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Button { store.guide.voice.toggle() } label: {
+                Image(systemName: voice ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                    .foregroundStyle(voice ? Theme.accent : Theme.muted)
+                    .frame(width: 44, height: 44)
+                    .background(Theme.wash, in: Circle())
+            }
+            .accessibilityLabel(voice ? L.t("voiceOn") : L.t("voiceOff"))
+        }
+    }
+
+    private var symbol: String {
+        if lost.finding { return "arrow.triangle.2.circlepath" }
+        return lost.kind == .off ? "exclamationmark" : "arrow.uturn.backward"
+    }
+
+    private var words: (String, String) {
+        if lost.finding { return (L.t("lostFinding"), L.t("lostFindingWhy")) }
+        if lost.failed != nil { return (L.t("lostNone"), L.t("lostNoneWhy")) }
+        switch lost.kind {
+        case .off: return (L.t("lostOff"), L.t("lostOffFrom", ["dist": L.distance(lost.metres)]))
+        case .back: return (L.t("lostBack"), L.t("lostBackWhy"))
         }
     }
 }

@@ -59,9 +59,10 @@ final class Guide {
 
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
-        case soon, left, right, straight, around, arrive
+        case soon, left, right, straight, around, arrive, off
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
+        case wrongWay = "wrong-way"
     }
 
     /// What has been said on this way, so each corner is said twice and no
@@ -97,6 +98,17 @@ final class Guide {
             if said.insert(corner + "-soon").inserted {
                 say([.soon, turn], L.t("turnSoon") + ", " + next.step.words)
             }
+        }
+    }
+
+    /// The rider has left the way: said once when the Store first sees it,
+    /// and not again until they have been back on a way. A new way is not
+    /// announced — its first turn is, as any way's is.
+    func warn(_ kind: Lost.Kind) {
+        guard voice else { return }
+        switch kind {
+        case .off: say([.off], L.t("lostOff"))
+        case .back: say([.wrongWay], L.t("lostBack"))
         }
     }
 
