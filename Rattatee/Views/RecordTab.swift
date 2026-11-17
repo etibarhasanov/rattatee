@@ -35,6 +35,7 @@ struct RecordTab: View {
             if let riding { RideDash(ride: riding) }
             RideMap(points: ride?.points ?? [],
                     goal: store.goal,
+                    here: store.recorder.here,
                     follow: !store.demo && !planning && (ride == nil || ride?.status == .recording),
                     // Somewhere to go is chosen before a ride, never during.
                     tap: ride == nil ? { name, point in store.tapped(name: name, at: point) } : nil)
@@ -49,6 +50,10 @@ struct RecordTab: View {
         // The way is asked for from where the phone is, which it may only
         // say a moment after the place was chosen.
         .onChange(of: store.recorder.here == nil) { Task { await store.findWay() } }
+        // And asked for before anything is chosen, where iOS already lets
+        // the app know: a tap then has somewhere to draw its way from, and
+        // does not wait on the phone's first fix as well as on the website.
+        .onAppear { if store.recorder.allowed { store.recorder.locate() } }
     }
 
     /// "Where to?", or the place chosen with a cross to let it go. Only
@@ -104,11 +109,31 @@ struct RecordTab: View {
 
 /// The map: where the phone is, and the line ridden so far. Before a ride a
 /// tap on it is somewhere to go: a place Apple's map names, or anywhere.
+///
+/// THE CAMERA MOVES ONCE FOR SOMEWHERE TO GO
+///
+/// A tap leaves the map where the rider had it: they zoomed in to choose
+/// that corner, and the pin lands under the finger. The camera moves when
+/// the way arrives, once, to the whole of it — from where the rider is to
+/// the pin. It used to re-frame on every change to the goal, and a tap
+/// changes it three times: the pin, the pin's street from the geocoder, and
+/// the way. The first of those threw away the rider's zoom for a frame of
+/// the pin alone, and the third moved it again, which read as the map
+/// loading something in between.
+///
+/// Until the way arrives a dotted straight line runs from the rider to the
+/// pin, so from where to where is on the map at once and the wait for the
+/// website has something to look at. A place chosen in the search may be
+/// off the screen; that one is framed straight away, rider and place, and
+/// the way then settles inside nearly the same frame.
 struct RideMap: View {
     let points: [Point]
     /// Where the rider is going and the suggested way there, in the accent
     /// under the line actually ridden.
     var goal: Goal?
+    /// Where the phone last said it was: the near end of the dotted line
+    /// and of the frame the way is shown in.
+    var here: CLLocationCoordinate2D?
     /// Keep the phone's position in the middle, or show the whole line.
     let follow: Bool
     /// A tap: the name of the place Apple's map drew there, if it drew one,
@@ -124,6 +149,9 @@ struct RideMap: View {
     @State private var picked: MapFeature?
     /// When it last did, so the tap under it does not drop a pin as well.
     @State private var pickedAt = Date.distantPast
+    /// What the map is showing, as of the last time it came to rest: how a
+    /// place just chosen is known to be on the screen already, or not.
+    @State private var seen: MKCoordinateRegion?
 
     var body: some View {
         GeometryReader { frame in
@@ -160,6 +188,11 @@ struct RideMap: View {
                 if case .found(let way) = goal.way {
                     MapPolyline(coordinates: way.line)
                         .stroke(Theme.accent.opacity(0.75), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                } else if goal.way == .looking, points.isEmpty, let here {
+                    // As the crow flies, until the website says how a bike
+                    // goes. Dotted, so it is not read as a way to ride.
+                    MapPolyline(coordinates: [here, goal.spot.coordinate])
+                        .stroke(Theme.accent.opacity(0.6), style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: [1, 9]))
                 }
                 Marker(goal.spot.name, coordinate: goal.spot.coordinate).tint(Theme.accent)
             }
@@ -173,9 +206,19 @@ struct RideMap: View {
             MapUserLocationButton()
             MapCompass()
         }
+        .onMapCameraChange(frequency: .onEnd) { seen = $0.region }
         .onAppear { aim() }
-        .onChange(of: follow) { aim() }
-        .onChange(of: goal) { aim() }
+        // Choosing somewhere to go stops the following and moves nothing;
+        // letting it go, or starting to ride, takes the camera back.
+        .onChange(of: follow) { if follow || goal == nil { aim() } }
+        // By the place and by the way, never by the goal whole: a pin's
+        // street arriving is a change to the goal and no reason to move.
+        .onChange(of: goal?.spot.id) {
+            if !follow, let goal, !inView(goal.spot.coordinate) { settle(goal) }
+        }
+        .onChange(of: goal?.way) {
+            if !follow, let goal, goal.way != .looking { settle(goal) }
+        }
     }
 
     /// The corner where the map draws its locate button and compass, which
@@ -187,10 +230,40 @@ struct RideMap: View {
     private func aim() {
         if follow {
             camera = .userLocation(fallback: .region(Self.tallinn))
-        } else if points.count > 1 || goal != nil {
+        } else if points.count > 1 {
             // Everything drawn: the line, the way, the destination.
             camera = .automatic
+        } else if let goal {
+            settle(goal)
         }
+    }
+
+    /// Whether a point is on the screen, as far as the map has said. Before
+    /// it has said anything, it is not.
+    private func inView(_ at: CLLocationCoordinate2D) -> Bool {
+        guard let seen else { return false }
+        return abs(at.latitude - seen.center.latitude) < seen.span.latitudeDelta / 2
+            && abs(at.longitude - seen.center.longitude) < seen.span.longitudeDelta / 2
+    }
+
+    /// Show the whole of somewhere to go: the rider, the place, and the way
+    /// between them where there is one. Framed by hand rather than left to
+    /// `.automatic`, which does not promise to count the rider's own dot.
+    private func settle(_ goal: Goal) {
+        var all = [goal.spot.coordinate]
+        if let here { all.append(here) }
+        if case .found(let way) = goal.way { all += way.line }
+        let spots = all.map { MKMapPoint($0) }
+        guard let west = spots.map(\.x).min(), let east = spots.map(\.x).max(),
+              let north = spots.map(\.y).min(), let south = spots.map(\.y).max() else { return }
+        // A quarter again on every side, which clears the search bar and
+        // the pin's own height; and never closer than a few streets, for a
+        // pin dropped beside the rider.
+        let least = 400 * MKMapPointsPerMeterAtLatitude(goal.spot.lat)
+        let width = max(east - west, least), height = max(south - north, least)
+        let rect = MKMapRect(x: (west + east) / 2 - width * 0.75, y: (north + south) / 2 - height * 0.75,
+                             width: width * 1.5, height: height * 1.5)
+        withAnimation { camera = .rect(rect) }
     }
 }
 
