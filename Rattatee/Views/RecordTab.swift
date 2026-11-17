@@ -9,7 +9,8 @@ import SwiftUI
 ///                    "Where to?" over the map opens the search
 ///   Going somewhere  the place, the suggested way in blue, and Go
 ///   Location is off  what to choose in Settings (or Precise Location is)
-///   Recording        distance, time, average; Pause and Finish
+///   Recording        the screen changes: distance, average and when it
+///                    began over the map, Pause and Finish under it
 ///   Paused           the same, greyed; Resume and Finish
 ///   Save this ride?  a name, Save ride, Throw it away   (FinishCards.swift)
 ///   Too short        Keep riding, Throw it away
@@ -25,7 +26,13 @@ struct RecordTab: View {
         // otherwise it keeps the phone in the middle while there is no ride
         // or one is being recorded.
         let planning = ride == nil && store.goal != nil
+        // Riding is a different screen from getting ready to: the numbers
+        // go to the top, where they can be read at a glance off a
+        // handlebar, the map takes the middle, and the card at the foot is
+        // only its two buttons.
+        let riding = store.current.flatMap { [.recording, .paused].contains($0.status) ? $0 : nil }
         VStack(spacing: 0) {
+            if let riding { RideDash(ride: riding) }
             RideMap(points: ride?.points ?? [],
                     goal: store.goal,
                     follow: !store.demo && !planning && (ride == nil || ride?.status == .recording))
@@ -208,41 +215,69 @@ struct GoalCard: View {
 
 // MARK: Recording and paused
 
-struct RecordingCard: View {
+/// The top of the screen while riding: three numbers and no more, at the
+/// owner's word — how far, how fast on average, and when it began. No
+/// running clock, no speed right now and no top speed: a phone's speed
+/// between two fixes jumps about, and an average over the whole ride is the
+/// one number of the three kinds that is true. Under them, where the rider
+/// said where they are going, how much of the way is left.
+struct RideDash: View {
     @Environment(Store.self) private var store
     let ride: Ride
 
     var body: some View {
         let recording = ride.status == .recording
-        SheetCard {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
                 Circle().fill(recording ? Theme.here : Theme.muted).frame(width: 10, height: 10)
                 Text(line(recording))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(recording ? Theme.ink : Theme.muted)
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, 6)
 
-            // The clock is the only thing that moves without a new point.
+            // The average is the only number that moves without a new
+            // point: the clock under it runs on.
             TimelineView(.periodic(from: .now, by: 1)) { moment in
-                RideStats(metres: ride.metres, seconds: ride.seconds(at: moment.date))
+                HStack(alignment: .firstTextBaseline) {
+                    stat(String(format: "%.1f", ride.metres / 1000), L.t("statKm"), big: true)
+                    stat(Self.average(ride.metres, ride.seconds(at: moment.date)), L.t("statAvg"), big: true)
+                    stat(L.time(ride.started), L.t("statStarted"), big: false)
+                }
             }
-            .padding(.bottom, toGo == nil ? 14 : 6)
 
             if let toGo {
                 Text(toGo).font(.subheadline).foregroundStyle(Theme.muted).lineLimit(1)
-                    .padding(.bottom, 12)
-            }
-
-            HStack(spacing: 10) {
-                if recording {
-                    Button(L.t("ridePause")) { store.pause() }.buttonStyle(.bigQuiet)
-                } else {
-                    Button(L.t("rideResume")) { store.resume() }.buttonStyle(.bigQuiet)
-                }
-                Button(L.t("rideFinish")) { store.finish() }.buttonStyle(.big)
+                    .padding(.top, 8)
             }
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.card.ignoresSafeArea(edges: .top))
+    }
+
+    private func stat(_ value: String, _ label: String, big: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(value)
+                .font(.system(size: big ? 46 : 30, weight: .bold))
+                .monospacedDigit()
+                .minimumScaleFactor(0.6)
+                .lineLimit(1)
+                .foregroundStyle(ride.status == .recording ? Theme.ink : Theme.muted)
+            Text(label.uppercased())
+                .font(.caption)
+                .foregroundStyle(Theme.muted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Nothing until there is something to divide: the first seconds of a
+    /// ride would otherwise read 43 km/h off one point.
+    static func average(_ metres: Double, _ seconds: Int) -> String {
+        guard seconds >= 10, metres >= 50 else { return "–" }
+        return String(format: "%.1f", metres / 1000 / (Double(seconds) / 3600))
     }
 
     /// "To Paper Mill Coffee · 1.1 km left", where the rider said where they
@@ -262,36 +297,21 @@ struct RecordingCard: View {
     }
 }
 
-/// Distance, time and average, the three numbers of a ride.
-struct RideStats: View {
-    let metres: Double
-    let seconds: Int
+/// The foot of the screen while riding: Pause or Resume, and Finish.
+struct RecordingCard: View {
+    @Environment(Store.self) private var store
+    let ride: Ride
 
     var body: some View {
-        HStack(alignment: .top) {
-            stat(String(format: "%.1f", metres / 1000), L.t("statKm"))
-            stat(L.clock(seconds), L.t("statTime"))
-            stat(average, L.t("statAvg"))
+        SheetCard {
+            HStack(spacing: 10) {
+                if ride.status == .recording {
+                    Button(L.t("ridePause")) { store.pause() }.buttonStyle(.bigQuiet)
+                } else {
+                    Button(L.t("rideResume")) { store.resume() }.buttonStyle(.bigQuiet)
+                }
+                Button(L.t("rideFinish")) { store.finish() }.buttonStyle(.big)
+            }
         }
-    }
-
-    /// Nothing until there is something to divide: the first seconds of a
-    /// ride would otherwise read 43 km/h off one point.
-    private var average: String {
-        guard seconds >= 10, metres >= 50 else { return "–" }
-        return String(format: "%.1f", metres / 1000 / (Double(seconds) / 3600))
-    }
-
-    private func stat(_ value: String, _ label: String) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text(value)
-                .font(.system(size: 30, weight: .bold))
-                .monospacedDigit()
-                .foregroundStyle(Theme.ink)
-            Text(label.uppercased())
-                .font(.caption)
-                .foregroundStyle(Theme.muted)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
