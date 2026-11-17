@@ -84,11 +84,14 @@ struct SearchSheet: View {
 
     @ViewBuilder
     private var empty: some View {
-        if failed {
+        if q.count < Search.shortest {
+            // Nothing typed yet: nothing to say.
+            EmptyView()
+        } else if failed {
             ContentUnavailableView(L.t("searchOfflineTitle"), systemImage: "wifi.slash",
                                    description: Text(L.t("searchOfflineWhy")))
         } else if searching || answered != q {
-            if q.count >= Search.shortest { ProgressView() }
+            ProgressView()
         } else if !showsGoogle {
             ContentUnavailableView(L.t("searchNoneTitle"), systemImage: "magnifyingglass",
                                    description: Text(L.t("searchNoneWhy")))
