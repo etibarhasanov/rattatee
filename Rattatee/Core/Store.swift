@@ -234,6 +234,102 @@ final class Store {
         guide.forget()
     }
 
+    // MARK: Off the way
+
+    /// Points in a row further than `Way.astray` from the line before it is
+    /// said: one is the phone's fix wandering, two is the rider.
+    static let astrayPoints = 2
+    /// Ridden backwards along the way this far, and it is said.
+    static let backSoon: Double = 40
+    /// Really going wrong, and a new way is asked for: this far from the
+    /// way, this far ridden backwards along it, or this far ridden at all
+    /// since it was said and the rider still not back.
+    static let farOff: Double = 150
+    static let farBack: Double = 150
+    static let lostFor: Double = 250
+    /// Not asked again sooner than this after it answered nothing, so a
+    /// tunnel or a dead signal is not a request every point.
+    static let rerouteEvery: TimeInterval = 30
+
+    /// One kept point of a ride with somewhere to go: on the way, the turns
+    /// are said as before; off it or going backwards along it, the row says
+    /// so, once, and a new way is asked for when the rider is plainly not
+    /// coming back to it.
+    private func follow(_ point: Point, after before: Point?, on way: Way, ridden: Double) {
+        guard var goal = self.goal, goal.lost?.finding != true else { return }
+        let spot = way.place(of: point.coordinate)
+        let off = spot.off > Way.astray
+
+        // Backwards is the way's own distance going down from point to
+        // point. Only where that change is about the distance between the
+        // two points: a way that passes near itself can make the nearest
+        // spot leap to another part of it, which is not the rider turning.
+        if !off {
+            let step = before.map { Geo.metres($0, point) } ?? 0
+            let change = spot.along - goal.along
+            if abs(change) <= step * 1.5 + 10 {
+                if change < 0 { goal.back -= change } else if change > 5 { goal.back = 0 }
+            }
+            goal.along = spot.along
+        }
+        goal.astray = off ? goal.astray + 1 : 0
+        // Once it has been said, one point off is enough to keep saying it.
+        let surelyOff = off && (goal.astray >= Self.astrayPoints || goal.lost != nil)
+        let back = !off && goal.back >= Self.backSoon
+
+        if !surelyOff && !back {
+            // On the way, or not yet surely off it.
+            goal.lost = nil
+            self.goal = goal
+            if !off { guide.hear(point.coordinate, on: way) }
+            return
+        }
+
+        let kind: Lost.Kind = off ? .off : .back
+        if goal.lost == nil || goal.lost?.kind != kind {
+            goal.lost = Lost(kind: kind, since: goal.lost?.since ?? ridden, metres: spot.off,
+                             failed: goal.lost?.failed)
+            guide.warn(kind)
+        }
+        goal.lost?.metres = spot.off
+
+        if let lost = goal.lost, !demo {
+            let wrong = off ? spot.off >= Self.farOff : goal.back >= Self.farBack
+            let long = ridden - lost.since >= Self.lostFor
+            let waited = lost.failed.map { Date().timeIntervalSince($0) >= Self.rerouteEvery } ?? true
+            if (wrong || long) && waited {
+                // Marked before the question goes, so the points that arrive
+                // while it is out do not ask it again.
+                goal.lost?.finding = true
+                let here = point.coordinate
+                Task { await reroute(from: here) }
+            }
+        }
+        self.goal = goal
+    }
+
+    /// A new way to the same place, from where the rider is now. It takes
+    /// the place of the old one, turns and all, and the voice starts over on
+    /// it; with no answer, the old one stays and it is asked again later.
+    private func reroute(from here: CLLocationCoordinate2D) async {
+        guard let goal else { return }
+        let ways = await Search.ways(from: here, to: goal.spot.coordinate)
+        guard self.goal?.spot.id == goal.spot.id else { return }
+        guard let first = ways.first else {
+            self.goal?.lost?.finding = false
+            self.goal?.lost?.failed = Date()
+            return
+        }
+        self.goal?.ways = ways
+        self.goal?.chosen = 0
+        self.goal?.way = .found(first)
+        self.goal?.lost = nil
+        self.goal?.along = 0
+        self.goal?.back = 0
+        self.goal?.astray = 0
+        guide.forget()
+    }
+
     /// Save: on disk as waiting first, then sent.
     func save(name: String) async {
         guard let i = currentIndex, rides[i].status == .finished else { return }
@@ -258,8 +354,11 @@ final class Store {
             if d < Self.step { return }
             if d / max(1, point.t - last.t) > Self.jump { return }
         }
+        let before = rides[i].points.last
         rides[i].points.append(point)
-        if case .found(let way) = goal?.way { guide.hear(point.coordinate, on: way) }
+        if case .found(let way) = goal?.way {
+            follow(point, after: before, on: way, ridden: rides[i].metres)
+        }
         unwritten += 1
         if unwritten >= Self.writeEvery { write(rides[i]) }
     }

@@ -209,6 +209,12 @@
     "et": "Google'ist otsimine puhkab täna. Proovi homme uuesti.",
     "ru": "Поиск в Google сегодня отдыхает. Попробуйте завтра."
   },
+  "goalAway": {
+    "az": "{name} · {dist} uzaqda",
+    "en": "To {name} · {dist} away",
+    "et": "Sihtkoht: {name} · {dist} kaugusel",
+    "ru": "Цель: {name} · {dist} отсюда"
+  },
   "goalFinding": {
     "az": "Yol axtarılır…",
     "en": "Finding a way…",
@@ -472,6 +478,54 @@
     "en": "Look",
     "et": "Välimus",
     "ru": "Оформление"
+  },
+  "lostBack": {
+    "az": "Yanlış istiqamətdə gedirsən",
+    "en": "Going the wrong way",
+    "et": "Sõidad vales suunas",
+    "ru": "Вы едете не в ту сторону"
+  },
+  "lostBackWhy": {
+    "az": "Geri dön, yoxsa yeni yol tapılacaq",
+    "en": "Turn around, or a new way will be found",
+    "et": "Pööra ümber või leitakse uus tee",
+    "ru": "Развернитесь, или будет найден новый путь"
+  },
+  "lostFinding": {
+    "az": "Yeni yol axtarılır…",
+    "en": "Finding a new way…",
+    "et": "Otsin uut teed…",
+    "ru": "Ищем новый путь…"
+  },
+  "lostFindingWhy": {
+    "az": "İndi olduğun yerdən",
+    "en": "From where you are now",
+    "et": "Sealt, kus sa praegu oled",
+    "ru": "Оттуда, где вы сейчас"
+  },
+  "lostNone": {
+    "az": "Hələ yeni yol yoxdur",
+    "en": "No new way yet",
+    "et": "Uut teed veel pole",
+    "ru": "Нового пути пока нет"
+  },
+  "lostNoneWhy": {
+    "az": "Bir azdan yenə yoxlanılacaq",
+    "en": "Trying again in a moment",
+    "et": "Proovin varsti uuesti",
+    "ru": "Скоро попробуем снова"
+  },
+  "lostOff": {
+    "az": "Yoldan çıxdın",
+    "en": "You're off the way",
+    "et": "Oled teelt kõrvale kaldunud",
+    "ru": "Вы сошли с пути"
+  },
+  "lostOffFrom": {
+    "az": "Yoldan {dist} uzaqdasan",
+    "en": "{dist} from it",
+    "et": "Teest {dist} eemal",
+    "ru": "В {dist} от него"
   },
   "openSettings": {
     "az": "Ayarları aç",
