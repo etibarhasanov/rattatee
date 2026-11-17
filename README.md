@@ -133,10 +133,11 @@ a pocket — "In 200 metres, turn right" about two hundred metres before, and
 "Turn right" at the corner — over music, which is turned down for the
 second it takes, and with the screen locked. The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
-recorded: twelve phrases in each language, listed in `docs/voice.md`,
+recorded: eight phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one. Until a
 phrase is recorded the phone's own voice reads it, in English and Russian;
-iOS has no Estonian or Azerbaijani voice. Further than sixty metres from the way the row
+iOS has no Estonian or Azerbaijani voice. A roundabout is in the row and
+is not said: a bike is mostly on the path beside one. Further than sixty metres from the way the row
 goes and the voice is quiet until the rider is back on it: nothing looks
 for a new way. A ride with nowhere to go has no row and no voice
 (`Core/Guide.swift`).
