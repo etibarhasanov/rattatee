@@ -20,7 +20,8 @@ enum LaunchScript {
     /// says it offers, so they can be photographed.
     static var doors: Bool { UserDefaults.standard.bool(forKey: "kDoors") }
 
-    /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides.
+    /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides,
+    /// and goal and going, which have somewhere to ride to.
     @MainActor
     static func stage(_ store: Store) {
         guard let demo = UserDefaults.standard.string(forKey: "kDemo") else { return }
@@ -39,7 +40,20 @@ enum LaunchScript {
             }
             return ride
         }
+        // Somewhere to go, and a suggested way that runs on past where the
+        // staged ride has got to.
+        let ahead = path(metres: 2400, from: now, seconds: 540)
+        var goal = Goal(spot: Spot(id: "paper-mill-coffee", name: "Paper Mill Coffee",
+                                   detail: "Masina 20 · Coffee roastery",
+                                   lat: ahead.last?.lat ?? 59.44, lng: ahead.last?.lng ?? 24.76, kind: .mine))
+        goal.way = .found(Way(metres: 2400, seconds: 540, line: ahead.map(\.coordinate)))
         switch demo {
+        case "goal":
+            store.pretend([])
+            store.goal = goal
+        case "going":
+            store.pretend([ride(.recording, metres: 1300, seconds: 312)])
+            store.goal = goal
         case "recording": store.pretend([ride(.recording)])
         case "paused": store.pretend([ride(.paused)])
         case "save": store.pretend([ride(.finished, metres: 8600, seconds: 2040)])

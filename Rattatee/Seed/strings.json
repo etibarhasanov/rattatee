@@ -79,6 +79,71 @@
     "et": "Valmis",
     "ru": "Готово"
   },
+  "findFromGoogle": {
+    "en": "From Google Maps",
+    "et": "Google Mapsist",
+    "ru": "С Google Карт"
+  },
+  "findGoogleAsk": {
+    "en": "Look for “{q}” on Google Maps",
+    "et": "Otsi „{q}“ Google Mapsist",
+    "ru": "Искать «{q}» на Google Картах"
+  },
+  "findGoogleAsking": {
+    "en": "Asking Google Maps…",
+    "et": "Küsin Google Mapsilt…",
+    "ru": "Спрашиваем Google Карты…"
+  },
+  "findGoogleNoMore": {
+    "en": "Google Maps has nothing more in Tallinn for “{q}”.",
+    "et": "Google Mapsil pole Tallinnas otsingule „{q}“ rohkem midagi.",
+    "ru": "В Google Картах больше ничего нет в Таллине по запросу «{q}»."
+  },
+  "findGoogleNone": {
+    "en": "Google Maps has nothing in Tallinn for “{q}” either.",
+    "et": "Ka Google Mapsil pole Tallinnas midagi „{q}“ kohta.",
+    "ru": "На Google Картах в Таллинне по запросу «{q}» тоже ничего нет."
+  },
+  "findGoogleResting": {
+    "en": "Looking on Google is resting for today. Try again tomorrow.",
+    "et": "Google'ist otsimine puhkab täna. Proovi homme uuesti.",
+    "ru": "Поиск в Google сегодня отдыхает. Попробуйте завтра."
+  },
+  "goalFinding": {
+    "en": "Finding a way…",
+    "et": "Otsin teed…",
+    "ru": "Ищем путь…"
+  },
+  "goalGo": {
+    "en": "Go",
+    "et": "Sõida",
+    "ru": "Поехали"
+  },
+  "goalLeft": {
+    "en": "To {name} · {dist} left",
+    "et": "Sihtkoht: {name} · jäänud {dist}",
+    "ru": "Цель: {name} · осталось {dist}"
+  },
+  "goalNoWay": {
+    "en": "No way was found from here. You can still ride there and record it.",
+    "et": "Siit ei leitud teed. Võid siiski sinna sõita ja sõidu salvestada.",
+    "ru": "Путь отсюда не найден. Всё равно можно доехать и записать поездку."
+  },
+  "goalNote": {
+    "en": "The blue line is a suggested way. Ride it or your own — what is recorded is the way you really go.",
+    "et": "Sinine joon on soovitatud tee. Sõida seda või oma teed — salvestatakse see, kust sa päriselt sõidad.",
+    "ru": "Синяя линия — предложенный путь. Езжайте по нему или по-своему: записывается то, как вы едете на самом деле."
+  },
+  "goalTo": {
+    "en": "To {name}",
+    "et": "Sihtkoht: {name}",
+    "ru": "Цель: {name}"
+  },
+  "goalWay": {
+    "en": "{dist} · about {min} min by bike",
+    "et": "{dist} · rattaga umbes {min} min",
+    "ru": "{dist} · на велосипеде около {min} мин"
+  },
   "keptTitle": {
     "en": "Kept on this phone",
     "et": "Telefonis alles",
@@ -278,6 +343,46 @@
     "en": "1 ride is waiting to upload. It will go by itself when there is a connection.",
     "et": "1 sõit ootab saatmist. See läheb ise teele, kui ühendus on olemas.",
     "ru": "1 поездка ждёт отправки. Она уйдёт сама, когда появится связь."
+  },
+  "searchKindMine": {
+    "en": "On the map",
+    "et": "Kaardil",
+    "ru": "На карте"
+  },
+  "searchKindPlace": {
+    "en": "Place",
+    "et": "Koht",
+    "ru": "Место"
+  },
+  "searchKindStreet": {
+    "en": "Street",
+    "et": "Tänav",
+    "ru": "Улица"
+  },
+  "searchNoneTitle": {
+    "en": "Nothing found",
+    "et": "Midagi ei leitud",
+    "ru": "Ничего не найдено"
+  },
+  "searchNoneWhy": {
+    "en": "Try a place, a street or a district in Tallinn. You can always just press Start and ride.",
+    "et": "Proovi mõnda kohta, tänavat või linnaosa Tallinnas. Võid ka lihtsalt vajutada „Alusta“ ja sõita.",
+    "ru": "Попробуйте место, улицу или район Таллина. А можно просто нажать «Старт» и ехать."
+  },
+  "searchOfflineTitle": {
+    "en": "No connection",
+    "et": "Ühendus puudub",
+    "ru": "Нет связи"
+  },
+  "searchOfflineWhy": {
+    "en": "Search needs the internet. Recording does not — close this and press Start.",
+    "et": "Otsing vajab internetti. Salvestamine ei vaja — sulge see ja vajuta „Alusta“.",
+    "ru": "Для поиска нужен интернет. Для записи — нет: закройте это и нажмите «Старт»."
+  },
+  "searchPrompt": {
+    "en": "Where to?",
+    "et": "Kuhu?",
+    "ru": "Куда?"
   },
   "signInProblem": {
     "en": "That did not work. Try again in a moment.",

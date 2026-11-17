@@ -48,6 +48,11 @@ final class Store {
 
     /// Every ride on this phone, newest first.
     private(set) var rides: [Ride] = []
+    /// Where the rider said they are going, if they did: chosen in the
+    /// search, drawn on the map, and gone when the ride is saved or thrown
+    /// away. Kept in memory only; a ride does not need one.
+    var goal: Goal?
+
     /// The ride whose save the Record tab is showing the outcome of.
     var shown: String?
     /// The ride being sent right now, if one is.
@@ -163,7 +168,25 @@ final class Store {
         recorder.stop()
         let id = rides[i].id
         rides.remove(at: i)
+        goal = nil
         if !demo { Disk.remove(id) }
+    }
+
+    /// Choose somewhere to ride to, and ask the site for the way there from
+    /// wherever the phone is. Asked again when the phone first says where it
+    /// is, if it had not yet.
+    func head(to spot: Spot) {
+        goal = Goal(spot: spot)
+        recorder.locate()
+        Task { await findWay() }
+    }
+
+    func findWay() async {
+        guard !demo, let goal, goal.way == .looking, let here = recorder.here else { return }
+        let way = await Search.way(from: here, to: goal.spot.coordinate)
+        // Only if it is still the place that was asked about.
+        guard self.goal?.spot == goal.spot else { return }
+        if let way { self.goal?.way = .found(way) } else { self.goal?.way = .missing }
     }
 
     /// Save: on disk as waiting first, then sent.
@@ -171,6 +194,7 @@ final class Store {
         guard let i = currentIndex, rides[i].status == .finished else { return }
         rides[i].name = String(name.trimmingCharacters(in: .whitespacesAndNewlines).prefix(Self.longestName))
         rides[i].status = .waiting
+        goal = nil
         shown = rides[i].id
         write(rides[i])
         await sendWaiting()

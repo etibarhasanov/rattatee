@@ -38,6 +38,7 @@ Two tabs.
 - **Record.** A map and a card at its foot, which is one of:
   - *Ready to ride* — one big **Start**, and the line that says the phone
     can go in a pocket and that GPS in the background uses battery.
+    **Where to?** over the map is optional: see **Search and go** below.
   - *Location is off* — what to choose in Settings, and a button to it.
   - *Recording* — distance, time, average speed, the line drawn so far,
     **Pause** and **Finish**. It carries on with the screen off and the app
@@ -55,6 +56,27 @@ Two tabs.
   **Waiting** or **Not kept · why**. A banner says how many are waiting,
   with **Try now**. A ride the server has answered can be swiped off the
   phone; a waiting one cannot. **Account** is at the top.
+
+### Search and go
+
+A ride needs no destination, but it can have one. **Where to?** opens the
+website's own search: its places first, then streets and districts, each
+with how far it is. From five letters a last row offers **Look for "…" on
+Google Maps**, exactly as the website's find bar does; what Google answers
+with goes to the top of the list, and the website keeps it, so the next
+search — here, in the map app or on the site — finds it without asking
+Google.
+
+Choosing a place puts it on the map with a suggested way by bike, in blue,
+how far it is and about how long, and **Go**, which is Start. While riding,
+the blue line stays under the line actually ridden and the card says how
+much of the way is left. The way is a suggestion and is not re-drawn when
+the rider leaves it; there are no spoken or turn-by-turn directions; and
+arriving finishes nothing — Finish is still a button. What is saved is the
+way really ridden, never the suggestion and never the destination.
+
+Search needs a connection and says so when there is none. Recording never
+does.
 
 English, Estonian and Russian, following the phone's language or the one
 chosen for the app in Settings. Blue by day and green by night, the
@@ -108,6 +130,10 @@ repository's `CLAUDE.md` under **What the app reads**.
 | | |
 |---|---|
 | `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
+| `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
+| `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
+| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |
 | `POST /api/account` | `ticket`, `logout`, `delete` |
 | `GET /api/google?app=<challenge>` | the Google round trip, ending at `tallinntastebuds://signin` |
@@ -150,11 +176,13 @@ Rattatee/
             Recorder.swift      Core Location, in the background too
             Ride.swift          a ride, a point, and the sums
             Store.swift         every ride on the phone, and sending them
+            Search.swift        places, streets, Google, and the way there
             Account.swift       signing in and out
             SocialSignIn.swift  Google and Apple, Kohuke's file unchanged
             Disk.swift          the ride files
             Strings.swift       the words, and how a distance is said
   Views/    RecordTab.swift     the map, Ready, Recording, Paused
+            SearchSheet.swift   Where to?
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
             AccountView.swift   Account, and deleting one
@@ -213,7 +241,10 @@ launched in each state and photographed. The pictures are the run's
     tracking. Linked to the user only when they are signed in.
   - *User ID* — collected only when signed in, for App Functionality,
     linked, not used for tracking.
-  - Nothing else: no analytics, no advertising, no third-party code.
+  - Nothing else: no analytics, no advertising, no third-party code. What
+    is typed into the search, and where the phone is when a way is asked
+    for, go to the website to be answered and are not kept with anything
+    that says who asked.
 - **Privacy policy URL**: `https://tallinntastebuds.ee/privacy`, which says
   what is kept of a ride.
 - **Account deletion** is in the app, under Account, as review requires of

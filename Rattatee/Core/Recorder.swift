@@ -39,6 +39,9 @@ final class Recorder: NSObject {
     /// which is no use for drawing a ride.
     private(set) var precise = true
     private(set) var running = false
+    /// Where the phone last said it was, however sure: what search measures
+    /// its distances from and a suggested way starts at. Not a ride's point.
+    private(set) var here: CLLocationCoordinate2D?
 
     /// Every fix good enough to consider, in order.
     @ObservationIgnored var onPoint: (@MainActor (Point) -> Void)?
@@ -73,6 +76,16 @@ final class Recorder: NSObject {
     func ask(then: @escaping () -> Void) {
         afterAsking = then
         manager.requestWhenInUseAuthorization()
+    }
+
+    /// One fix, for the search: where the rider is before a ride has begun.
+    /// Asks the question first if iOS never has.
+    func locate() {
+        if allowed {
+            manager.requestLocation()
+        } else if !refused {
+            ask { [weak self] in self?.manager.requestLocation() }
+        }
     }
 
     func start() {
@@ -110,6 +123,7 @@ extension Recorder: CLLocationManagerDelegate {
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         MainActor.assumeIsolated {
+            if let last = locations.last, last.horizontalAccuracy >= 0 { here = last.coordinate }
             for fix in locations {
                 // A negative accuracy is no fix at all.
                 guard fix.horizontalAccuracy >= 0, fix.horizontalAccuracy <= Self.sure else { continue }
