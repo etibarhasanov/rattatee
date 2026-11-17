@@ -23,9 +23,9 @@ import Observation
 /// The lists are kept on the phone as they were last read, so the picker
 /// works with no signal. An add that cannot reach the website waits on the
 /// phone the way a ride does, and goes when the rides go — the app coming to
-/// the front, or the network coming back (`Store.sendWaiting`). An add the
-/// website refuses (signed out, a full list) is dropped: sending it again
-/// would be refused again. One gap, the rides' own: an own place whose
+/// the front, or the network coming back (`Store.sendWaiting`), and so does
+/// one the website answered with a 5xx. An add it refuses with a 4xx (signed
+/// out, a full list) is dropped: sending it again would be refused again. One gap, the rides' own: an own place whose
 /// answer was lost is made a second time on the next try.
 @MainActor
 @Observable
@@ -100,9 +100,10 @@ final class ListBook {
         do {
             try await send(add)
             return .added
-        } catch let refusal as API.Refusal {
+        } catch let refusal as API.Refusal where refusal.status < 500 {
             return .refused(refusal.code)
         } catch {
+            // No signal, or the website having a bad moment (a 5xx): later.
             waiting.append(add)
             Self.write(waiting, Self.waitingFile)
             return .waiting
@@ -117,10 +118,10 @@ final class ListBook {
         while let next = waiting.first {
             do {
                 try await send(next)
-            } catch is API.Refusal {
+            } catch let refusal as API.Refusal where refusal.status < 500 {
                 // Refused for good: dropped, below.
             } catch {
-                return // Still no signal: try again next time.
+                return // No signal, or a 5xx: try again next time.
             }
             waiting.removeFirst()
             Self.write(waiting, Self.waitingFile)
