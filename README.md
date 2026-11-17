@@ -122,9 +122,24 @@ Choosing a place puts it on the map with a suggested way by bike, in blue,
 how far it is and about how long, and **Go**, which is Start. While riding,
 the blue line stays under the line actually ridden and the card says how
 much of the way is left. The way is a suggestion and is not re-drawn when
-the rider leaves it; there are no spoken or turn-by-turn directions; and
-arriving finishes nothing — Finish is still a button. What is saved is the
-way really ridden, never the suggestion and never the destination.
+the rider leaves it; and arriving finishes nothing — Finish is still a
+button. What is saved is the way really ridden, never the suggestion and
+never the destination.
+
+**The turns, shown and said.** The website says where the way turns, and
+under the numbers a row shows the next corner: an arrow, how far, what to
+do and the street it is onto. A voice says the same, since the phone is in
+a pocket — "In 200 metres, turn right" about two hundred metres before, and
+"Turn right" at the corner — over music, which is turned down for the
+second it takes, and with the screen locked. The speaker in the row
+switches it off and on, and the phone remembers. The voice is the owner's,
+recorded: twelve phrases in each language, listed in `docs/voice.md`,
+which is why it says no street names and no distance but the one. Until a
+phrase is recorded the phone's own voice reads it, in English and Russian;
+iOS has no Estonian voice. Further than sixty metres from the way the row
+goes and the voice is quiet until the rider is back on it: nothing looks
+for a new way. A ride with nowhere to go has no row and no voice
+(`Core/Guide.swift`).
 
 **Add to a list.** Signed in, the card of somewhere to go has **Add to a
 list** beside Go: the rider's lists on the website, a press each, and a new
@@ -200,7 +215,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
-| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields |
+| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields; and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout` and `arrive`; one the app does not know is left out |
 | `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
 | `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |
@@ -245,7 +260,8 @@ Rattatee/
             Recorder.swift      Core Location, in the background too
             Ride.swift          a ride, a point, and the sums
             Store.swift         every ride on the phone, and sending them
-            Search.swift        places, streets, Google, and the way there
+            Search.swift        places, streets, Google, and the way there and its turns
+            Guide.swift         the voice that says the turns
             Venues.swift        the places kept on the phone, a name and a pin each
             Recents.swift       where the rider has gone before, newest first
             Lists.swift         the rider's lists, and adds waiting for signal
@@ -262,11 +278,13 @@ Rattatee/
             SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et and ru
+  Voice/    <lang>-<clip>.m4a   the turns, recorded; empty until they are
   *.lproj/  InfoPlist.strings   the location question, in each language
   PrivacyInfo.xcprivacy         the privacy manifest
-Config/     Info.plist          the background mode and the languages
+Config/     Info.plist          the two background modes and the languages
             Rattatee.entitlements  Sign in with Apple, Release only
 docs/       icon.html           the icon, drawn
+            voice.md            the phrases to record, and where they go
 ```
 
 The project uses a synchronised folder, as Kohuke's does: a file added
@@ -309,6 +327,10 @@ launched in each state and photographed. The pictures are the run's
   screen locked, until they press Finish; nothing is recorded otherwise.* A
   screen recording of a ride being started and the phone locked is what
   reviewers ask for when they ask.
+- **Background audio** is the second background mode, and review asks what
+  plays. In one line: *short spoken directions — "turn right" — on the way
+  to a place the user chose, while a ride is being recorded; nothing plays
+  otherwise.*
 - **App Privacy**, matching `PrivacyInfo.xcprivacy`:
   - *Precise Location* — collected, for App Functionality, not used for
     tracking. Linked to the user only when they are signed in.

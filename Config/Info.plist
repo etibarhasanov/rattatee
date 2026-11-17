@@ -12,6 +12,12 @@
 	     under the ordinary "While Using the App" permission. iOS shows the
 	     blue location pill while it does, which is the honest thing.
 
+	     UIBackgroundModes `audio` is for the voice that says the turns of the
+	     way somewhere (Core/Guide.swift): a recording a second long, played
+	     with the screen locked, which iOS lets an app start from the
+	     background only with this. Nothing plays for a ride with nowhere to
+	     go, or with the voice switched off.
+
 	     CFBundleLocalizations tells iOS the app speaks Estonian and Russian as
 	     well as English, so the permission prompt is asked in the phone's
 	     language (the texts are in Rattatee/<lang>.lproj/InfoPlist.strings)
@@ -22,6 +28,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
+		<string>audio</string>
 	</array>
 	<key>CFBundleLocalizations</key>
 	<array>

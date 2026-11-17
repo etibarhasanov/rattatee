@@ -426,6 +426,11 @@ struct RideDash: View {
                 Text(toGo).font(.subheadline).foregroundStyle(Theme.muted).lineLimit(1)
                     .padding(.top, 8)
             }
+
+            if let next {
+                Divider().overlay(Theme.hairline).padding(.top, 10)
+                TurnRow(step: next.step, metres: next.metres).padding(.top, 10)
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
@@ -467,9 +472,51 @@ struct RideDash: View {
         return L.t("goalLeft", ["name": goal.spot.name, "dist": L.distance(left)])
     }
 
+    /// The corner coming up on the way there, where the website said where
+    /// the way turns and the rider is still on it.
+    private var next: (step: Step, metres: Double)? {
+        guard case .found(let way) = store.goal?.way, let last = ride.points.last else { return nil }
+        return way.next(from: last.coordinate)
+    }
+
     private func line(_ recording: Bool) -> String {
         if !recording { return L.t("ridePausedLine") }
         return ride.points.isEmpty ? L.t("rideWaiting") : L.t("rideRecording")
+    }
+}
+
+/// The next turn, under the numbers: an arrow, how far, what to do and the
+/// street it is onto, and the switch for the voice that says the same. The
+/// street is beside the words rather than in them — "onto Narva maantee" is
+/// a case ending in Estonian that nothing here can decline.
+struct TurnRow: View {
+    @Environment(Store.self) private var store
+    let step: Step
+    let metres: Double
+
+    var body: some View {
+        let voice = store.guide.voice
+        HStack(spacing: 12) {
+            Image(systemName: step.turn.symbol)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(Theme.onAccent)
+                .frame(width: 44, height: 44)
+                .background(Theme.accent, in: RoundedRectangle(cornerRadius: 12))
+            VStack(alignment: .leading, spacing: 0) {
+                Text(L.distance(metres)).font(.title3.weight(.bold)).monospacedDigit()
+                    .foregroundStyle(Theme.ink)
+                Text(step.name.isEmpty ? step.words : step.words + " · " + step.name)
+                    .font(.subheadline).foregroundStyle(Theme.muted).lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Button { store.guide.voice.toggle() } label: {
+                Image(systemName: voice ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                    .foregroundStyle(voice ? Theme.accent : Theme.muted)
+                    .frame(width: 44, height: 44)
+                    .background(Theme.wash, in: Circle())
+            }
+            .accessibilityLabel(voice ? L.t("voiceOn") : L.t("voiceOff"))
+        }
     }
 }
 

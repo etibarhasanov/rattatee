@@ -90,6 +90,7 @@ jobs:
           check "encryption answer"   '"ITSAppUsesNonExemptEncryption"'
           check "location permission" '"NSLocationWhenInUseUsageDescription"'
           check "background location" '0 => "location"'
+          check "background audio"    '1 => "audio"'
           for f in PrivacyInfo.xcprivacy strings.json et.lproj/InfoPlist.strings ru.lproj/InfoPlist.strings; do
             if [ -e "$app/$f" ]; then echo "ok: $f is in the bundle"; else echo "::error::$f is missing from the bundle"; fail=1; fi
           done

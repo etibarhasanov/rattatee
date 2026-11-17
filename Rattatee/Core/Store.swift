@@ -60,6 +60,8 @@ final class Store {
     private(set) var sendingId: String?
 
     let recorder = Recorder()
+    /// The voice that says the turns of the way to `goal`.
+    let guide = Guide()
 
     /// Screenshots for CI: nothing is written to disk or sent.
     @ObservationIgnored var demo = false
@@ -170,6 +172,7 @@ final class Store {
         let id = rides[i].id
         rides.remove(at: i)
         goal = nil
+        guide.forget()
         if !demo { Disk.remove(id) }
     }
 
@@ -180,6 +183,7 @@ final class Store {
         goal = Goal(spot: spot)
         // Where to? opens on where the rider has been (`Recents`).
         if !demo { Recents.shared.add(spot) }
+        guide.forget()
         recorder.locate()
         Task { await findWay() }
     }
@@ -227,6 +231,7 @@ final class Store {
         guard let goal, goal.ways.indices.contains(index) else { return }
         self.goal?.chosen = index
         self.goal?.way = .found(goal.ways[index])
+        guide.forget()
     }
 
     /// Save: on disk as waiting first, then sent.
@@ -235,6 +240,7 @@ final class Store {
         rides[i].name = String(name.trimmingCharacters(in: .whitespacesAndNewlines).prefix(Self.longestName))
         rides[i].status = .waiting
         goal = nil
+        guide.forget()
         shown = rides[i].id
         write(rides[i])
         await sendWaiting()
@@ -253,6 +259,7 @@ final class Store {
             if d / max(1, point.t - last.t) > Self.jump { return }
         }
         rides[i].points.append(point)
+        if case .found(let way) = goal?.way { guide.hear(point.coordinate, on: way) }
         unwritten += 1
         if unwritten >= Self.writeEvery { write(rides[i]) }
     }
