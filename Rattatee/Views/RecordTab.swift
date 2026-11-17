@@ -270,13 +270,15 @@ struct RideMap: View {
         let spots = all.map { MKMapPoint($0) }
         guard let west = spots.map(\.x).min(), let east = spots.map(\.x).max(),
               let north = spots.map(\.y).min(), let south = spots.map(\.y).max() else { return }
-        // A quarter again on every side, which clears the search bar and
-        // the pin's own height; and never closer than a few streets, for a
-        // pin dropped beside the rider.
+        // A quarter again on three sides, and half again on top, which
+        // clears the search bar and the pin's own height — with a quarter
+        // there the pin stood under the bar on CI's staged screen. Never
+        // closer than a few streets, for a pin dropped beside the rider.
         let least = 400 * MKMapPointsPerMeterAtLatitude(goal.spot.lat)
         let width = max(east - west, least), height = max(south - north, least)
-        let rect = MKMapRect(x: (west + east) / 2 - width * 0.75, y: (north + south) / 2 - height * 0.75,
-                             width: width * 1.5, height: height * 1.5)
+        let middle = (west + east) / 2, top = (north + south) / 2 - height / 2
+        let rect = MKMapRect(x: middle - width * 0.75, y: top - height * 0.5,
+                             width: width * 1.5, height: height * 1.75)
         withAnimation { camera = .rect(rect) }
     }
 }
