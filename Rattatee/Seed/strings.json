@@ -609,6 +609,16 @@
     "et": "Kuhu?",
     "ru": "Куда?"
   },
+  "searchRecent": {
+    "en": "Recent",
+    "et": "Hiljutised",
+    "ru": "Недавние"
+  },
+  "searchRecentRemove": {
+    "en": "Remove",
+    "et": "Eemalda",
+    "ru": "Убрать"
+  },
   "signInProblem": {
     "en": "That did not work. Try again in a moment.",
     "et": "See ei õnnestunud. Proovi hetke pärast uuesti.",
