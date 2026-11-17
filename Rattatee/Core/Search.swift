@@ -4,8 +4,10 @@ import Foundation
 /// Somewhere to ride to: a place off the website's search, a street off its
 /// geocoder, something Google Maps was asked for, or a point tapped on the
 /// map — a place Apple's map names, or anywhere at all.
-struct Spot: Identifiable, Equatable {
-    enum Kind {
+struct Spot: Identifiable, Equatable, Codable {
+    /// Written to the phone by name (`Recents`): a case renamed is a place
+    /// somebody chose that no longer reads back.
+    enum Kind: String, Codable {
         /// On the Tallinn Tastebuds map: `map: true` in a row of /api/places.
         case mine
         /// One of the city's other venues, out of the same search.
@@ -97,8 +99,10 @@ struct Goal: Equatable {
 /// All of it needs a connection and none of it is needed to record: a search
 /// that fails says so and Start still works.
 enum Search {
-    /// The fewest letters worth a search, and the fewest before Google is
-    /// offered — the website's five.
+    /// The fewest letters worth asking the website — one letter is answered
+    /// by the phone alone, from where the rider has been and its copy of
+    /// the places — and the fewest before Google is offered, the website's
+    /// five.
     static let shortest = 2
     static let googleFrom = 5
 
@@ -141,10 +145,18 @@ enum Search {
         }
     }
 
-    /// Whether Look for it on Google Maps can be offered at all.
+    /// Whether Look for it on Google Maps can be offered at all. Asked once
+    /// a launch, and only when somebody has typed enough letters for the
+    /// button: most searches end at the second or third.
+    @MainActor private static var ready: Bool?
+
+    @MainActor
     static func googleReady() async -> Bool {
+        if let ready { return ready }
         guard let object = try? await rows("api/lookup", [:]) as? [String: Any] else { return false }
-        return object["ready"] as? Bool ?? false
+        let answer = object["ready"] as? Bool ?? false
+        ready = answer
+        return answer
     }
 
     enum Looked {

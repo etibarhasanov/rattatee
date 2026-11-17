@@ -3,8 +3,9 @@ import Foundation
 import Observation
 
 /// Every place the website's search knows, kept on the phone as a name and a
-/// pin, so Where to? has something to show the moment it opens and while the
-/// typing is still on its way to the site.
+/// pin, so Where to? has a few places nearby to show the moment it opens,
+/// an answer to the first letter with nothing asked of the website, and
+/// rows to show while longer typing is still on its way to the site.
 ///
 /// WHERE IT COMES FROM
 ///
@@ -85,10 +86,12 @@ final class Venues {
         keep(list)
     }
 
-    /// The places nearest a point, nearest first. Without a point, the
-    /// places on the map, A to Z: something worth choosing from rather than
-    /// the first twenty of eleven hundred.
-    func nearest(_ here: CLLocationCoordinate2D?, count: Int = 20) -> [Spot] {
+    /// The few places nearest a point, nearest first. Without a point, a
+    /// few of the places on the map, A to Z: something worth choosing from
+    /// rather than the first of eleven hundred. A handful, on purpose —
+    /// Where to? opens on where the rider has been and a look round the
+    /// corner, not on a list of the city.
+    func nearest(_ here: CLLocationCoordinate2D?, count: Int = 5) -> [Spot] {
         guard let here else {
             return all.filter(\.map)
                 .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
@@ -103,7 +106,7 @@ final class Venues {
     /// first, then a word in it starting with them, then anywhere — and
     /// within each, nearest first where the phone knows where it is. Folded
     /// as the website folds its roll, so "pohjala" finds Põhjala.
-    func matching(_ q: String, near here: CLLocationCoordinate2D?, count: Int = 12) -> [Spot] {
+    func matching(_ q: String, near here: CLLocationCoordinate2D?, count: Int = 8) -> [Spot] {
         let needle = Self.fold(q)
         guard !needle.isEmpty else { return [] }
         var hits: [(venue: Venue, rank: Int, metres: Double)] = []

@@ -178,6 +178,8 @@ final class Store {
     /// is, if it had not yet.
     func head(to spot: Spot) {
         goal = Goal(spot: spot)
+        // Where to? opens on where the rider has been (`Recents`).
+        if !demo { Recents.shared.add(spot) }
         recorder.locate()
         Task { await findWay() }
     }
