@@ -529,10 +529,10 @@
     "et": "sõiduaeg",
     "ru": "время в пути"
   },
-  "statTime": {
-    "en": "time",
-    "et": "aeg",
-    "ru": "время"
+  "statStarted": {
+    "en": "started",
+    "et": "algus",
+    "ru": "старт"
   },
   "statTop": {
     "en": "top speed",

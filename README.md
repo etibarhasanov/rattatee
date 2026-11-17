@@ -39,10 +39,17 @@ Three tabs.
   - *Ready* — one big **Start** and nothing to read. **Where to?** over
     the map is optional: see **Search and go** below.
   - *Location is off* — what to choose in Settings, and a button to it.
-  - *Recording* — the one word, then distance, time, average speed, the line
-    drawn so far, **Pause** and **Finish**. It carries on with the screen off and the app
-    in the background; iOS shows its blue location pill while it does.
-  - *Paused* — nothing is recorded and the clock stops. **Resume**, Finish.
+  - *Recording* — the screen changes. Across the top, large enough to
+    read off a handlebar, three numbers and no more: distance, average
+    speed, and when the ride began — no running clock, no speed right now
+    and no top speed, since an average over the whole ride is the one a
+    phone gets right. Under them, how much of the way is left where there
+    is somewhere to go. The map with the line drawn so far takes the
+    middle, and **Pause** and **Finish** the foot. It carries on with the
+    screen off and the app in the background; iOS shows its blue location
+    pill while it does.
+  - *Paused* — the same, greyed; nothing is recorded and the clock the
+    average is taken over stops. **Resume**, Finish.
   - *Nice ride* — when it began and ended, and the ride's own numbers:
     distance, riding time, average speed and top speed. Then an optional
     name (60 characters), **Save ride** and **Throw it away** (asked twice),
