@@ -49,8 +49,7 @@ final class Venues {
     @ObservationIgnored private var asking = false
 
     private static var file: URL {
-        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("venues.json")
+        Disk.support.appendingPathComponent("venues.json")
     }
 
     private init() {
@@ -119,6 +118,23 @@ final class Venues {
         }
         return hits.sorted { $0.rank != $1.rank ? $0.rank < $1.rank : $0.metres < $1.metres }
             .prefix(count).map { Self.spot($0.venue) }
+    }
+
+    /// The place on the roll that a place tapped on Apple's map is, if it
+    /// is one: within a street's width, with the one name holding the other
+    /// ("Põhjala" and "Põhjala Tap Room"). So a tap on a café the website
+    /// knows is that café, under the website's id, with no network at all.
+    func same(as name: String, at point: CLLocationCoordinate2D) -> Spot? {
+        let key = Self.fold(name)
+        guard !key.isEmpty else { return nil }
+        var best: (Venue, Double)?
+        for (i, venue) in all.enumerated() {
+            let other = keys[i]
+            guard other.contains(key) || key.contains(other) else { continue }
+            let d = Self.metres(point, venue)
+            if d <= 80, d < (best?.1 ?? .infinity) { best = (venue, d) }
+        }
+        return best.map { Self.spot($0.0) }
     }
 
     private static func spot(_ venue: Venue) -> Spot {

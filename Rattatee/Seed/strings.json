@@ -189,6 +189,16 @@
     "et": "Sihtkoht: {name} · jäänud {dist}",
     "ru": "Цель: {name} · осталось {dist}"
   },
+  "goalList": {
+    "en": "Add to a list",
+    "et": "Lisa nimekirja",
+    "ru": "В список"
+  },
+  "goalListSignIn": {
+    "en": "Make an account under Account to put places on your own lists.",
+    "et": "Loo konto vaates Konto, et lisada kohti oma nimekirjadesse.",
+    "ru": "Создайте аккаунт во вкладке «Аккаунт», чтобы добавлять места в свои списки."
+  },
   "goalNoWay": {
     "en": "No way was found from here. You can still ride there and record it.",
     "et": "Siit ei leitud teed. Võid siiski sinna sõita ja sõidu salvestada.",
@@ -228,6 +238,91 @@
     "en": "Phone’s language",
     "et": "Telefoni keel",
     "ru": "Язык телефона"
+  },
+  "listAddTo": {
+    "en": "Add {name} to",
+    "et": "Lisa {name}",
+    "ru": "Добавить {name} в"
+  },
+  "listCount": {
+    "en": "{n} places",
+    "et": "{n} kohta",
+    "ru": "мест: {n}"
+  },
+  "listCountOne": {
+    "en": "1 place",
+    "et": "1 koht",
+    "ru": "1 место"
+  },
+  "listNameFirst": {
+    "en": "Give the place a name first.",
+    "et": "Anna kohale kõigepealt nimi.",
+    "ru": "Сначала дайте месту название."
+  },
+  "listOffline": {
+    "en": "No connection, and no lists kept on this phone yet.",
+    "et": "Ühendust pole ja selles telefonis pole veel ühtegi nimekirja.",
+    "ru": "Нет связи, и на этом телефоне ещё нет сохранённых списков."
+  },
+  "listOwnPlace": {
+    "en": "Tallinn Tastebuds does not have this place yet, so it goes on your lists as your own, under this name.",
+    "et": "Tallinn Tastebudsil seda kohta veel pole, nii et see läheb sinu nimekirjadesse sinu enda kohana, selle nime all.",
+    "ru": "На Tallinn Tastebuds этого места ещё нет, поэтому оно попадёт в ваши списки как ваше собственное, под этим названием."
+  },
+  "listPlaceName": {
+    "en": "Name of the place",
+    "et": "Koha nimi",
+    "ru": "Название места"
+  },
+  "listWaiting": {
+    "en": "Sent when there is signal",
+    "et": "Saadetakse, kui levi on",
+    "ru": "Отправится, когда будет связь"
+  },
+  "listsCreate": {
+    "en": "Make the list",
+    "et": "Loo nimekiri",
+    "ru": "Создать список"
+  },
+  "listsErrFull": {
+    "en": "That is as many places as one list can hold.",
+    "et": "Rohkem kohti üks nimekiri ei hoia.",
+    "ru": "Больше мест один список не держит."
+  },
+  "listsErrGeneric": {
+    "en": "That did not go through. Try again.",
+    "et": "See ei läinud läbi. Proovi uuesti.",
+    "ru": "Не получилось. Попробуйте ещё раз."
+  },
+  "listsErrSignedOut": {
+    "en": "You have been signed out. Sign in again and the list is still there.",
+    "et": "Sind logiti välja. Logi uuesti sisse, nimekiri on alles.",
+    "ru": "Вы вышли из аккаунта. Войдите снова — список на месте."
+  },
+  "listsErrTitle": {
+    "en": "A list needs a name.",
+    "et": "Nimekirjal peab olema nimi.",
+    "ru": "У списка должно быть название."
+  },
+  "listsErrTooMany": {
+    "en": "That is as many lists as one account can hold.",
+    "et": "Rohkem nimekirju üks konto ei hoia.",
+    "ru": "Больше списков один аккаунт не держит."
+  },
+  "listsNewName": {
+    "en": "Name of the new list",
+    "et": "Uue nimekirja nimi",
+    "ru": "Название нового списка"
+  },
+  "listsNone": {
+    "en": "No lists yet. Make one and start filling it.",
+    "et": "Ühtegi nimekirja veel pole. Tee üks ja hakka täitma.",
+    "ru": "Списков пока нет. Создайте список и начните наполнять."
+  },
+  "listsSaveDone": {
+    "en": "Saved",
+    "et": "Salvestatud",
+    "ru": "Сохранено"
   },
   "locOffTitle": {
     "en": "Location is off",
@@ -298,6 +393,11 @@
     "en": "Open Settings",
     "et": "Ava seaded",
     "ru": "Открыть настройки"
+  },
+  "pinName": {
+    "en": "Dropped pin",
+    "et": "Märgitud punkt",
+    "ru": "Отмеченная точка"
   },
   "privacyLink": {
     "en": "Privacy",
@@ -449,10 +549,20 @@
     "et": "1 sõit ootab saatmist. See läheb ise teele, kui ühendus on olemas.",
     "ru": "1 поездка ждёт отправки. Она уйдёт сама, когда появится связь."
   },
+  "searchKindApple": {
+    "en": "Apple Maps",
+    "et": "Apple Maps",
+    "ru": "Apple Maps"
+  },
   "searchKindMine": {
     "en": "On the map",
     "et": "Kaardil",
     "ru": "На карте"
+  },
+  "searchKindPin": {
+    "en": "Pin",
+    "et": "Punkt",
+    "ru": "Точка"
   },
   "searchKindPlace": {
     "en": "Place",

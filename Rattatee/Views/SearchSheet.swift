@@ -215,6 +215,8 @@ struct SpotRow: View {
         case .place: return L.t("searchKindPlace")
         case .street: return L.t("searchKindStreet")
         case .google: return L.t("findFromGoogle")
+        case .apple: return L.t("searchKindApple")
+        case .pin: return L.t("searchKindPin")
         }
     }
 }

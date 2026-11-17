@@ -93,6 +93,13 @@ with goes to the top of the list, and the website keeps it, so the next
 search — here, in the map app or on the site — finds it without asking
 Google.
 
+Or tap the map. A place Apple's map names is somewhere to go under that
+name — and if the phone's copy of the website's places has it within a
+street's width, it is the website's place, under the website's id. A tap
+anywhere else drops a pin, whose street the phone works out for itself.
+Neither asks Google or the website for anything but the way there; taps do
+nothing once a ride has begun.
+
 Choosing a place puts it on the map with a suggested way by bike, in blue,
 how far it is and about how long, and **Go**, which is Start. While riding,
 the blue line stays under the line actually ridden and the card says how
@@ -100,6 +107,15 @@ much of the way is left. The way is a suggestion and is not re-drawn when
 the rider leaves it; there are no spoken or turn-by-turn directions; and
 arriving finishes nothing — Finish is still a button. What is saved is the
 way really ridden, never the suggestion and never the destination.
+
+**Add to a list.** Signed in, the card of somewhere to go has **Add to a
+list** beside Go: the rider's lists on the website, a press each, and a new
+one made on the spot. A place the website does not have — one only Apple's
+map names, or a pin — goes on as the rider's own place, under a name they
+can change, which the website keeps for their lists alone. The lists are
+kept on the phone as last read, and an add with no signal waits on the
+phone and goes when the rides go (`Core/Lists.swift`). Signed out, the card
+says an account is what this needs.
 
 Streets, addresses and Google need a connection, and the search says there
 is none only when the phone's copy has nothing for the letters either.
@@ -167,6 +183,8 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
 | `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line` |
+| `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
+| `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |
 | `POST /api/account` | `create` and `login` with `username` and `password`, answered with `user` or the errors `taken`, `username`, `password`, `no-match` and `slow-down`; `ticket`, `logout`, `delete` |
 | `GET /api/google?app=<challenge>` | the Google round trip, ending at `tallinntastebuds://signin` |
@@ -211,12 +229,14 @@ Rattatee/
             Store.swift         every ride on the phone, and sending them
             Search.swift        places, streets, Google, and the way there
             Venues.swift        the places kept on the phone, a name and a pin each
+            Lists.swift         the rider's lists, and adds waiting for signal
             Account.swift       signing in and out
             SocialSignIn.swift  Google and Apple, Kohuke's file unchanged
-            Disk.swift          the ride files
+            Disk.swift          the ride files, and where the other copies live
             Strings.swift       the words, the language chosen, and how a distance is said
-  Views/    RecordTab.swift     the map, Ready, Recording, Paused
+  Views/    RecordTab.swift     the map and its taps, Ready, Recording, Paused
             SearchSheet.swift   Where to?
+            ListPicker.swift    Add to a list
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
             AccountView.swift   the Account tab, the colours, deleting an account
