@@ -4,9 +4,9 @@ import Observation
 /// Where the rider has gone before: the last few places they chose, newest
 /// first, kept on the phone and nowhere else.
 ///
-/// Where to? opens on these, above a handful of places nearby, because
+/// Where to? opens on the last three of these and nothing else, because
 /// somewhere a rider has been is far likelier to be where they are going
-/// than the twentieth-nearest café. They also answer the first letter typed
+/// than the nearest café. They also answer the first letter typed
 /// — "p" finds the Põhjala they rode to last week before anything else is
 /// asked of anybody.
 ///
@@ -21,7 +21,7 @@ final class Recents {
 
     /// How many are kept, and how many Where to? shows before a letter.
     static let kept = 12
-    static let shown = 5
+    static let shown = 3
 
     private(set) var all: [Spot] = []
 

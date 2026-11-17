@@ -78,19 +78,18 @@ Three tabs.
 
 ### Search and go
 
-A ride needs no destination, but it can have one. **Where to?** opens on
-where the rider has been — the last five places they chose, kept on the
+A ride needs no destination, but it can have one. **Where to?** opens with
+the keyboard up and the last three places the rider chose — kept on the
 phone and nowhere else (`Core/Recents.swift`; swipe one away to forget it)
-— and under that the five places nearest them, or, before the phone has
-said where it is, five of the places on the map. Those come out of a copy
-the phone keeps of every place the website's search knows: a name and a pin
-each, and nothing else (`Core/Venues.swift`). The copy is the website's
-whole roll, `GET /api/places` with no query, about 75 KB, asked for when
-the app opens if the phone's is missing or a week old — one request a week
-a phone, which is what lets opening the sheet and typing a first letter ask
-the website for nothing at all. One letter is answered by the phone alone,
-the rider's own places first. From the second the website's own search is
-asked and replaces those rows when it answers: its places first, then
+— and nothing else. Typing takes those away. One letter or two are answered
+by the phone alone, the rider's own places first and then a copy the phone
+keeps of every place the website's search knows: a name and a pin each, and
+nothing else (`Core/Venues.swift`). The copy is the website's whole roll,
+`GET /api/places` with no query, about 75 KB, asked for when the app opens
+if the phone's is missing or a week old — one request a week a phone, which
+is what lets opening the sheet and the first letters ask the website for
+nothing at all. From the third letter the website's own search is asked and
+replaces those rows when it answers: its places first, then
 streets and districts, each with how far it is. From five letters a last row offers **Look for "…" on
 Google Maps**, exactly as the website's find bar does; what Google answers
 with goes to the top of the list, and the website keeps it, so the next
@@ -213,7 +212,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | | |
 |---|---|
 | `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres. `anon` is what lets a save with no session through; with a session the ride is on the account |
-| `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? takes its few nearby places and its answer to a first letter from, keeping `id`, `name`, `lat`, `lng` and `map` |
+| `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |

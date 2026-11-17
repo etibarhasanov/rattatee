@@ -3,9 +3,9 @@ import Foundation
 import Observation
 
 /// Every place the website's search knows, kept on the phone as a name and a
-/// pin, so Where to? has a few places nearby to show the moment it opens,
-/// an answer to the first letter with nothing asked of the website, and
-/// rows to show while longer typing is still on its way to the site.
+/// pin, so Where to? has an answer to the first letters with nothing asked
+/// of the website, rows to show while longer typing is still on its way to
+/// the site, and a tap on the map can be told for a place the site knows.
 ///
 /// WHERE IT COMES FROM
 ///
@@ -84,22 +84,6 @@ final class Venues {
         guard !list.isEmpty, let out = try? JSONEncoder().encode(list) else { return }
         try? out.write(to: Self.file, options: .atomic)
         keep(list)
-    }
-
-    /// The few places nearest a point, nearest first. Without a point, a
-    /// few of the places on the map, A to Z: something worth choosing from
-    /// rather than the first of eleven hundred. A handful, on purpose —
-    /// Where to? opens on where the rider has been and a look round the
-    /// corner, not on a list of the city.
-    func nearest(_ here: CLLocationCoordinate2D?, count: Int = 5) -> [Spot] {
-        guard let here else {
-            return all.filter(\.map)
-                .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-                .prefix(count).map(Self.spot)
-        }
-        return all.map { ($0, Self.metres(here, $0)) }
-            .sorted { $0.1 < $1.1 }
-            .prefix(count).map { Self.spot($0.0) }
     }
 
     /// The places whose names hold these letters — a name starting with them
