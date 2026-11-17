@@ -14,7 +14,7 @@ import Observation
 ///
 /// The owner's, recorded: one short file a phrase, in each of the app's four
 /// languages, under `Rattatee/Voice/` as `<lang>-<clip>.m4a` — `et-left.m4a`,
-/// `ru-roundabout-2.m4a`. `docs/voice.md` is the list of them and what each
+/// `ru-keep-right.m4a`. `docs/voice.md` is the list of them and what each
 /// says. That is why the phrases are few and carry no street name and no
 /// distance but the one: a recording can only say what was recorded. The
 /// street is in the row.
@@ -58,12 +58,9 @@ final class Guide {
 
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
-        case soon, left, right, straight, around, roundabout, arrive
+        case soon, left, right, straight, around, arrive
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
-        case roundabout1 = "roundabout-1"
-        case roundabout2 = "roundabout-2"
-        case roundabout3 = "roundabout-3"
     }
 
     /// What has been said on this way, so each corner is said twice and no
@@ -88,18 +85,21 @@ final class Guide {
 
     /// One point of the ride, on the way being ridden.
     func hear(_ here: CLLocationCoordinate2D, on way: Way) {
-        guard voice, let next = way.next(from: here) else { return }
+        // A roundabout is shown and not said, at the owner's word: a bike
+        // is mostly on a path beside one, and "take the second exit" is a
+        // sentence for a car.
+        guard voice, let next = way.next(from: here), let turn = clip(next.step) else { return }
         let corner = "\(Int(next.step.along))"
         if next.metres <= Self.now {
-            if said.insert(corner + "-now").inserted { say([clip(next.step)], next.step.words) }
+            if said.insert(corner + "-now").inserted { say([turn], next.step.words) }
         } else if next.step.turn != .arrive, Self.soon.contains(next.metres) {
             if said.insert(corner + "-soon").inserted {
-                say([.soon, clip(next.step)], L.t("turnSoon") + ", " + next.step.words)
+                say([.soon, turn], L.t("turnSoon") + ", " + next.step.words)
             }
         }
     }
 
-    private func clip(_ step: Step) -> Clip {
+    private func clip(_ step: Step) -> Clip? {
         switch step.turn {
         case .left: return .left
         case .right: return .right
@@ -108,13 +108,7 @@ final class Guide {
         case .straight: return .straight
         case .around: return .around
         case .arrive: return .arrive
-        case .roundabout:
-            switch step.exit {
-            case 1: return .roundabout1
-            case 2: return .roundabout2
-            case 3: return .roundabout3
-            default: return .roundabout
-            }
+        case .roundabout: return nil
         }
     }
 
