@@ -26,6 +26,9 @@ on screen says so — "Roundabout, exit 2" — and the voice says nothing.
 The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
+**Recorded so far: Azerbaijani**, all eight, on 2026-11-17. English,
+Estonian and Russian are still to do.
+
 ## Recording
 
 - Voice Memos on an iPhone, in a quiet room, the phone a hand's width from
