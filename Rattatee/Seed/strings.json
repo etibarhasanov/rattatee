@@ -695,12 +695,6 @@
     "et": "Tänav",
     "ru": "Улица"
   },
-  "searchNear": {
-    "az": "Yaxınlıqda",
-    "en": "Near you",
-    "et": "Sinu lähedal",
-    "ru": "Рядом с вами"
-  },
   "searchNoneTitle": {
     "az": "Heç nə tapılmadı",
     "en": "Nothing found",

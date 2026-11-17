@@ -3,16 +3,17 @@ import SwiftUI
 
 /// Where to? — the search behind the bar on the Record tab.
 ///
-/// Opened, before a letter is typed, it shows where the rider has been
-/// (`Recents`) and under that a handful of places nearby out of the copy the
-/// phone keeps (`Venues`) — no wait, no signal needed, and nothing asked of
-/// the website. It used to open on the twenty nearest, which was a list of
-/// the neighbourhood nobody had asked for.
+/// It opens with the keyboard up and next to nothing on it: the last three
+/// places the rider chose (`Recents`), and no more than that, the way a map's
+/// search shows what was looked for last and gets out of the way. It opened
+/// on places nearby once, twenty and then five, and a list nobody asked for
+/// read as the app fetching things, though it never left the phone.
 ///
-/// One letter is answered by the phone alone: the rider's own places first,
-/// then its copy. From the second letter the website's own search is asked,
-/// after a pause in the typing, and replaces the phone's rows when it
-/// answers: its places first, in the order it ranks them, with their
+/// Typing takes the recent rows away. One letter or two are answered by the
+/// phone alone, out of its copy of the website's places (`Venues`), the
+/// rider's own places first. From the third letter the website's own search
+/// is asked, after a pause in the typing, and replaces the phone's rows when
+/// it answers: its places first, in the order it ranks them, with their
 /// addresses, then streets and districts. From five letters a last row
 /// offers to look on Google Maps, as the website's find bar does, and what
 /// Google answers with goes to the top of the list. Choosing a row closes
@@ -21,7 +22,7 @@ import SwiftUI
 /// WHAT IS WORKED OUT WHEN
 ///
 /// The phone's rows are worked out once for each thing that changes them —
-/// the sheet opening, the first fix, a letter — and kept in `@State`. They
+/// the sheet opening, a letter — and kept in `@State`. They
 /// were computed properties once, and SwiftUI asks a computed property again
 /// at every redraw and every place the body names it: eleven hundred
 /// distances sorted three times over whenever anything on the sheet moved.
@@ -40,14 +41,15 @@ struct SearchSheet: View {
     /// The phone's own rows: what the sheet opens on, and its answer to the
     /// letters typed until the site has one. See WHAT IS WORKED OUT WHEN.
     @State private var recent: [Spot] = []
-    @State private var nearby: [Spot] = []
     @State private var local: [Spot] = []
 
     @State private var googleReady = false
     @State private var asking = false
     /// What Google said for which letters: a sentence, when it found nothing.
     @State private var googleSaid: (q: String, text: String)?
-    @FocusState private var typing: Bool
+    /// Whether the search field has the keyboard. Set as the sheet opens,
+    /// so there is nothing to tap before typing.
+    @State private var typing = false
 
     private var q: String { text.trimmingCharacters(in: .whitespaces) }
 
@@ -57,7 +59,7 @@ struct SearchSheet: View {
 
     /// The rows on screen: the site's answer once it has one, and the
     /// phone's until then — or instead, when the site cannot be reached, or
-    /// is not asked because there is only one letter.
+    /// is not asked because there are too few letters.
     private var rows: [Spot] {
         if q.isEmpty { return [] }
         return siteAnswered ? found : local
@@ -80,16 +82,6 @@ struct SearchSheet: View {
                         }
                     } header: {
                         Text(L.t("searchRecent"))
-                    }
-                }
-                if q.isEmpty && !nearby.isEmpty {
-                    Section {
-                        ForEach(nearby) { spot in
-                            Button { choose(spot) } label: { SpotRow(spot: spot, here: store.recorder.here) }
-                                .listRowBackground(Theme.card)
-                        }
-                    } header: {
-                        Text(store.recorder.here == nil ? L.t("searchKindMine") : L.t("searchNear"))
                     }
                 }
                 ForEach(rows) { spot in
@@ -125,27 +117,25 @@ struct SearchSheet: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) { Button(L.t("close")) { dismiss() } }
             }
-            .searchable(text: $text, placement: .navigationBarDrawer(displayMode: .always), prompt: L.t("searchPrompt"))
+            .searchable(text: $text, isPresented: $typing, placement: .navigationBarDrawer(displayMode: .always), prompt: L.t("searchPrompt"))
             .autocorrectionDisabled()
             .textInputAutocapitalization(.never)
         }
         .task {
+            // For how far each row is; nothing is listed by it any more.
             store.recorder.locate()
-            opening()
+            recent = Array(Recents.shared.all.prefix(Recents.shown))
+            typing = true
             // The copy the phone keeps is asked for at launch; this is for a
             // phone that had no signal then, and asks nothing of one that
             // has a copy less than a week old.
             await Venues.shared.refresh()
-            opening()
         }
-        // The first fix turns "on the map, A to Z" into "near you". Later
-        // fixes move the rider a few metres and are not worth a new list.
-        .onChange(of: store.recorder.here == nil) { opening() }
         // Wait for a pause in the typing before asking, as the website does:
         // the task is cancelled and begun again at every keystroke.
         .task(id: q) {
-            // The phone's answer first, at once, and for one letter it is
-            // the whole answer.
+            // The phone's answer first, at once, and for a letter or two it
+            // is the whole answer.
             local = q.isEmpty ? [] : phone(q)
             guard asksSite else { found = []; answered = ""; failed = false; return }
             try? await Task.sleep(for: .milliseconds(300))
@@ -159,14 +149,6 @@ struct SearchSheet: View {
         }
     }
 
-    /// What the sheet opens on: the last few places chosen, and a few
-    /// nearby that are not among them.
-    private func opening() {
-        recent = Array(Recents.shared.all.prefix(Recents.shown))
-        let known = Set(recent.map(\.id))
-        nearby = Venues.shared.nearest(store.recorder.here).filter { !known.contains($0.id) }
-    }
-
     /// The phone's answer to these letters: the rider's own places first,
     /// then its copy of the website's.
     private func phone(_ q: String) -> [Spot] {
@@ -177,7 +159,7 @@ struct SearchSheet: View {
 
     private func forget(_ spot: Spot) {
         Recents.shared.remove(spot)
-        opening()
+        recent.removeAll { $0.id == spot.id }
     }
 
     /// Offered from five letters, once the site's own answer is in, as on
@@ -189,8 +171,8 @@ struct SearchSheet: View {
     @ViewBuilder
     private var empty: some View {
         if !asksSite {
-            // One letter the phone has nothing for: the second asks the
-            // site, and there is nothing to say until then.
+            // Letters the phone has nothing for: the third asks the site,
+            // and there is nothing to say until then.
             EmptyView()
         } else if failed {
             ContentUnavailableView(L.t("searchOfflineTitle"), systemImage: "wifi.slash",
