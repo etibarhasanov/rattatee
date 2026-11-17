@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 /// The app's words, in English, Estonian and Russian.
 ///
@@ -10,16 +11,27 @@ import Foundation
 /// too were copied from its `data/ui.json` under the same keys — `ride*` and
 /// `account*` — so a sentence fixed there can be copied here by key.
 ///
-/// The language is the one iOS picked for this app: the phone's own, or the
-/// one chosen for Rattatee alone under Settings, which iOS offers because
+/// The language is the one chosen under Account, or, until somebody
+/// chooses, the one iOS picked for this app: the phone's own, or the one
+/// chosen for Rattatee alone under Settings, which iOS offers because
 /// Config/Info.plist lists all three. Anything else reads English.
+///
+/// The choice is read through `LangStore`, which is observable, so every
+/// view that asks `L.t` for a sentence is redrawn the moment it changes —
+/// no restart, the way the colour changes.
 enum L {
     static let languages = ["en", "et", "ru"]
 
-    static let lang: String = {
+    /// What iOS picked, used while the choice is "Phone's language".
+    static let phone: String = {
         let first = Bundle.main.preferredLocalizations.first ?? "en"
         return languages.contains(first) ? first : "en"
     }()
+
+    static var lang: String {
+        let chosen = LangStore.shared.choice
+        return languages.contains(chosen) ? chosen : phone
+    }
 
     private static let table: [String: [String: String]] = {
         guard let data = Disk.seed("strings"),
@@ -59,5 +71,20 @@ enum L {
 
     static func time(_ date: Date) -> String {
         date.formatted(.dateTime.hour().minute().locale(Locale(identifier: lang)))
+    }
+}
+
+/// The language chosen under Account: one of `L.languages`, or empty for
+/// the phone's own. Kept on the phone, beside the colour.
+@Observable
+final class LangStore {
+    static let shared = LangStore()
+
+    var choice: String {
+        didSet { UserDefaults.standard.set(choice, forKey: "lang") }
+    }
+
+    private init() {
+        choice = UserDefaults.standard.string(forKey: "lang") ?? ""
     }
 }

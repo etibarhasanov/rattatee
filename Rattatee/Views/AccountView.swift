@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// The Account tab: signing in with Apple or Google, which nobody has to do;
-/// signing out and deleting the account; the colour and the background; and
+/// The Account tab: making an account or signing in — with a username and a
+/// password, or Apple or Google — which nobody has to do; signing out and
+/// deleting the account; the language; the colour and the background; and
 /// the privacy page.
 struct AccountTab: View {
     @Environment(Store.self) private var store
@@ -9,6 +10,7 @@ struct AccountTab: View {
 
     var body: some View {
         @Bindable var style = StyleStore.shared
+        @Bindable var lang = LangStore.shared
         NavigationStack {
             Form {
                 if let user = store.user {
@@ -19,14 +21,30 @@ struct AccountTab: View {
                     }
                     .listRowBackground(Theme.card)
                 } else {
-                    Section {
-                        SignInDoors()
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets())
-                    } header: {
-                        Text(L.t("signInWhy")).textCase(nil)
+                    PasswordForm()
+                    if store.appleOffered || store.googleOffered {
+                        Section {
+                            SignInDoors()
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets())
+                        } header: {
+                            Text(L.t("accountOr")).textCase(nil).frame(maxWidth: .infinity)
+                        }
                     }
                 }
+
+                // The app's own language, whatever the phone's is. The names
+                // are each in their own language, as every language menu is.
+                Section {
+                    Picker(L.t("language"), selection: $lang.choice) {
+                        Text(L.t("languagePhone")).tag("")
+                        Text("English").tag("en")
+                        Text("Eesti").tag("et")
+                        Text("Русский").tag("ru")
+                    }
+                    .foregroundStyle(Theme.ink)
+                }
+                .listRowBackground(Theme.card)
 
                 Section {
                     HStack {

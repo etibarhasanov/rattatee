@@ -25,6 +25,9 @@ struct RattateeApp: App {
                     #if DEBUG
                     LaunchScript.stage(store)
                     #endif
+                    // The places Where to? opens on, if the phone's copy
+                    // is missing or a week old (Core/Venues.swift).
+                    if !store.demo { Task { await Venues.shared.refresh() } }
                     await store.whoAmI()
                 }
         }

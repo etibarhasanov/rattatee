@@ -59,17 +59,27 @@ Three tabs.
   **Waiting** or **Not kept · why**. A banner says how many are waiting,
   with **Try now**. A ride the server has answered can be swiped off the
   phone; a waiting one cannot.
-- **Account.** Continue with Apple or Google where the website offers them
-  — the same accounts as the site and Kohuke, made on the spot the first
-  time — or, signed in, sign out and delete the account. Under **Look**,
+- **Account.** **Create account** or **Sign in** with a username and a
+  password, as in Kohuke, or continue with Apple or Google where the
+  website offers them — the same accounts as the site and Kohuke, made on
+  the spot the first time — or, signed in, sign out and delete the
+  account. **Language**: the phone's, or English, Eesti or Русский for this
+  app alone, switched at once. Under **Look**,
   the colour, one of the website's four (Red, Green, Blue, Plum), and the
   background: **Like the phone**, which is where a new install starts,
   **Light** or **Dark**. Then Privacy.
 
 ### Search and go
 
-A ride needs no destination, but it can have one. **Where to?** opens the
-website's own search: its places first, then streets and districts, each
+A ride needs no destination, but it can have one. **Where to?** opens on
+the twenty places nearest the rider — or, before the phone has said where
+it is, the places on the map, A to Z — out of a copy the phone keeps of
+every place the website's search knows: a name and a pin each, and nothing
+else (`Core/Venues.swift`). The copy is the website's whole roll,
+`GET /api/places` with no query, about 75 KB, asked for when the app opens
+if the phone's is missing or a week old. Letters typed are answered from it
+at once, with no signal if need be, and the website's own search replaces
+those rows when it answers: its places first, then streets and districts, each
 with how far it is. From five letters a last row offers **Look for "…" on
 Google Maps**, exactly as the website's find bar does; what Google answers
 with goes to the top of the list, and the website keeps it, so the next
@@ -84,11 +94,13 @@ the rider leaves it; there are no spoken or turn-by-turn directions; and
 arriving finishes nothing — Finish is still a button. What is saved is the
 way really ridden, never the suggestion and never the destination.
 
-Search needs a connection and says so when there is none. Recording never
-does.
+Streets, addresses and Google need a connection, and the search says there
+is none only when the phone's copy has nothing for the letters either.
+Recording never needs one.
 
-English, Estonian and Russian, following the phone's language or the one
-chosen for the app in Settings.
+English, Estonian and Russian, following the one chosen under Account, or
+until somebody chooses, the phone's language or the one chosen for the app
+in Settings.
 
 Every colour has a day and a night. Red and Blue by day, and Green and Plum
 by night, are the website's own styles to the value; the other four were
@@ -143,12 +155,13 @@ repository's `CLAUDE.md` under **What the app reads**.
 | | |
 |---|---|
 | `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `GET /api/places` | the whole roll, with no query: the copy Where to? opens on, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
 | `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |
-| `POST /api/account` | `ticket`, `logout`, `delete` |
+| `POST /api/account` | `create` and `login` with `username` and `password`, answered with `user` or the errors `taken`, `username`, `password`, `no-match` and `slow-down`; `ticket`, `logout`, `delete` |
 | `GET /api/google?app=<challenge>` | the Google round trip, ending at `tallinntastebuds://signin` |
 | `POST /api/apple` | Apple's token and its nonce, answered as a sign-in |
 
@@ -190,16 +203,17 @@ Rattatee/
             Ride.swift          a ride, a point, and the sums
             Store.swift         every ride on the phone, and sending them
             Search.swift        places, streets, Google, and the way there
+            Venues.swift        the places kept on the phone, a name and a pin each
             Account.swift       signing in and out
             SocialSignIn.swift  Google and Apple, Kohuke's file unchanged
             Disk.swift          the ride files
-            Strings.swift       the words, and how a distance is said
+            Strings.swift       the words, the language chosen, and how a distance is said
   Views/    RecordTab.swift     the map, Ready, Recording, Paused
             SearchSheet.swift   Where to?
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
             AccountView.swift   the Account tab, the colours, deleting an account
-            SignIn.swift        the two sign-in buttons
+            SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et and ru
   *.lproj/  InfoPlist.strings   the location question, in each language

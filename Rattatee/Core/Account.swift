@@ -5,9 +5,11 @@ import Foundation
 ///
 /// An account here is the website's account and nothing else: a session the
 /// site hands back as its HttpOnly cookie, kept by `URLSession`'s shared
-/// cookie store across launches. Google and Apple are the two ways in —
-/// `SocialSignIn` says how — and their buttons are drawn only where the site
-/// says it can answer them (`appGoogle` and `appApple` on `GET /api/account`).
+/// cookie store across launches. There are three ways in, as in Kohuke: a
+/// username and a password, made or used right here through the website's
+/// own `create` and `login`; and Google and Apple — `SocialSignIn` says how —
+/// whose buttons are drawn only where the site says it can answer them
+/// (`appGoogle` and `appApple` on `GET /api/account`).
 ///
 /// Signing out keeps the rides on the phone: they are the phone's record.
 /// A ride is filed under whoever is signed in at the moment it is sent, or
@@ -29,6 +31,20 @@ extension Store {
         // with no signal is not shown a sign-in screen.
         checked = true
         await sendWaiting()
+    }
+
+    /// Make an account with a username and a password, or sign in with one.
+    /// The site's refusal words come back as `API.Refusal` — `taken`,
+    /// `username`, `password`, `no-match`, `slow-down` — and the form says
+    /// each in a sentence of its own. There is no captcha on these two, so an
+    /// app can use them as the website's sheet does.
+    func enter(username: String, password: String, create: Bool) async throws {
+        let answer = try await API.postObject("api/account", [
+            "action": create ? "create" : "login",
+            "username": username.trimmingCharacters(in: .whitespaces),
+            "password": password
+        ])
+        await arrive(answer)
     }
 
     /// Sign in through Google, making the account if this Google account has
