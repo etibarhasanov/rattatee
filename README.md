@@ -106,6 +106,14 @@ for the way. When the way arrives the map moves once, to the whole of it,
 from where the rider is to the pin. A place chosen in the search that is
 off the screen is framed straight away instead, rider and place.
 
+Where the website finds more than one way — up to three — the card has a
+small button for each, *9 min · 2.1 km*, as the website's own route bar
+does. The one chosen is the solid line and the others are faint under it;
+pressing another changes which is solid, and the map stays where it is.
+**Go** starts with the one chosen, and how much is left while riding is
+measured along it. The buttons say how long and how far and nothing about
+which is nicer, because the router does not say.
+
 Choosing a place puts it on the map with a suggested way by bike, in blue,
 how far it is and about how long, and **Go**, which is Start. While riding,
 the blue line stays under the line actually ridden and the card says how
@@ -188,7 +196,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
-| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line` |
+| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields |
 | `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
 | `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |

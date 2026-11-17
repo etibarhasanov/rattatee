@@ -186,6 +186,15 @@ struct RideMap: View {
             UserAnnotation()
             if let goal {
                 if case .found(let way) = goal.way {
+                    // The ways on offer and not chosen, faint under the
+                    // one that is: before a ride only, while it is still
+                    // a choice.
+                    if points.isEmpty {
+                        ForEach(Array(goal.ways.enumerated()).filter { $0.offset != goal.chosen }, id: \.offset) { _, other in
+                            MapPolyline(coordinates: other.line)
+                                .stroke(Theme.accent.opacity(0.3), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+                        }
+                    }
                     MapPolyline(coordinates: way.line)
                         .stroke(Theme.accent.opacity(0.75), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
                 } else if goal.way == .looking, points.isEmpty, let here {
@@ -216,7 +225,8 @@ struct RideMap: View {
         .onChange(of: goal?.spot.id) {
             if !follow, let goal, !inView(goal.spot.coordinate) { settle(goal) }
         }
-        .onChange(of: goal?.way) {
+        // And not by which way is chosen: all of them are in the frame.
+        .onChange(of: goal?.way == .looking) {
             if !follow, let goal, goal.way != .looking { settle(goal) }
         }
     }
@@ -253,6 +263,8 @@ struct RideMap: View {
         var all = [goal.spot.coordinate]
         if let here { all.append(here) }
         if case .found(let way) = goal.way { all += way.line }
+        // Every way on offer, so choosing another moves nothing.
+        for other in goal.ways { all += other.line }
         let spots = all.map { MKMapPoint($0) }
         guard let west = spots.map(\.x).min(), let east = spots.map(\.x).max(),
               let north = spots.map(\.y).min(), let south = spots.map(\.y).max() else { return }
@@ -314,6 +326,7 @@ struct GoalCard: View {
         SheetCard {
             Text(goal.spot.name).font(.title2.bold()).foregroundStyle(Theme.ink).lineLimit(2)
             Text(line).font(.subheadline).foregroundStyle(Theme.muted)
+            if goal.ways.count > 1 { ways }
             // "No way found" outranks the sign-in line: it is about the ride.
             Note(text: listable && store.user == nil && goal.way != .missing ? L.t("goalListSignIn") : note)
                 .padding(.top, 10).padding(.bottom, 14)
@@ -325,6 +338,34 @@ struct GoalCard: View {
             }
         }
         .sheet(isPresented: $listing) { ListPicker(spot: goal.spot) }
+    }
+
+    /// The ways on offer, a small button each — how long and how far, as
+    /// on the website's route bar, and nothing about which is nicer, since
+    /// the router does not say. The one chosen is filled, and is the solid
+    /// line on the map; Go starts with it.
+    private var ways: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 6) {
+                ForEach(Array(goal.ways.enumerated()), id: \.offset) { index, way in
+                    let on = index == goal.chosen
+                    Button {
+                        store.choose(way: index)
+                    } label: {
+                        Text(L.t("goalWayChip", ["min": String(max(1, Int((Double(way.seconds) / 60).rounded()))),
+                                                 "dist": L.distance(way.metres)]))
+                            .font(.footnote.weight(.semibold))
+                            .monospacedDigit()
+                            .padding(.horizontal, 12)
+                            .frame(minHeight: 36)
+                            .foregroundStyle(on ? Theme.onAccent : Theme.ink)
+                            .background(on ? Theme.accent : Theme.wash, in: Capsule())
+                    }
+                    .accessibilityAddTraits(on ? .isSelected : [])
+                }
+            }
+        }
+        .padding(.top, 10)
     }
 
     private var line: String {

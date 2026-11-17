@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 
 /// Opens the app on a given tab and state, for the screenshots CI takes.
@@ -48,7 +49,15 @@ enum LaunchScript {
         var goal = Goal(spot: Spot(id: "paper-mill-coffee", name: "Paper Mill Coffee",
                                    detail: "Masina 20 · Coffee roastery",
                                    lat: ahead.last?.lat ?? 59.44, lng: ahead.last?.lng ?? 24.76, kind: .mine))
-        goal.way = .found(Way(metres: 2400, seconds: 540, line: ahead.map(\.coordinate)))
+        let way = Way(metres: 2400, seconds: 540, line: ahead.map(\.coordinate))
+        // And a second way to choose from, bowed out to one side of the
+        // first, so the card's row of ways can be photographed.
+        let bowed = ahead.enumerated().map { i, point in
+            let bow = sin(Double(i) / Double(max(1, ahead.count - 1)) * .pi) * 0.004
+            return CLLocationCoordinate2D(latitude: point.lat - bow, longitude: point.lng + bow)
+        }
+        goal.ways = [way, Way(metres: 2900, seconds: 660, line: bowed)]
+        goal.way = .found(way)
         switch demo {
         case "goal":
             store.pretend([])
