@@ -100,6 +100,12 @@ anywhere else drops a pin, whose street the phone works out for itself.
 Neither asks Google or the website for anything but the way there; taps do
 nothing once a ride has begun.
 
+A tap leaves the map where it was: the pin lands under the finger, and a
+dotted straight line runs to it from the rider while the website is asked
+for the way. When the way arrives the map moves once, to the whole of it,
+from where the rider is to the pin. A place chosen in the search that is
+off the screen is framed straight away instead, rider and place.
+
 Choosing a place puts it on the map with a suggested way by bike, in blue,
 how far it is and about how long, and **Go**, which is Start. While riding,
 the blue line stays under the line actually ridden and the card says how
