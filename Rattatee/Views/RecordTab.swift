@@ -223,7 +223,9 @@ struct RideMap: View {
         // By the place and by the way, never by the goal whole: a pin's
         // street arriving is a change to the goal and no reason to move.
         .onChange(of: goal?.spot.id) {
-            if !follow, let goal, !inView(goal.spot.coordinate) { settle(goal) }
+            // Off the screen, or arriving with its way already found (a
+            // staged screen does): there is no later moment to frame it at.
+            if !follow, let goal, !inView(goal.spot.coordinate) || goal.way != .looking { settle(goal) }
         }
         // And not by which way is chosen: all of them are in the frame.
         .onChange(of: goal?.way == .looking) {
