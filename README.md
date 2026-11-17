@@ -1,0 +1,239 @@
+# Rattatee
+
+Record a bike ride in Tallinn with the phone in your pocket. The iPhone app
+that saves rides to [Tallinn Tastebuds](https://tallinntastebuds.ee), where
+they are collected to become a map of confirmed bike routes, per street and
+per direction.
+
+*Rattatee* is Estonian for a bike path.
+
+SwiftUI, iOS 17 and later, iPhone only, no third-party dependencies.
+
+---
+
+## Why it exists
+
+The website records rides too, from the bike button on its map. But a web
+page stops being told where it is the moment the screen locks, so its
+recorder asks you to keep the page open and the screen on, and pauses when
+you do not. An app can ask iOS to keep hearing its position in the
+background. That is this app's one job: Start, lock the phone, ride, Finish,
+Save.
+
+**It is an interface.** Rattatee has no server and no database of its own,
+the same as Kohuke (`etibarhasanov/kohuke`) and the map app
+(`etibarhasanov/TallinnTasteBudsApp`). It saves through the same Function
+the website's recorder does, `POST /api/rides`. Its project structure,
+sign-in and networking are copied from Kohuke.
+
+**Nobody has to sign in.** What the rides are for is their points. People
+ride, press Save, and that is it: the ride is kept with no account on it.
+Signing in is there for whoever wants it, under **Account**, and buys one
+thing — the ride is also listed on their account page on the website.
+
+## What it does
+
+Two tabs.
+
+- **Record.** A map and a card at its foot, which is one of:
+  - *Ready to ride* — one big **Start**, and the line that says the phone
+    can go in a pocket and that GPS in the background uses battery.
+  - *Location is off* — what to choose in Settings, and a button to it.
+  - *Recording* — distance, time, average speed, the line drawn so far,
+    **Pause** and **Finish**. It carries on with the screen off and the app
+    in the background; iOS shows its blue location pill while it does.
+  - *Paused* — nothing is recorded and the clock stops. **Resume**, Finish.
+  - *Save this ride?* — an optional name (60 characters), **Save ride**,
+    **Throw it away** (asked twice). It says the two things worth knowing
+    first: no name is ever shown with a ride, and the first and last 200 m
+    are left off.
+  - *Too short to keep* — under 700 m, with **Keep riding**.
+  - *Saved*, or *Kept on this phone* when the server could not be reached,
+    or *Not kept* when it refused the ride for good.
+- **My rides.** Every ride recorded on this phone, newest first, under the
+  month it was ridden in: name, distance, time, date, and **Saved**,
+  **Waiting** or **Not kept · why**. A banner says how many are waiting,
+  with **Try now**. A ride the server has answered can be swiped off the
+  phone; a waiting one cannot. **Account** is at the top.
+
+English, Estonian and Russian, following the phone's language or the one
+chosen for the app in Settings. Blue by day and green by night, the
+website's two styles of those names.
+
+## The rules of a recording
+
+The website's, from `assets/ride.js` there, so a ride recorded here is the
+same kind of line:
+
+- A point is kept when it is at least **12 m** from the last kept point and
+  the fix is accurate to **30 m** or better.
+- A jump faster than **60 km/h** between two kept points is dropped.
+- Coordinates are rounded to **5 decimals**.
+- Every kept point also carries its **time** and its **accuracy**.
+- Core Location is asked for the `fitness` activity and the best accuracy,
+  and never to pause on its own. The permission is **While Using the App**
+  with the `location` background mode; "Always" is never asked for.
+  `Core/Recorder.swift` says why that is enough.
+- There is no auto-pause. Pause is a button.
+
+## A ride is never lost
+
+A ride is a file on the phone from the moment Start is pressed
+(`Core/Disk.swift`, Application Support, one JSON file a ride). It is
+rewritten every five points, about sixty metres, and at every pause.
+
+- **The app is killed mid-ride**, or the battery dies: the ride comes back
+  **Paused** the next time the app opens, with everything up to its last
+  written point and the riding time it had there. Resume or Finish.
+- **No signal at Save**: Save marks the ride *waiting* on disk before
+  anything is sent. It is sent again when the app comes to the front, when
+  the network comes back, and on **Try now**. Only the server's answer moves
+  it on.
+- **The server refuses it**: `short`, `fast` and `malformed` are final and
+  the ride is listed as *Not kept*, still on the phone. `often` (the day's
+  cap) waits for the next UTC midnight. Anything else is tried again.
+
+One known gap, accepted for the first version: `/api/rides` has no request
+id, so if the server stores a ride and its answer is lost on the way back,
+the next try stores it a second time. The fix is an optional field on the
+route that the server uses to recognise a repeat.
+
+## What it asks the website for
+
+All of it is in `Rattatee/Core/API.swift`, `Store.swift` and
+`Account.swift`. These are promises the website keeps to an installed app
+that cannot be updated in a day, and they are listed in the website
+repository's `CLAUDE.md` under **What the app reads**.
+
+| | |
+|---|---|
+| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |
+| `POST /api/account` | `ticket`, `logout`, `delete` |
+| `GET /api/google?app=<challenge>` | the Google round trip, ending at `tallinntastebuds://signin` |
+| `POST /api/apple` | Apple's token and its nonce, answered as a sign-in |
+
+A line longer than 3,500 points, about forty kilometres, is thinned evenly
+before it is sent, and points outside the box the server accepts are left
+out (`Geo.line` in `Core/Ride.swift`).
+
+**Sign in with Apple needs the website to know this app.** Apple signs its
+token for a bundle id, and `functions/api/_apple.js` there lists the ids it
+accepts; this app's is `ee.tallinntastebuds.rattatee`.
+
+**The words are compiled in**, unlike Kohuke's, because the app has to say
+"Recording" with no signal. `Rattatee/Seed/strings.json` holds every string
+in the three languages; the ones the website has too (`ride*`, `account*`)
+were copied from its `data/ui.json` under the same keys. CI fails on a key
+missing a language, a key the code asks for that is not there, and a key
+nothing asks for.
+
+### What the website does not have yet
+
+- **A request id on a save**, so a retry after a lost answer is not a second
+  ride. See above.
+- **The server's list in My rides.** `GET /api/rides?mine=1` answers a
+  signed-in account's rides; the app lists only what is on the phone, so
+  rides do not follow an account to a new phone yet.
+- **Everybody's rides on the map.** `GET /api/rides?bbox=` answers them; the
+  record map does not draw them yet.
+
+---
+
+## The code
+
+```
+Rattatee/
+  App/      RattateeApp.swift   the app and its two tabs
+            LaunchScript.swift  launch arguments, for CI's screenshots
+  Core/     API.swift           the one door to the website
+            Recorder.swift      Core Location, in the background too
+            Ride.swift          a ride, a point, and the sums
+            Store.swift         every ride on the phone, and sending them
+            Account.swift       signing in and out
+            SocialSignIn.swift  Google and Apple, Kohuke's file unchanged
+            Disk.swift          the ride files
+            Strings.swift       the words, and how a distance is said
+  Views/    RecordTab.swift     the map, Ready, Recording, Paused
+            FinishCards.swift   Save, Too short, and what came of it
+            RidesTab.swift      My rides
+            AccountView.swift   Account, and deleting one
+            SignIn.swift        the two sign-in buttons
+            Theme.swift         the website's colours
+  Seed/     strings.json        every string, in en, et and ru
+  *.lproj/  InfoPlist.strings   the location question, in each language
+  PrivacyInfo.xcprivacy         the privacy manifest
+Config/     Info.plist          the background mode and the languages
+            Rattatee.entitlements  Sign in with Apple, Release only
+docs/       icon.html           the icon, drawn
+```
+
+The project uses a synchronised folder, as Kohuke's does: a file added
+under `Rattatee/` is in the build with no change to the project file.
+
+## Building it
+
+Open `Rattatee.xcodeproj` in Xcode 16 or later, choose a team under
+**Signing & Capabilities**, and run it on a phone. The simulator builds and
+shows every screen, but only a phone on a bike records a ride.
+
+- **Debug** is signed without the Sign in with Apple entitlement, so it
+  installs from Xcode with an ordinary Apple ID. The Apple button then fails
+  when pressed; Google and riding without an account both work.
+- **Release** carries the entitlement, so archiving needs the paid developer
+  team, with the **Sign in with Apple** capability on the app id
+  `ee.tallinntastebuds.rattatee`.
+
+**Every push is built on GitHub**, `.github/workflows/ios.yml`: the strings
+are checked, the app is built for the simulator, the built `Info.plist` is
+checked for the permission text and the background mode, and the app is
+launched in each state and photographed. The pictures are the run's
+`screens` artifact and, shrunk, the `ci-screens` branch.
+
+### To TestFlight
+
+1. In App Store Connect, make the app: bundle id
+   `ee.tallinntastebuds.rattatee`, name Rattatee.
+2. In Xcode: **Product → Archive** with the Release configuration, then
+   **Distribute App → App Store Connect**.
+3. Fill in what review asks for, below.
+
+### What App Store review asks for
+
+- **The location purpose string** is `NSLocationWhenInUseUsageDescription`,
+  in the project's build settings in English and in
+  `Rattatee/<lang>.lproj/InfoPlist.strings` for each language.
+- **Background location** has to be justified in the review notes. In one
+  line: *the app records a bike ride the user starts with a button, with the
+  screen locked, until they press Finish; nothing is recorded otherwise.* A
+  screen recording of a ride being started and the phone locked is what
+  reviewers ask for when they ask.
+- **App Privacy**, matching `PrivacyInfo.xcprivacy`:
+  - *Precise Location* — collected, for App Functionality, not used for
+    tracking. Linked to the user only when they are signed in.
+  - *User ID* — collected only when signed in, for App Functionality,
+    linked, not used for tracking.
+  - Nothing else: no analytics, no advertising, no third-party code.
+- **Privacy policy URL**: `https://tallinntastebuds.ee/privacy`, which says
+  what is kept of a ride.
+- **Account deletion** is in the app, under Account, as review requires of
+  an app that can make an account.
+- **Sign-in is optional**, so review needs no demo account.
+
+### The icon
+
+`docs/icon.html` is the icon as a page. Photograph it at 1024 × 1024 into
+`Rattatee/Assets.xcassets/AppIcon.appiconset/icon-1024.png` with any
+headless browser.
+
+## Done when
+
+- A ride recorded on a real iPhone with the screen locked for the whole
+  ride saves and comes back from `GET /api/rides?bbox=`.
+- Killing the app mid-ride, or losing signal at Save, does not lose the
+  ride.
+- The project archives for TestFlight with the permission texts and the
+  privacy details above.
+
+None of the three can be checked from a cloud session. CI proves the app
+compiles and draws its screens; the ride itself needs a phone and a bike.

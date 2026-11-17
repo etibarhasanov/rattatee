@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Most keys the app needs are build settings (INFOPLIST_KEY_* in the
+	     project), which Xcode merges into the Info.plist it generates. This
+	     file holds the two Xcode has no build setting for.
+
+	     UIBackgroundModes `location` is the whole reason the app exists: with
+	     it, and `allowsBackgroundLocationUpdates` set in Core/Recorder.swift,
+	     a ride started in the app keeps recording with the screen locked
+	     under the ordinary "While Using the App" permission. iOS shows the
+	     blue location pill while it does, which is the honest thing.
+
+	     CFBundleLocalizations tells iOS the app speaks Estonian and Russian as
+	     well as English, so the permission prompt is asked in the phone's
+	     language (the texts are in Rattatee/<lang>.lproj/InfoPlist.strings)
+	     and Settings offers a per-app language.
+
+	     It lives outside Rattatee/ because that folder is a synchronised
+	     group: a plist inside it would also be copied into the bundle. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>et</string>
+		<string>ru</string>
+	</array>
+</dict>
+</plist>

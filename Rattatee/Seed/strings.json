@@ -1,0 +1,322 @@
+{
+  "accountCurrentPassword": {
+    "en": "Current password",
+    "et": "Praegune parool",
+    "ru": "Нынешний пароль"
+  },
+  "accountDelete": {
+    "en": "Delete account",
+    "et": "Kustuta konto",
+    "ru": "Удалить аккаунт"
+  },
+  "accountDeleteCosts": {
+    "en": "There is no undo. Links to your profile and lists stop working straight away.",
+    "et": "Tagasi võtta ei saa. Lingid su profiilile ja nimekirjadele lakkavad kohe töötamast.",
+    "ru": "Отменить нельзя. Ссылки на ваш профиль и списки сразу перестанут работать."
+  },
+  "accountDeleteGo": {
+    "en": "Delete for good",
+    "et": "Kustuta jäädavalt",
+    "ru": "Удалить навсегда"
+  },
+  "accountDeleteWhy": {
+    "en": "This takes {name} off the site: your saves, your lists, your page and your decks. Numbers about visits stay, with no name on them.",
+    "et": "See eemaldab {name} saidilt: salvestused, nimekirjad, sinu lehe ja kaardipakid. Külastuste arvud jäävad, ilma nimeta.",
+    "ru": "Это удалит {name} с сайта: сохранённые места, списки, вашу страницу и колоды. Статистика посещений останется, без имени."
+  },
+  "accountGoogle": {
+    "en": "Continue with Google",
+    "et": "Jätka Google’iga",
+    "ru": "Продолжить с Google"
+  },
+  "accountSignOut": {
+    "en": "Sign out",
+    "et": "Logi välja",
+    "ru": "Выйти"
+  },
+  "accountSignedIn": {
+    "en": "Signed in as {name}",
+    "et": "Sisse logitud nimega {name}",
+    "ru": "Вы вошли как {name}"
+  },
+  "appApple": {
+    "en": "Continue with Apple",
+    "et": "Jätka Apple’iga",
+    "ru": "Продолжить с Apple"
+  },
+  "appDeleteNoPassword": {
+    "en": "An account made with Google or Apple and no password: type your username instead.",
+    "et": "Konto, mis on tehtud Google’i või Apple’iga ja millel pole parooli: kirjuta parooli asemel oma kasutajanimi.",
+    "ru": "Если аккаунт создан через Google или Apple и пароля у него нет, введите вместо него имя пользователя."
+  },
+  "appSameAccount": {
+    "en": "Your Tallinn Tastebuds account — the same one as the website and Kohuke.",
+    "et": "Sinu Tallinn Tastebudsi konto — sama, mis veebilehel ja Kohukes.",
+    "ru": "Ваш аккаунт Tallinn Tastebuds — тот же, что на сайте и в Kohuke."
+  },
+  "badgeNotKept": {
+    "en": "Not kept · {why}",
+    "et": "Ei jäänud alles · {why}",
+    "ru": "Не сохранено · {why}"
+  },
+  "badgeSaved": {
+    "en": "Saved",
+    "et": "Salvestatud",
+    "ru": "Сохранено"
+  },
+  "badgeWaiting": {
+    "en": "Waiting",
+    "et": "Ootab",
+    "ru": "Ждёт"
+  },
+  "close": {
+    "en": "Close",
+    "et": "Sulge",
+    "ru": "Закрыть"
+  },
+  "done": {
+    "en": "Done",
+    "et": "Valmis",
+    "ru": "Готово"
+  },
+  "keptTitle": {
+    "en": "Kept on this phone",
+    "et": "Telefonis alles",
+    "ru": "Сохранено на телефоне"
+  },
+  "keptWhy": {
+    "en": "It did not reach the server. It is safe here and will be sent by itself when there is a connection. You can see it under My rides.",
+    "et": "See ei jõudnud serverisse. Sõit on siin kindlalt alles ja saadetakse ise ära, kui ühendus on olemas. Selle leiad „Minu sõitude“ alt.",
+    "ru": "Она не дошла до сервера. Здесь она в сохранности и отправится сама, когда появится связь. Её видно в разделе «Мои поездки»."
+  },
+  "locOffTitle": {
+    "en": "Location is off",
+    "et": "Asukoht on välja lülitatud",
+    "ru": "Геолокация выключена"
+  },
+  "locOffWhy": {
+    "en": "Rattatee can only record a ride if it may use your location, also while the phone is locked. In Settings, choose While Using the App.",
+    "et": "Rattatee saab sõitu salvestada ainult siis, kui tal on lubatud sinu asukohta kasutada, ka lukus telefoniga. Vali seadetes „Rakenduse kasutamise ajal“.",
+    "ru": "Rattatee может записать поездку, только если ему можно использовать ваше местоположение, в том числе при заблокированном телефоне. В Настройках выберите «При использовании приложения»."
+  },
+  "openSettings": {
+    "en": "Open Settings",
+    "et": "Ava seaded",
+    "ru": "Открыть настройки"
+  },
+  "privacyLink": {
+    "en": "Privacy",
+    "et": "Privaatsus",
+    "ru": "Конфиденциальность"
+  },
+  "readyTitle": {
+    "en": "Ready to ride",
+    "et": "Valmis sõitma",
+    "ru": "Можно ехать"
+  },
+  "readyWhy": {
+    "en": "Put the phone in your pocket — it keeps recording with the screen locked. GPS in the background uses battery: about as much as a navigation app.",
+    "et": "Pane telefon taskusse — salvestamine jätkub ka lukus ekraaniga. Taustal töötav GPS kulutab akut, umbes sama palju kui navigeerimisrakendus.",
+    "ru": "Положите телефон в карман — запись продолжится и с заблокированным экраном. GPS в фоне расходует батарею — примерно как навигатор."
+  },
+  "rideFast": {
+    "en": "That was faster than a bike rides, so it cannot be kept.",
+    "et": "See oli kiirem, kui ratas sõidab, nii et seda ei saa alles jätta.",
+    "ru": "Это было быстрее, чем ездит велосипед, поэтому сохранить нельзя."
+  },
+  "rideFinish": {
+    "en": "Finish",
+    "et": "Lõpeta",
+    "ru": "Готово"
+  },
+  "rideKeepGoing": {
+    "en": "Keep riding",
+    "et": "Sõida edasi",
+    "ru": "Ехать дальше"
+  },
+  "rideName": {
+    "en": "Name (optional)",
+    "et": "Nimi (valikuline)",
+    "ru": "Название (необязательно)"
+  },
+  "rideOften": {
+    "en": "That is twenty rides today, the most one account can save in a day. The ride is kept on this phone for tomorrow.",
+    "et": "Täna on juba kakskümmend sõitu — rohkem ei saa üks konto päevas salvestada. Sõit jääb homseks selles telefonis alles.",
+    "ru": "Сегодня уже двадцать поездок — больше один аккаунт за день сохранить не может. Поездка останется на телефоне до завтра."
+  },
+  "ridePause": {
+    "en": "Pause",
+    "et": "Peata",
+    "ru": "Пауза"
+  },
+  "ridePausedLine": {
+    "en": "Paused · nothing is recorded",
+    "et": "Peatatud · midagi ei salvestata",
+    "ru": "Пауза · ничего не записывается"
+  },
+  "rideRecordingLock": {
+    "en": "Recording · fine to lock the screen",
+    "et": "Salvestan · ekraani võib lukustada",
+    "ru": "Идёт запись · экран можно заблокировать"
+  },
+  "rideRemove": {
+    "en": "Remove from this phone",
+    "et": "Eemalda telefonist",
+    "ru": "Убрать с телефона"
+  },
+  "rideResume": {
+    "en": "Resume",
+    "et": "Jätka",
+    "ru": "Продолжить"
+  },
+  "rideSave": {
+    "en": "Save ride",
+    "et": "Salvesta sõit",
+    "ru": "Сохранить"
+  },
+  "rideSaveTitle": {
+    "en": "Save this ride?",
+    "et": "Kas salvestada see sõit?",
+    "ru": "Сохранить поездку?"
+  },
+  "rideSaveWhyApp": {
+    "en": "It becomes a confirmed bike route. Your name is never shown with it, and the first and last 200 m are left off.",
+    "et": "Sellest saab kinnitatud rattatee. Sinu nime selle juures kunagi ei näidata ning esimesed ja viimased 200 m jäetakse ära.",
+    "ru": "Она станет подтверждённым велосипедным маршрутом. Ваше имя рядом с ней никогда не показывается, а первые и последние 200 м отрезаются."
+  },
+  "rideSaved": {
+    "en": "Saved",
+    "et": "Salvestatud",
+    "ru": "Сохранено"
+  },
+  "rideSavedWhyApp": {
+    "en": "It is a confirmed bike route now. Thank you.",
+    "et": "See on nüüd kinnitatud rattatee. Aitäh!",
+    "ru": "Теперь это подтверждённый велосипедный маршрут. Спасибо!"
+  },
+  "rideSaving": {
+    "en": "Saving…",
+    "et": "Salvestan…",
+    "ru": "Сохраняем…"
+  },
+  "rideShortServer": {
+    "en": "Once the first and last 200 m are taken off, too little is left to keep.",
+    "et": "Kui esimesed ja viimased 200 m ära võtta, jääb alles hoidmiseks liiga vähe.",
+    "ru": "Если отрезать первые и последние 200 м, остаётся слишком мало, чтобы сохранить."
+  },
+  "rideShortTitle": {
+    "en": "Too short to keep",
+    "et": "Liiga lühike, et alles jätta",
+    "ru": "Слишком коротко"
+  },
+  "rideShortWhy": {
+    "en": "A ride has to be longer than {dist} to be kept.",
+    "et": "Sõit peab alles jäämiseks olema pikem kui {dist}.",
+    "ru": "Чтобы сохранить поездку, она должна быть длиннее {dist}."
+  },
+  "rideStart": {
+    "en": "Start",
+    "et": "Alusta",
+    "ru": "Старт"
+  },
+  "rideThrow": {
+    "en": "Throw it away",
+    "et": "Viska ära",
+    "ru": "Удалить"
+  },
+  "rideUntitled": {
+    "en": "Ride · {date}",
+    "et": "Sõit · {date}",
+    "ru": "Поездка · {date}"
+  },
+  "rideWaiting": {
+    "en": "Waiting for your location…",
+    "et": "Ootan sinu asukohta…",
+    "ru": "Ждём ваше местоположение…"
+  },
+  "ridesAccount": {
+    "en": "Account",
+    "et": "Konto",
+    "ru": "Аккаунт"
+  },
+  "ridesEmptyTitle": {
+    "en": "No rides yet",
+    "et": "Sõite veel pole",
+    "ru": "Поездок пока нет"
+  },
+  "ridesEmptyWhy": {
+    "en": "Rides you record on this phone show up here.",
+    "et": "Siin on sõidud, mille sa selle telefoniga salvestad.",
+    "ru": "Здесь появятся поездки, записанные на этом телефоне."
+  },
+  "ridesFoot": {
+    "en": "Rides are listed from this phone only. Saved rides are on the server without your name.",
+    "et": "Siin on ainult selle telefoni sõidud. Salvestatud sõidud on serveris ilma sinu nimeta.",
+    "ru": "Здесь только поездки с этого телефона. Сохранённые поездки хранятся на сервере без вашего имени."
+  },
+  "ridesWaitingMany": {
+    "en": "{n} rides are waiting to upload. They will go by themselves when there is a connection.",
+    "et": "{n} sõitu ootab saatmist. Need lähevad ise teele, kui ühendus on olemas.",
+    "ru": "Поездок ждут отправки: {n}. Они уйдут сами, когда появится связь."
+  },
+  "ridesWaitingOne": {
+    "en": "1 ride is waiting to upload. It will go by itself when there is a connection.",
+    "et": "1 sõit ootab saatmist. See läheb ise teele, kui ühendus on olemas.",
+    "ru": "1 поездка ждёт отправки. Она уйдёт сама, когда появится связь."
+  },
+  "signInProblem": {
+    "en": "That did not work. Try again in a moment.",
+    "et": "See ei õnnestunud. Proovi hetke pärast uuesti.",
+    "ru": "Не получилось. Попробуйте ещё раз чуть позже."
+  },
+  "signInWhy": {
+    "en": "You do not need an account: a ride is saved without one. Signed in, your rides are also listed on your account page on tallinntastebuds.ee. Nobody else sees whose ride it is.",
+    "et": "Kontot pole vaja: sõit salvestatakse ka ilma. Sisse logituna on sinu sõidud näha ka sinu kontolehel saidil tallinntastebuds.ee. Keegi teine ei näe, kelle sõit see on.",
+    "ru": "Аккаунт не нужен: поездка сохраняется и без него. Если войти, ваши поездки будут также видны на странице вашего аккаунта на tallinntastebuds.ee. Никто другой не видит, чья это поездка."
+  },
+  "statAvg": {
+    "en": "km/h avg",
+    "et": "km/h keskm.",
+    "ru": "км/ч в ср."
+  },
+  "statKm": {
+    "en": "km",
+    "et": "km",
+    "ru": "км"
+  },
+  "statTime": {
+    "en": "time",
+    "et": "aeg",
+    "ru": "время"
+  },
+  "tabRecord": {
+    "en": "Record",
+    "et": "Salvesta",
+    "ru": "Запись"
+  },
+  "tabRides": {
+    "en": "My rides",
+    "et": "Minu sõidud",
+    "ru": "Мои поездки"
+  },
+  "tryNow": {
+    "en": "Try now",
+    "et": "Proovi kohe",
+    "ru": "Попробовать сейчас"
+  },
+  "whyFast": {
+    "en": "too fast",
+    "et": "liiga kiire",
+    "ru": "слишком быстро"
+  },
+  "whyMalformed": {
+    "en": "not readable",
+    "et": "loetamatu",
+    "ru": "не читается"
+  },
+  "whyShort": {
+    "en": "too short",
+    "et": "liiga lühike",
+    "ru": "слишком коротко"
+  }
+}
