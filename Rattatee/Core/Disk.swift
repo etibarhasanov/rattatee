@@ -1,7 +1,8 @@
 import Foundation
 
 /// What the phone keeps between launches: every ride, one JSON file each,
-/// in Application Support under `rides/`.
+/// in Application Support under `rides/`, and beside it the places and lists
+/// the app keeps a copy of.
 ///
 /// A ride is written here while it is being recorded — every few points and
 /// at every pause — and stays until it is removed by hand, so a ride the
@@ -9,9 +10,19 @@ import Foundation
 /// dead battery. Files are written atomically: a ride is the old file or the
 /// new one, never half of each.
 enum Disk {
-    static var rides: URL {
+    /// Application Support, made if it is not there yet — which it is not on
+    /// a phone that has never recorded a ride. The copy of the places
+    /// (`Venues`) and the lists (`ListBook`) are kept here, beside `rides/`.
+    static var support: URL {
         let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let dir = root.appendingPathComponent("rides", isDirectory: true)
+        if !FileManager.default.fileExists(atPath: root.path) {
+            try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        }
+        return root
+    }
+
+    static var rides: URL {
+        let dir = support.appendingPathComponent("rides", isDirectory: true)
         if !FileManager.default.fileExists(atPath: dir.path) {
             try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             // The rides are the user's own and only on this phone until they

@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import Network
 import Observation
@@ -181,11 +182,38 @@ final class Store {
         Task { await findWay() }
     }
 
+    /// A tap on the map before a ride: a place Apple's map names, or
+    /// anywhere at all. Nothing here asks Google or the website's search —
+    /// a named place is looked for in the phone's copy of the roll first
+    /// (`Venues.same`), so a café the website knows is that café under its
+    /// own id; anything else is Apple's name, or a pin whose street the
+    /// phone itself works out. Then it is somewhere to go, like a search row.
+    func tapped(name: String?, at point: CLLocationCoordinate2D) {
+        guard current == nil else { return }
+        let lat = Geo.round5(point.latitude), lng = Geo.round5(point.longitude)
+        if let name, !name.isEmpty {
+            head(to: Venues.shared.same(as: name, at: point)
+                 ?? Spot(id: "apple-\(lat)-\(lng)", name: name, detail: "", lat: lat, lng: lng, kind: .apple))
+            return
+        }
+        let pin = Spot(id: "pin-\(lat)-\(lng)", name: L.t("pinName"), detail: "", lat: lat, lng: lng, kind: .pin)
+        head(to: pin)
+        Task {
+            // Apple's own answer, on the phone's terms: no Google, and no
+            // cost to anybody. A pin with no street is still a pin.
+            let found = try? await CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: lat, longitude: lng))
+            guard let mark = found?.first, self.goal?.spot.id == pin.id else { return }
+            let street = [mark.thoroughfare, mark.subThoroughfare].compactMap { $0 }.joined(separator: " ")
+            self.goal?.spot.detail = street.isEmpty ? (mark.name ?? "") : street
+        }
+    }
+
     func findWay() async {
         guard !demo, let goal, goal.way == .looking, let here = recorder.here else { return }
         let way = await Search.way(from: here, to: goal.spot.coordinate)
         // Only if it is still the place that was asked about.
-        guard self.goal?.spot == goal.spot else { return }
+        // By id: a pin's address may have arrived meanwhile.
+        guard self.goal?.spot.id == goal.spot.id else { return }
         if let way { self.goal?.way = .found(way) } else { self.goal?.way = .missing }
     }
 
@@ -256,6 +284,9 @@ final class Store {
             sendingId = next.id
             await send(next.id)
         }
+        // Then any place waiting to go on a list, after the rides: a ride is
+        // what the app is for.
+        await ListBook.shared.sendWaiting()
     }
 
     private func canSend(_ ride: Ride) -> Bool {

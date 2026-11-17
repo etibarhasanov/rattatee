@@ -2,7 +2,8 @@ import CoreLocation
 import Foundation
 
 /// Somewhere to ride to: a place off the website's search, a street off its
-/// geocoder, or something Google Maps was asked for.
+/// geocoder, something Google Maps was asked for, or a point tapped on the
+/// map — a place Apple's map names, or anywhere at all.
 struct Spot: Identifiable, Equatable {
     enum Kind {
         /// On the Tallinn Tastebuds map: `map: true` in a row of /api/places.
@@ -13,17 +14,27 @@ struct Spot: Identifiable, Equatable {
         case street
         /// What Google Maps just answered with, through /api/lookup.
         case google
+        /// A place Apple's map names, tapped, that the website does not know.
+        case apple
+        /// Anywhere else tapped on the map.
+        case pin
     }
 
     let id: String
     let name: String
-    /// The address, and what kind of place it is where the site says.
-    let detail: String
+    /// The address, and what kind of place it is where the site says. A pin
+    /// learns its address a moment after it is dropped.
+    var detail: String
     let lat: Double
     let lng: Double
     let kind: Kind
 
     var coordinate: CLLocationCoordinate2D { CLLocationCoordinate2D(latitude: lat, longitude: lng) }
+
+    /// On the website's roll under this id — the map's own places, the
+    /// export and what Google has answered — so a list can take it as it is.
+    /// The rest have to be added as somebody's own place first.
+    var onRoll: Bool { [.mine, .place, .google].contains(kind) }
 }
 
 /// A suggested way by bike, from /api/route.
@@ -63,7 +74,7 @@ struct Way: Equatable {
 /// the site has answered with one.
 struct Goal: Equatable {
     enum Finding: Equatable { case looking, found(Way), missing }
-    let spot: Spot
+    var spot: Spot
     var way: Finding = .looking
 }
 

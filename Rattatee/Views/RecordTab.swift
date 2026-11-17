@@ -35,7 +35,9 @@ struct RecordTab: View {
             if let riding { RideDash(ride: riding) }
             RideMap(points: ride?.points ?? [],
                     goal: store.goal,
-                    follow: !store.demo && !planning && (ride == nil || ride?.status == .recording))
+                    follow: !store.demo && !planning && (ride == nil || ride?.status == .recording),
+                    // Somewhere to go is chosen before a ride, never during.
+                    tap: ride == nil ? { name, point in store.tapped(name: name, at: point) } : nil)
                 .overlay(alignment: .top) {
                     if ride == nil { searchBar }
                 }
@@ -100,7 +102,8 @@ struct RecordTab: View {
     }
 }
 
-/// The map: where the phone is, and the line ridden so far.
+/// The map: where the phone is, and the line ridden so far. Before a ride a
+/// tap on it is somewhere to go: a place Apple's map names, or anywhere.
 struct RideMap: View {
     let points: [Point]
     /// Where the rider is going and the suggested way there, in the accent
@@ -108,15 +111,50 @@ struct RideMap: View {
     var goal: Goal?
     /// Keep the phone's position in the middle, or show the whole line.
     let follow: Bool
+    /// A tap: the name of the place Apple's map drew there, if it drew one,
+    /// and the point. Nil while riding, when taps do nothing.
+    var tap: ((String?, CLLocationCoordinate2D) -> Void)?
 
     private static let tallinn = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 59.437, longitude: 24.7536),
         span: MKCoordinateSpan(latitudeDelta: 0.06, longitudeDelta: 0.12))
 
     @State private var camera: MapCameraPosition = .userLocation(fallback: .region(RideMap.tallinn))
+    /// The place Apple's map drew under a tap, which it selects by itself.
+    @State private var picked: MapFeature?
+    /// When it last did, so the tap under it does not drop a pin as well.
+    @State private var pickedAt = Date.distantPast
 
     var body: some View {
-        Map(position: $camera) {
+        GeometryReader { frame in
+            MapReader { proxy in
+                map
+                    // Beside the map's own gestures rather than instead of
+                    // them: dragging and pinching go on as before.
+                    .simultaneousGesture(SpatialTapGesture().onEnded { tapped in
+                        guard tap != nil, !onControls(tapped.location, width: frame.size.width),
+                              let point = proxy.convert(tapped.location, from: .local) else { return }
+                        Task { @MainActor in
+                            // A tap on a named place selects it a moment
+                            // later; wait for that, and drop a pin only if
+                            // it did not.
+                            try? await Task.sleep(for: .milliseconds(250))
+                            guard Date().timeIntervalSince(pickedAt) > 0.6 else { return }
+                            tap?(nil, point)
+                        }
+                    })
+            }
+        }
+        .onChange(of: picked) {
+            guard let feature = picked else { return }
+            pickedAt = Date()
+            tap?(feature.title, feature.coordinate)
+            picked = nil
+        }
+    }
+
+    private var map: some View {
+        Map(position: $camera, selection: $picked) {
             UserAnnotation()
             if let goal {
                 if case .found(let way) = goal.way {
@@ -130,6 +168,7 @@ struct RideMap: View {
                     .stroke(Theme.here, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
             }
         }
+        .mapFeatureSelectionDisabled { feature in tap == nil || feature.kind != .pointOfInterest }
         .mapControls {
             MapUserLocationButton()
             MapCompass()
@@ -137,6 +176,12 @@ struct RideMap: View {
         .onAppear { aim() }
         .onChange(of: follow) { aim() }
         .onChange(of: goal) { aim() }
+    }
+
+    /// The corner where the map draws its locate button and compass, which
+    /// the tap gesture beside it would otherwise hear as a pin as well.
+    private func onControls(_ at: CGPoint, width: CGFloat) -> Bool {
+        at.x > width - 64 && at.y < 140
     }
 
     private func aim() {
@@ -182,18 +227,31 @@ struct LocationOffCard: View {
 /// Somewhere to go: the place, how far by the suggested way, and Go, which
 /// is Start. The way is a suggestion and says so; what is recorded is where
 /// the rider really went.
+///
+/// A place — not a street — can also go on one of the rider's lists on the
+/// website, which needs an account: signed in, Add to a list beside Go;
+/// signed out, a line saying so.
 struct GoalCard: View {
     @Environment(Store.self) private var store
     let goal: Goal
+    @State private var listing = false
 
     var body: some View {
+        let listable = goal.spot.kind != .street
         SheetCard {
             Text(goal.spot.name).font(.title2.bold()).foregroundStyle(Theme.ink).lineLimit(2)
             Text(line).font(.subheadline).foregroundStyle(Theme.muted)
-            Note(text: note).padding(.top, 10).padding(.bottom, 14)
-            Button(L.t("goalGo")) { store.start() }
-                .buttonStyle(.big)
+            // "No way found" outranks the sign-in line: it is about the ride.
+            Note(text: listable && store.user == nil && goal.way != .missing ? L.t("goalListSignIn") : note)
+                .padding(.top, 10).padding(.bottom, 14)
+            HStack(spacing: 10) {
+                if listable && store.user != nil {
+                    Button(L.t("goalList")) { listing = true }.buttonStyle(.bigQuiet)
+                }
+                Button(L.t("goalGo")) { store.start() }.buttonStyle(.big)
+            }
         }
+        .sheet(isPresented: $listing) { ListPicker(spot: goal.spot) }
     }
 
     private var line: String {
