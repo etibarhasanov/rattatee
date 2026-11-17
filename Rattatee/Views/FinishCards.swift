@@ -111,7 +111,7 @@ struct OutcomeCard: View {
                 done
             case .refused:
                 head(L.t("badgeNotKept", ["why": why(ride.problem)]))
-                Note(text: ride.problem == "fast" ? L.t("rideFast") : L.t("rideShortServer"))
+                Note(text: ride.problem == "fast" ? L.t("rideFast") : ride.problem == "outside" ? L.t("rideOutside") : L.t("rideShortServer"))
                     .padding(.top, 10).padding(.bottom, 14)
                 done
             default:
@@ -148,6 +148,7 @@ func why(_ problem: String?) -> String {
     switch problem {
     case "fast": return L.t("whyFast")
     case "short": return L.t("whyShort")
+    case "outside": return L.t("whyOutside")
     default: return L.t("whyMalformed")
     }
 }

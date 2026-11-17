@@ -121,6 +121,10 @@ final class Store {
             if !recorder.refused { recorder.ask { [weak self] in self?.start() } }
             return
         }
+        // Approximate location is a fix good to a few kilometres: every one
+        // would be dropped and the ride would wait for ever. The Record tab
+        // says so instead.
+        guard recorder.precise else { return }
         let ride = Ride(id: UUID().uuidString.lowercased(), started: Date(), status: .recording, since: Date())
         rides.insert(ride, at: 0)
         shown = nil
@@ -140,7 +144,7 @@ final class Store {
     /// Resume, and Keep riding on the too-short card.
     func resume() {
         guard let i = currentIndex, rides[i].status != .recording else { return }
-        guard recorder.allowed else { return }
+        guard recorder.allowed, recorder.precise else { return }
         rides[i].since = Date()
         rides[i].status = .recording
         write(rides[i])
@@ -237,12 +241,13 @@ final class Store {
 
     private func send(_ id: String) async {
         guard let ride = self.ride(id) else { return }
-        let line = Geo.line(ride.points, began: ride.started)
+        let line = Geo.line(ride.points)
         var outcome = ride
 
         if line.count < 2 {
+            // Nothing of it is inside the box the server takes rides in.
             outcome.status = .refused
-            outcome.problem = "short"
+            outcome.problem = "outside"
         } else {
             do {
                 let data = try await API.post("api/rides", [

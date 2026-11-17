@@ -99,6 +99,16 @@
     "et": "Rattatee saab sõitu salvestada ainult siis, kui tal on lubatud sinu asukohta kasutada, ka lukus telefoniga. Vali seadetes „Rakenduse kasutamise ajal“.",
     "ru": "Rattatee может записать поездку, только если ему можно использовать ваше местоположение, в том числе при заблокированном телефоне. В Настройках выберите «При использовании приложения»."
   },
+  "locPreciseTitle": {
+    "en": "Precise Location is off",
+    "et": "Täpne asukoht on välja lülitatud",
+    "ru": "Точная геопозиция выключена"
+  },
+  "locPreciseWhy": {
+    "en": "Rattatee only gets a rough idea of where the phone is, which is not enough to draw a ride. In Settings, under Location, turn on Precise Location.",
+    "et": "Rattatee teab ainult umbkaudu, kus telefon on, ja sellest ei piisa sõidu joonistamiseks. Lülita seadetes asukoha all sisse „Täpne asukoht“.",
+    "ru": "Rattatee знает лишь приблизительно, где находится телефон, а этого мало, чтобы нарисовать поездку. В Настройках, в разделе «Геопозиция», включите «Точная геопозиция»."
+  },
   "openSettings": {
     "en": "Open Settings",
     "et": "Ava seaded",
@@ -143,6 +153,11 @@
     "en": "That is twenty rides today, the most one account can save in a day. The ride is kept on this phone for tomorrow.",
     "et": "Täna on juba kakskümmend sõitu — rohkem ei saa üks konto päevas salvestada. Sõit jääb homseks selles telefonis alles.",
     "ru": "Сегодня уже двадцать поездок — больше один аккаунт за день сохранить не может. Поездка останется на телефоне до завтра."
+  },
+  "rideOutside": {
+    "en": "Rides are collected in and around Tallinn, and this one was somewhere else.",
+    "et": "Sõite kogutakse Tallinnas ja selle ümbruses, aga see sõit oli mujal.",
+    "ru": "Поездки собираются в Таллине и окрестностях, а эта была в другом месте."
   },
   "ridePause": {
     "en": "Pause",
@@ -313,6 +328,11 @@
     "en": "not readable",
     "et": "loetamatu",
     "ru": "не читается"
+  },
+  "whyOutside": {
+    "en": "outside Tallinn",
+    "et": "väljaspool Tallinna",
+    "ru": "не в Таллине"
   },
   "whyShort": {
     "en": "too short",

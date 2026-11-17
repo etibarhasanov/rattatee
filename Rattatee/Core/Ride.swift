@@ -126,7 +126,7 @@ enum Geo {
     static let maxPoints = 3500
 
     /// The line as the server takes it: `[lat, lng, t, acc]` — five decimals,
-    /// whole seconds since the ride began, whole metres — inside the box, and
+    /// whole seconds since the first point, whole metres — inside the box, and
     /// no more than `maxPoints` of it. The server keeps the last two only if
     /// every point has them and they are sane (a `t` from 0 to a day, an
     /// accuracy up to a kilometre), which these always are short of a ride
@@ -134,14 +134,15 @@ enum Geo {
     /// evenly, keeping the first and the last point; a 3,500-point ride is
     /// about forty kilometres, so this only happens on very long days, and a
     /// point every 24 m instead of every 12 still follows the streets.
-    static func line(_ points: [Point], began: Date) -> [[Double]] {
+    static func line(_ points: [Point]) -> [[Double]] {
         let inside = points.filter(inTallinn)
         var kept = inside
         if inside.count > maxPoints {
             let step = Double(inside.count - 1) / Double(maxPoints - 1)
             kept = (0..<maxPoints).map { inside[Int((Double($0) * step).rounded())] }
         }
-        let zero = began.timeIntervalSince1970
+        // Counted from the first point kept, as the website's recorder counts.
+        let zero = points.first?.t ?? 0
         return kept.map {
             [round5($0.lat), round5($0.lng), max(0, ($0.t - zero).rounded()), $0.acc.rounded()]
         }

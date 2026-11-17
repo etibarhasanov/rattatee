@@ -6,7 +6,7 @@ import SwiftUI
 /// order, plus what only an app needs to say.
 ///
 ///   Ready            Start, and the line about the pocket and the battery
-///   Location is off  what to choose in Settings
+///   Location is off  what to choose in Settings (or Precise Location is)
 ///   Recording        distance, time, average; Pause and Finish
 ///   Paused           the same, greyed; Resume and Finish
 ///   Save this ride?  a name, Save ride, Throw it away   (FinishCards.swift)
@@ -40,8 +40,8 @@ struct RecordTab: View {
             }
         } else if let outcome {
             OutcomeCard(ride: outcome)
-        } else if store.recorder.refused {
-            LocationOffCard()
+        } else if store.recorder.refused || (store.recorder.allowed && !store.recorder.precise) {
+            LocationOffCard(approximate: !store.recorder.refused)
         } else {
             ReadyCard()
         }
@@ -101,10 +101,13 @@ struct ReadyCard: View {
 }
 
 struct LocationOffCard: View {
+    /// Location is allowed but only approximately: Precise Location is off.
+    var approximate = false
+
     var body: some View {
         SheetCard {
-            Text(L.t("locOffTitle")).font(.title2.bold()).foregroundStyle(Theme.ink)
-            Note(text: L.t("locOffWhy")).padding(.top, 4).padding(.bottom, 14)
+            Text(approximate ? L.t("locPreciseTitle") : L.t("locOffTitle")).font(.title2.bold()).foregroundStyle(Theme.ink)
+            Note(text: approximate ? L.t("locPreciseWhy") : L.t("locOffWhy")).padding(.top, 4).padding(.bottom, 14)
             Button(L.t("openSettings")) {
                 if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
             }

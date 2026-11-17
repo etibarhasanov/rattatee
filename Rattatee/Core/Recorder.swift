@@ -34,6 +34,10 @@ final class Recorder: NSObject {
     static let sure: Double = 30
 
     private(set) var authorization: CLAuthorizationStatus = .notDetermined
+    /// Whether iOS gives the app the phone's real position, or the
+    /// approximate one somebody can choose instead ("Precise Location" off),
+    /// which is no use for drawing a ride.
+    private(set) var precise = true
     private(set) var running = false
 
     /// Every fix good enough to consider, in order.
@@ -47,6 +51,7 @@ final class Recorder: NSObject {
     override init() {
         super.init()
         authorization = manager.authorizationStatus
+        precise = manager.accuracyAuthorization == .fullAccuracy
         manager.delegate = self
         manager.activityType = .fitness
         manager.desiredAccuracy = kCLLocationAccuracyBest
@@ -93,6 +98,7 @@ extension Recorder: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         MainActor.assumeIsolated {
             authorization = manager.authorizationStatus
+            precise = manager.accuracyAuthorization == .fullAccuracy
             if allowed, let then = afterAsking {
                 afterAsking = nil
                 then()
