@@ -41,6 +41,7 @@ struct AccountTab: View {
                         Text("English").tag("en")
                         Text("Eesti").tag("et")
                         Text("Русский").tag("ru")
+                        Text("Azərbaycanca").tag("az")
                     }
                     .foregroundStyle(Theme.ink)
                 }

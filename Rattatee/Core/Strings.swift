@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// The app's words, in English, Estonian and Russian.
+/// The app's words, in English, Estonian, Russian and Azerbaijani.
 ///
 /// Kohuke reads most of its strings from the website at launch. Rattatee
 /// cannot: it has to say "Recording" in a pocket on a train with no signal,
@@ -14,13 +14,13 @@ import Observation
 /// The language is the one chosen under Account, or, until somebody
 /// chooses, the one iOS picked for this app: the phone's own, or the one
 /// chosen for Rattatee alone under Settings, which iOS offers because
-/// Config/Info.plist lists all three. Anything else reads English.
+/// Config/Info.plist lists all four. Anything else reads English.
 ///
 /// The choice is read through `LangStore`, which is observable, so every
 /// view that asks `L.t` for a sentence is redrawn the moment it changes —
 /// no restart, the way the colour changes.
 enum L {
-    static let languages = ["en", "et", "ru"]
+    static let languages = ["en", "et", "ru", "az"]
 
     /// What iOS picked, used while the choice is "Phone's language".
     static let phone: String = {

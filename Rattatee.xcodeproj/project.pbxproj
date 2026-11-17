@@ -90,6 +90,7 @@
 				en,
 				et,
 				ru,
+				az,
 				Base,
 			);
 			mainGroup = B2C3D4E500000000000000A4;

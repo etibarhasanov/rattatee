@@ -136,7 +136,7 @@ switches it off and on, and the phone remembers. The voice is the owner's,
 recorded: twelve phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one. Until a
 phrase is recorded the phone's own voice reads it, in English and Russian;
-iOS has no Estonian voice. Further than sixty metres from the way the row
+iOS has no Estonian or Azerbaijani voice. Further than sixty metres from the way the row
 goes and the voice is quiet until the rider is back on it: nothing looks
 for a new way. A ride with nowhere to go has no row and no voice
 (`Core/Guide.swift`).
@@ -154,7 +154,7 @@ Streets, addresses and Google need a connection, and the search says there
 is none only when the phone's copy has nothing for the letters either.
 Recording never needs one.
 
-English, Estonian and Russian, following the one chosen under Account, or
+English, Estonian, Russian and Azerbaijani, following the one chosen under Account, or
 until somebody chooses, the phone's language or the one chosen for the app
 in Settings.
 
@@ -233,7 +233,7 @@ accepts; this app's is `ee.tallinntastebuds.rattatee`.
 
 **The words are compiled in**, unlike Kohuke's, because the app has to say
 "Recording" with no signal. `Rattatee/Seed/strings.json` holds every string
-in the three languages; the ones the website has too (`ride*`, `account*`)
+in the four languages; the ones the website has too (`ride*`, `account*`)
 were copied from its `data/ui.json` under the same keys. CI fails on a key
 missing a language, a key the code asks for that is not there, and a key
 nothing asks for.
@@ -277,7 +277,7 @@ Rattatee/
             AccountView.swift   the Account tab, the colours, deleting an account
             SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
-  Seed/     strings.json        every string, in en, et and ru
+  Seed/     strings.json        every string, in en, et, ru and az
   Voice/    <lang>-<clip>.m4a   the turns, recorded; empty until they are
   *.lproj/  InfoPlist.strings   the location question, in each language
   PrivacyInfo.xcprivacy         the privacy manifest

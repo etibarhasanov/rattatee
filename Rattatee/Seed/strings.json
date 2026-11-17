@@ -1,770 +1,924 @@
 {
   "accountCreate": {
+    "az": "Hesab yarat",
     "en": "Create account",
     "et": "Loo konto",
     "ru": "Создать аккаунт"
   },
   "accountCurrentPassword": {
+    "az": "İndiki parol",
     "en": "Current password",
     "et": "Praegune parool",
     "ru": "Нынешний пароль"
   },
   "accountDelete": {
+    "az": "Hesabı sil",
     "en": "Delete account",
     "et": "Kustuta konto",
     "ru": "Удалить аккаунт"
   },
   "accountDeleteCosts": {
+    "az": "Geri qaytarmaq olmur. Profilinə və siyahılarına olan keçidlər dərhal işləməyi dayandırır.",
     "en": "There is no undo. Links to your profile and lists stop working straight away.",
     "et": "Tagasi võtta ei saa. Lingid su profiilile ja nimekirjadele lakkavad kohe töötamast.",
     "ru": "Отменить нельзя. Ссылки на ваш профиль и списки сразу перестанут работать."
   },
   "accountDeleteGo": {
+    "az": "Həmişəlik sil",
     "en": "Delete for good",
     "et": "Kustuta jäädavalt",
     "ru": "Удалить навсегда"
   },
   "accountDeleteWhy": {
+    "az": "Bu, {name} hesabını saytdan silir: yadda saxladığın yerlər, siyahıların, səhifən və kart dəstlərin. Ziyarət sayları adsız qalır.",
     "en": "This takes {name} off the site: your saves, your lists, your page and your decks. Numbers about visits stay, with no name on them.",
     "et": "See eemaldab {name} saidilt: salvestused, nimekirjad, sinu lehe ja kaardipakid. Külastuste arvud jäävad, ilma nimeta.",
     "ru": "Это удалит {name} с сайта: сохранённые места, списки, вашу страницу и колоды. Статистика посещений останется, без имени."
   },
   "accountErrGeneric": {
+    "az": "Nəsə səhv getdi. Yenidən cəhd et.",
     "en": "Something went wrong. Try again.",
     "et": "Midagi läks valesti. Proovi uuesti.",
     "ru": "Что-то пошло не так. Попробуйте снова."
   },
   "accountErrNoMatch": {
+    "az": "İstifadəçi adı və ya parol yanlışdır.",
     "en": "Wrong username or password.",
     "et": "Vale kasutajanimi või parool.",
     "ru": "Неверное имя пользователя или пароль."
   },
   "accountErrPassword": {
+    "az": "Parol ən azı 8 simvol olmalıdır.",
     "en": "Password must be at least 8 characters.",
     "et": "Parool peab olema vähemalt 8 märki.",
     "ru": "Пароль должен быть не короче 8 символов."
   },
   "accountErrSlow": {
+    "az": "Çox cəhd. Bir neçə dəqiqə gözlə.",
     "en": "Too many tries. Wait a few minutes.",
     "et": "Liiga palju katseid. Oota mõni minut.",
     "ru": "Слишком много попыток. Подождите несколько минут."
   },
   "accountErrTaken": {
+    "az": "Bu istifadəçi adı tutulub.",
     "en": "That username is taken.",
     "et": "See kasutajanimi on juba võetud.",
     "ru": "Это имя уже занято."
   },
   "accountErrUsername": {
+    "az": "3–24 hərf, rəqəm, nöqtə, tire və ya alt xətt istifadə et.",
     "en": "Use 3 to 24 letters, numbers, dots, dashes or underscores.",
     "et": "Kasuta 3–24 tähte, numbrit, punkti, sidekriipsu või alakriipsu.",
     "ru": "Используйте 3–24 буквы, цифры, точки, дефисы или подчёркивания."
   },
   "accountGoogle": {
+    "az": "Google ilə davam et",
     "en": "Continue with Google",
     "et": "Jätka Google’iga",
     "ru": "Продолжить с Google"
   },
   "accountOr": {
+    "az": "və ya",
     "en": "or",
     "et": "või",
     "ru": "или"
   },
   "accountPassword": {
+    "az": "Parol",
     "en": "Password",
     "et": "Parool",
     "ru": "Пароль"
   },
   "accountSignIn": {
+    "az": "Daxil ol",
     "en": "Sign in",
     "et": "Logi sisse",
     "ru": "Войти"
   },
   "accountSignOut": {
+    "az": "Çıxış et",
     "en": "Sign out",
     "et": "Logi välja",
     "ru": "Выйти"
   },
   "accountSignedIn": {
+    "az": "{name} kimi daxil olunub",
     "en": "Signed in as {name}",
     "et": "Sisse logitud nimega {name}",
     "ru": "Вы вошли как {name}"
   },
   "accountUsername": {
+    "az": "İstifadəçi adı",
     "en": "Username",
     "et": "Kasutajanimi",
     "ru": "Имя пользователя"
   },
   "accountUsernameHint": {
+    "az": "3–24 hərf və ya rəqəm. Paylaşdığın siyahılarda görünür.",
     "en": "3–24 letters or numbers. Shown on lists you share.",
     "et": "3–24 tähte või numbrit. Näha nimekirjades, mida jagad.",
     "ru": "3–24 буквы или цифры. Видно в списках, которыми вы делитесь."
   },
   "accountWorking": {
+    "az": "İşlənir…",
     "en": "Working…",
     "et": "Töötan…",
     "ru": "Выполняется…"
   },
   "appApple": {
+    "az": "Apple ilə davam et",
     "en": "Continue with Apple",
     "et": "Jätka Apple’iga",
     "ru": "Продолжить с Apple"
   },
   "appDeleteNoPassword": {
+    "az": "Hesab Google və ya Apple ilə yaradılıb və parolu yoxdursa, əvəzinə istifadəçi adını yaz.",
     "en": "An account made with Google or Apple and no password: type your username instead.",
     "et": "Konto, mis on tehtud Google’i või Apple’iga ja millel pole parooli: kirjuta parooli asemel oma kasutajanimi.",
     "ru": "Если аккаунт создан через Google или Apple и пароля у него нет, введите вместо него имя пользователя."
   },
   "appNoReset": {
+    "az": "Parolu sıfırlamaq olmur — qoy telefon onu yadda saxlasın.",
     "en": "There’s no reset — let your phone save the password.",
     "et": "Taastamist pole — lase telefonil parool meelde jätta.",
     "ru": "Восстановления нет — пусть телефон запомнит пароль."
   },
   "badgeNotKept": {
+    "az": "Saxlanmadı · {why}",
     "en": "Not kept · {why}",
     "et": "Ei jäänud alles · {why}",
     "ru": "Не сохранено · {why}"
   },
   "badgeSaved": {
+    "az": "Saxlanıldı",
     "en": "Saved",
     "et": "Salvestatud",
     "ru": "Сохранено"
   },
   "badgeWaiting": {
+    "az": "Gözləyir",
     "en": "Waiting",
     "et": "Ootab",
     "ru": "Ждёт"
   },
   "close": {
+    "az": "Bağla",
     "en": "Close",
     "et": "Sulge",
     "ru": "Закрыть"
   },
   "done": {
+    "az": "Hazır",
     "en": "Done",
     "et": "Valmis",
     "ru": "Готово"
   },
   "findFromGoogle": {
+    "az": "Google Maps-dən",
     "en": "From Google Maps",
     "et": "Google Mapsist",
     "ru": "С Google Карт"
   },
   "findGoogleAsk": {
+    "az": "Google Maps-də “{q}” axtar",
     "en": "Look for “{q}” on Google Maps",
     "et": "Otsi „{q}“ Google Mapsist",
     "ru": "Искать «{q}» на Google Картах"
   },
   "findGoogleAsking": {
+    "az": "Google Maps-dən soruşulur…",
     "en": "Asking Google Maps…",
     "et": "Küsin Google Mapsilt…",
     "ru": "Спрашиваем Google Карты…"
   },
   "findGoogleNoMore": {
+    "az": "Google Maps-də Tallində “{q}” üçün başqa heç nə yoxdur.",
     "en": "Google Maps has nothing more in Tallinn for “{q}”.",
     "et": "Google Mapsil pole Tallinnas otsingule „{q}“ rohkem midagi.",
     "ru": "В Google Картах больше ничего нет в Таллине по запросу «{q}»."
   },
   "findGoogleNone": {
+    "az": "Google Maps-də də Tallində “{q}” üçün heç nə yoxdur.",
     "en": "Google Maps has nothing in Tallinn for “{q}” either.",
     "et": "Ka Google Mapsil pole Tallinnas midagi „{q}“ kohta.",
     "ru": "На Google Картах в Таллинне по запросу «{q}» тоже ничего нет."
   },
   "findGoogleResting": {
+    "az": "Google-da axtarış bu gün dincəlir. Sabah yenidən cəhd edin.",
     "en": "Looking on Google is resting for today. Try again tomorrow.",
     "et": "Google'ist otsimine puhkab täna. Proovi homme uuesti.",
     "ru": "Поиск в Google сегодня отдыхает. Попробуйте завтра."
   },
   "goalFinding": {
+    "az": "Yol axtarılır…",
     "en": "Finding a way…",
     "et": "Otsin teed…",
     "ru": "Ищем путь…"
   },
   "goalGo": {
+    "az": "Get",
     "en": "Go",
     "et": "Sõida",
     "ru": "Поехали"
   },
   "goalLeft": {
+    "az": "{name} · {dist} qalıb",
     "en": "To {name} · {dist} left",
     "et": "Sihtkoht: {name} · jäänud {dist}",
     "ru": "Цель: {name} · осталось {dist}"
   },
   "goalList": {
+    "az": "Siyahıya əlavə et",
     "en": "Add to a list",
     "et": "Lisa nimekirja",
     "ru": "В список"
   },
   "goalListSignIn": {
+    "az": "Yerləri öz siyahılarına əlavə etmək üçün Hesab bölməsində hesab yarat.",
     "en": "Make an account under Account to put places on your own lists.",
     "et": "Loo konto vaates Konto, et lisada kohti oma nimekirjadesse.",
     "ru": "Создайте аккаунт во вкладке «Аккаунт», чтобы добавлять места в свои списки."
   },
   "goalNoWay": {
+    "az": "Buradan yol tapılmadı. Yenə də ora sürüb gedişi yaza bilərsən.",
     "en": "No way was found from here. You can still ride there and record it.",
     "et": "Siit ei leitud teed. Võid siiski sinna sõita ja sõidu salvestada.",
     "ru": "Путь отсюда не найден. Всё равно можно доехать и записать поездку."
   },
   "goalNote": {
+    "az": "Göy xətt təklif olunan yoldur. Onunla get və ya öz yolunla — yazılan sənin həqiqətən getdiyin yoldur.",
     "en": "The blue line is a suggested way. Ride it or your own — what is recorded is the way you really go.",
     "et": "Sinine joon on soovitatud tee. Sõida seda või oma teed — salvestatakse see, kust sa päriselt sõidad.",
     "ru": "Синяя линия — предложенный путь. Езжайте по нему или по-своему: записывается то, как вы едете на самом деле."
   },
   "goalTo": {
+    "az": "{name}",
     "en": "To {name}",
     "et": "Sihtkoht: {name}",
     "ru": "Цель: {name}"
   },
   "goalWay": {
+    "az": "{dist} · velosipedlə təxminən {min} dəq",
     "en": "{dist} · about {min} min by bike",
     "et": "{dist} · rattaga umbes {min} min",
     "ru": "{dist} · на велосипеде около {min} мин"
   },
   "goalWayChip": {
+    "az": "{min} dəq · {dist}",
     "en": "{min} min · {dist}",
     "et": "{min} min · {dist}",
     "ru": "{min} мин · {dist}"
   },
   "keptTitle": {
+    "az": "Bu telefonda saxlanıldı",
     "en": "Kept on this phone",
     "et": "Telefonis alles",
     "ru": "Сохранено на телефоне"
   },
   "keptWhy": {
+    "az": "Serverə çatmadı. Burada təhlükəsizdir və bağlantı olanda özü göndəriləcək. Onu Gedişlərim bölməsində görə bilərsən.",
     "en": "It did not reach the server. It is safe here and will be sent by itself when there is a connection. You can see it under My rides.",
     "et": "See ei jõudnud serverisse. Sõit on siin kindlalt alles ja saadetakse ise ära, kui ühendus on olemas. Selle leiad „Minu sõitude“ alt.",
     "ru": "Она не дошла до сервера. Здесь она в сохранности и отправится сама, когда появится связь. Её видно в разделе «Мои поездки»."
   },
   "language": {
+    "az": "Dil",
     "en": "Language",
     "et": "Keel",
     "ru": "Язык"
   },
   "languagePhone": {
+    "az": "Telefonun dili",
     "en": "Phone’s language",
     "et": "Telefoni keel",
     "ru": "Язык телефона"
   },
   "listAddTo": {
+    "az": "{name} — hara əlavə edək",
     "en": "Add {name} to",
     "et": "Lisa {name}",
     "ru": "Добавить {name} в"
   },
   "listCount": {
+    "az": "{n} yer",
     "en": "{n} places",
     "et": "{n} kohta",
     "ru": "мест: {n}"
   },
   "listCountOne": {
+    "az": "1 yer",
     "en": "1 place",
     "et": "1 koht",
     "ru": "1 место"
   },
   "listNameFirst": {
+    "az": "Əvvəlcə yerə ad ver.",
     "en": "Give the place a name first.",
     "et": "Anna kohale kõigepealt nimi.",
     "ru": "Сначала дайте месту название."
   },
   "listOffline": {
+    "az": "Bağlantı yoxdur və bu telefonda hələ siyahı saxlanmayıb.",
     "en": "No connection, and no lists kept on this phone yet.",
     "et": "Ühendust pole ja selles telefonis pole veel ühtegi nimekirja.",
     "ru": "Нет связи, и на этом телефоне ещё нет сохранённых списков."
   },
   "listOwnPlace": {
+    "az": "Tallinn Tastebuds-da bu yer hələ yoxdur, ona görə siyahılarına sənin öz yerin kimi, bu adla düşür.",
     "en": "Tallinn Tastebuds does not have this place yet, so it goes on your lists as your own, under this name.",
     "et": "Tallinn Tastebudsil seda kohta veel pole, nii et see läheb sinu nimekirjadesse sinu enda kohana, selle nime all.",
     "ru": "На Tallinn Tastebuds этого места ещё нет, поэтому оно попадёт в ваши списки как ваше собственное, под этим названием."
   },
   "listPlaceName": {
+    "az": "Yerin adı",
     "en": "Name of the place",
     "et": "Koha nimi",
     "ru": "Название места"
   },
   "listWaiting": {
+    "az": "Şəbəkə olanda göndəriləcək",
     "en": "Sent when there is signal",
     "et": "Saadetakse, kui levi on",
     "ru": "Отправится, когда будет связь"
   },
   "listsCreate": {
+    "az": "Siyahını yarat",
     "en": "Make the list",
     "et": "Loo nimekiri",
     "ru": "Создать список"
   },
   "listsErrFull": {
+    "az": "Bir siyahının saxlaya biləcəyi yer sayı bu qədərdir.",
     "en": "That is as many places as one list can hold.",
     "et": "Rohkem kohti üks nimekiri ei hoia.",
     "ru": "Больше мест один список не держит."
   },
   "listsErrGeneric": {
+    "az": "Alınmadı. Yenidən yoxla.",
     "en": "That did not go through. Try again.",
     "et": "See ei läinud läbi. Proovi uuesti.",
     "ru": "Не получилось. Попробуйте ещё раз."
   },
   "listsErrSignedOut": {
+    "az": "Hesabdan çıxmısan. Yenidən daxil ol, siyahı yerindədir.",
     "en": "You have been signed out. Sign in again and the list is still there.",
     "et": "Sind logiti välja. Logi uuesti sisse, nimekiri on alles.",
     "ru": "Вы вышли из аккаунта. Войдите снова — список на месте."
   },
   "listsErrTitle": {
+    "az": "Siyahının adı olmalıdır.",
     "en": "A list needs a name.",
     "et": "Nimekirjal peab olema nimi.",
     "ru": "У списка должно быть название."
   },
   "listsErrTooMany": {
+    "az": "Bir hesabın saxlaya biləcəyi siyahı sayı bu qədərdir.",
     "en": "That is as many lists as one account can hold.",
     "et": "Rohkem nimekirju üks konto ei hoia.",
     "ru": "Больше списков один аккаунт не держит."
   },
   "listsNewName": {
+    "az": "Yeni siyahının adı",
     "en": "Name of the new list",
     "et": "Uue nimekirja nimi",
     "ru": "Название нового списка"
   },
   "listsNone": {
+    "az": "Hələ siyahı yoxdur. Birini yarat və doldurmağa başla.",
     "en": "No lists yet. Make one and start filling it.",
     "et": "Ühtegi nimekirja veel pole. Tee üks ja hakka täitma.",
     "ru": "Списков пока нет. Создайте список и начните наполнять."
   },
   "listsSaveDone": {
+    "az": "Yadda saxlanıldı",
     "en": "Saved",
     "et": "Salvestatud",
     "ru": "Сохранено"
   },
   "locOffTitle": {
+    "az": "Məkan söndürülüb",
     "en": "Location is off",
     "et": "Asukoht on välja lülitatud",
     "ru": "Геолокация выключена"
   },
   "locOffWhy": {
+    "az": "Rattatee gedişi yalnız məkanından istifadə edə bilsə yaza bilər, telefon kilidli olanda da. Ayarlarda «Tətbiqdən istifadə edərkən» seç.",
     "en": "Rattatee can only record a ride if it may use your location, also while the phone is locked. In Settings, choose While Using the App.",
     "et": "Rattatee saab sõitu salvestada ainult siis, kui tal on lubatud sinu asukohta kasutada, ka lukus telefoniga. Vali seadetes „Rakenduse kasutamise ajal“.",
     "ru": "Rattatee может записать поездку, только если ему можно использовать ваше местоположение, в том числе при заблокированном телефоне. В Настройках выберите «При использовании приложения»."
   },
   "locPreciseTitle": {
+    "az": "Dəqiq məkan söndürülüb",
     "en": "Precise Location is off",
     "et": "Täpne asukoht on välja lülitatud",
     "ru": "Точная геопозиция выключена"
   },
   "locPreciseWhy": {
+    "az": "Rattatee telefonun harada olduğunu yalnız təxmini bilir, bu isə gedişi çəkmək üçün azdır. Ayarlarda, Məkan bölməsində Dəqiq məkanı yandır.",
     "en": "Rattatee only gets a rough idea of where the phone is, which is not enough to draw a ride. In Settings, under Location, turn on Precise Location.",
     "et": "Rattatee teab ainult umbkaudu, kus telefon on, ja sellest ei piisa sõidu joonistamiseks. Lülita seadetes asukoha all sisse „Täpne asukoht“.",
     "ru": "Rattatee знает лишь приблизительно, где находится телефон, а этого мало, чтобы нарисовать поездку. В Настройках, в разделе «Геопозиция», включите «Точная геопозиция»."
   },
   "lookBackground": {
+    "az": "Fon",
     "en": "Background",
     "et": "Taust",
     "ru": "Фон"
   },
   "lookBlue": {
+    "az": "Göy",
     "en": "Blue",
     "et": "Sinine",
     "ru": "Синий"
   },
   "lookDark": {
+    "az": "Tünd",
     "en": "Dark",
     "et": "Tume",
     "ru": "Тёмный"
   },
   "lookGreen": {
+    "az": "Yaşıl",
     "en": "Green",
     "et": "Roheline",
     "ru": "Зелёный"
   },
   "lookLight": {
+    "az": "Açıq",
     "en": "Light",
     "et": "Hele",
     "ru": "Светлый"
   },
   "lookPhone": {
+    "az": "Telefondakı kimi",
     "en": "Like the phone",
     "et": "Nagu telefonis",
     "ru": "Как в телефоне"
   },
   "lookPlum": {
+    "az": "Gavalı",
     "en": "Plum",
     "et": "Ploom",
     "ru": "Сливовый"
   },
   "lookRed": {
+    "az": "Qırmızı",
     "en": "Red",
     "et": "Punane",
     "ru": "Красный"
   },
   "lookTitle": {
+    "az": "Görünüş",
     "en": "Look",
     "et": "Välimus",
     "ru": "Оформление"
   },
   "openSettings": {
+    "az": "Ayarları aç",
     "en": "Open Settings",
     "et": "Ava seaded",
     "ru": "Открыть настройки"
   },
   "pinName": {
+    "az": "Qoyulmuş nişan",
     "en": "Dropped pin",
     "et": "Märgitud punkt",
     "ru": "Отмеченная точка"
   },
   "privacyLink": {
+    "az": "Məxfilik",
     "en": "Privacy",
     "et": "Privaatsus",
     "ru": "Конфиденциальность"
   },
   "rideFast": {
+    "az": "Bu, velosipedin getdiyindən sürətli idi, ona görə saxlanıla bilməz.",
     "en": "That was faster than a bike rides, so it cannot be kept.",
     "et": "See oli kiirem, kui ratas sõidab, nii et seda ei saa alles jätta.",
     "ru": "Это было быстрее, чем ездит велосипед, поэтому сохранить нельзя."
   },
   "rideFinish": {
+    "az": "Bitir",
     "en": "Finish",
     "et": "Lõpeta",
     "ru": "Готово"
   },
   "rideKeepGoing": {
+    "az": "Sürməyə davam et",
     "en": "Keep riding",
     "et": "Sõida edasi",
     "ru": "Ехать дальше"
   },
   "rideName": {
+    "az": "Ad (istəyə görə)",
     "en": "Name (optional)",
     "et": "Nimi (valikuline)",
     "ru": "Название (необязательно)"
   },
   "rideNice": {
+    "az": "Gözəl gediş",
     "en": "Nice ride",
     "et": "Tubli sõit",
     "ru": "Хорошая поездка"
   },
   "rideOften": {
+    "az": "Bu gün artıq iyirmi gediş var — bir hesab gündə bundan çox saxlaya bilməz. Gediş sabaha qədər bu telefonda qalır.",
     "en": "That is twenty rides today, the most one account can save in a day. The ride is kept on this phone for tomorrow.",
     "et": "Täna on juba kakskümmend sõitu — rohkem ei saa üks konto päevas salvestada. Sõit jääb homseks selles telefonis alles.",
     "ru": "Сегодня уже двадцать поездок — больше один аккаунт за день сохранить не может. Поездка останется на телефоне до завтра."
   },
   "rideOutside": {
+    "az": "Gedişlər Tallində və ətrafında toplanır, bu isə başqa yerdə idi.",
     "en": "Rides are collected in and around Tallinn, and this one was somewhere else.",
     "et": "Sõite kogutakse Tallinnas ja selle ümbruses, aga see sõit oli mujal.",
     "ru": "Поездки собираются в Таллине и окрестностях, а эта была в другом месте."
   },
   "ridePause": {
+    "az": "Dayandır",
     "en": "Pause",
     "et": "Peata",
     "ru": "Пауза"
   },
   "ridePausedLine": {
+    "az": "Dayandırılıb · heç nə yazılmır",
     "en": "Paused · nothing is recorded",
     "et": "Peatatud · midagi ei salvestata",
     "ru": "Пауза · ничего не записывается"
   },
   "rideRecording": {
+    "az": "Yazılır",
     "en": "Recording",
     "et": "Salvestan",
     "ru": "Идёт запись"
   },
   "rideRemove": {
+    "az": "Bu telefondan sil",
     "en": "Remove from this phone",
     "et": "Eemalda telefonist",
     "ru": "Убрать с телефона"
   },
   "rideResume": {
+    "az": "Davam et",
     "en": "Resume",
     "et": "Jätka",
     "ru": "Продолжить"
   },
   "rideSave": {
+    "az": "Saxla",
     "en": "Save ride",
     "et": "Salvesta sõit",
     "ru": "Сохранить"
   },
   "rideSaveWhyApp": {
+    "az": "O, təsdiqlənmiş velosiped marşrutu olur. Adın onunla heç vaxt göstərilmir, ilk və son 200 m isə kəsilir.",
     "en": "It becomes a confirmed bike route. Your name is never shown with it, and the first and last 200 m are left off.",
     "et": "Sellest saab kinnitatud rattatee. Sinu nime selle juures kunagi ei näidata ning esimesed ja viimased 200 m jäetakse ära.",
     "ru": "Она станет подтверждённым велосипедным маршрутом. Ваше имя рядом с ней никогда не показывается, а первые и последние 200 м отрезаются."
   },
   "rideSaved": {
+    "az": "Saxlanıldı",
     "en": "Saved",
     "et": "Salvestatud",
     "ru": "Сохранено"
   },
   "rideSavedWhyApp": {
+    "az": "İndi bu, təsdiqlənmiş velosiped marşrutudur. Təşəkkür edirik.",
     "en": "It is a confirmed bike route now. Thank you.",
     "et": "See on nüüd kinnitatud rattatee. Aitäh!",
     "ru": "Теперь это подтверждённый велосипедный маршрут. Спасибо!"
   },
   "rideSaving": {
+    "az": "Saxlanılır…",
     "en": "Saving…",
     "et": "Salvestan…",
     "ru": "Сохраняем…"
   },
   "rideShortServer": {
+    "az": "İlk və son 200 m çıxılandan sonra saxlamağa çox az qalır.",
     "en": "Once the first and last 200 m are taken off, too little is left to keep.",
     "et": "Kui esimesed ja viimased 200 m ära võtta, jääb alles hoidmiseks liiga vähe.",
     "ru": "Если отрезать первые и последние 200 м, остаётся слишком мало, чтобы сохранить."
   },
   "rideShortTitle": {
+    "az": "Saxlamaq üçün çox qısadır",
     "en": "Too short to keep",
     "et": "Liiga lühike, et alles jätta",
     "ru": "Слишком коротко"
   },
   "rideShortWhy": {
+    "az": "Gediş saxlanmaq üçün {dist}-dən uzun olmalıdır.",
     "en": "A ride has to be longer than {dist} to be kept.",
     "et": "Sõit peab alles jäämiseks olema pikem kui {dist}.",
     "ru": "Чтобы сохранить поездку, она должна быть длиннее {dist}."
   },
   "rideStart": {
+    "az": "Başla",
     "en": "Start",
     "et": "Alusta",
     "ru": "Старт"
   },
   "rideThrow": {
+    "az": "At",
     "en": "Throw it away",
     "et": "Viska ära",
     "ru": "Удалить"
   },
   "rideUntitled": {
+    "az": "Gediş · {date}",
     "en": "Ride · {date}",
     "et": "Sõit · {date}",
     "ru": "Поездка · {date}"
   },
   "rideWaiting": {
+    "az": "Yerini gözləyirik…",
     "en": "Waiting for your location…",
     "et": "Ootan sinu asukohta…",
     "ru": "Ждём ваше местоположение…"
   },
   "ridesEmptyTitle": {
+    "az": "Hələ gediş yoxdur",
     "en": "No rides yet",
     "et": "Sõite veel pole",
     "ru": "Поездок пока нет"
   },
   "ridesEmptyWhy": {
+    "az": "Bu telefonda yazdığın gedişlər burada görünür.",
     "en": "Rides you record on this phone show up here.",
     "et": "Siin on sõidud, mille sa selle telefoniga salvestad.",
     "ru": "Здесь появятся поездки, записанные на этом телефоне."
   },
   "ridesFoot": {
+    "az": "Gedişlər yalnız bu telefondan göstərilir. Saxlanmış gedişlər serverdə sənin adın olmadan durur.",
     "en": "Rides are listed from this phone only. Saved rides are on the server without your name.",
     "et": "Siin on ainult selle telefoni sõidud. Salvestatud sõidud on serveris ilma sinu nimeta.",
     "ru": "Здесь только поездки с этого телефона. Сохранённые поездки хранятся на сервере без вашего имени."
   },
   "ridesWaitingMany": {
+    "az": "{n} gediş göndərilməyi gözləyir. Bağlantı olanda özləri gedəcək.",
     "en": "{n} rides are waiting to upload. They will go by themselves when there is a connection.",
     "et": "{n} sõitu ootab saatmist. Need lähevad ise teele, kui ühendus on olemas.",
     "ru": "Поездок ждут отправки: {n}. Они уйдут сами, когда появится связь."
   },
   "ridesWaitingOne": {
+    "az": "1 gediş göndərilməyi gözləyir. Bağlantı olanda özü gedəcək.",
     "en": "1 ride is waiting to upload. It will go by itself when there is a connection.",
     "et": "1 sõit ootab saatmist. See läheb ise teele, kui ühendus on olemas.",
     "ru": "1 поездка ждёт отправки. Она уйдёт сама, когда появится связь."
   },
   "searchKindApple": {
+    "az": "Apple Xəritələr",
     "en": "Apple Maps",
     "et": "Apple Maps",
     "ru": "Apple Maps"
   },
   "searchKindMine": {
+    "az": "Xəritədə",
     "en": "On the map",
     "et": "Kaardil",
     "ru": "На карте"
   },
   "searchKindPin": {
+    "az": "Nişan",
     "en": "Pin",
     "et": "Punkt",
     "ru": "Точка"
   },
   "searchKindPlace": {
+    "az": "Yer",
     "en": "Place",
     "et": "Koht",
     "ru": "Место"
   },
   "searchKindStreet": {
+    "az": "Küçə",
     "en": "Street",
     "et": "Tänav",
     "ru": "Улица"
   },
   "searchNear": {
+    "az": "Yaxınlıqda",
     "en": "Near you",
     "et": "Sinu lähedal",
     "ru": "Рядом с вами"
   },
   "searchNoneTitle": {
+    "az": "Heç nə tapılmadı",
     "en": "Nothing found",
     "et": "Midagi ei leitud",
     "ru": "Ничего не найдено"
   },
   "searchNoneWhy": {
+    "az": "Tallində bir yer, küçə və ya rayon yoxla. İstəsən, sadəcə Başla düyməsini bas və sür.",
     "en": "Try a place, a street or a district in Tallinn. You can always just press Start and ride.",
     "et": "Proovi mõnda kohta, tänavat või linnaosa Tallinnas. Võid ka lihtsalt vajutada „Alusta“ ja sõita.",
     "ru": "Попробуйте место, улицу или район Таллина. А можно просто нажать «Старт» и ехать."
   },
   "searchOfflineTitle": {
+    "az": "Bağlantı yoxdur",
     "en": "No connection",
     "et": "Ühendus puudub",
     "ru": "Нет связи"
   },
   "searchOfflineWhy": {
+    "az": "Axtarışa internet lazımdır. Yazmağa yox — bunu bağla və Başla düyməsini bas.",
     "en": "Search needs the internet. Recording does not — close this and press Start.",
     "et": "Otsing vajab internetti. Salvestamine ei vaja — sulge see ja vajuta „Alusta“.",
     "ru": "Для поиска нужен интернет. Для записи — нет: закройте это и нажмите «Старт»."
   },
   "searchPrompt": {
+    "az": "Hara?",
     "en": "Where to?",
     "et": "Kuhu?",
     "ru": "Куда?"
   },
   "searchRecent": {
+    "az": "Son baxılanlar",
     "en": "Recent",
     "et": "Hiljutised",
     "ru": "Недавние"
   },
   "searchRecentRemove": {
+    "az": "Sil",
     "en": "Remove",
     "et": "Eemalda",
     "ru": "Убрать"
   },
   "signInProblem": {
+    "az": "Alınmadı. Bir azdan yenidən yoxla.",
     "en": "That did not work. Try again in a moment.",
     "et": "See ei õnnestunud. Proovi hetke pärast uuesti.",
     "ru": "Не получилось. Попробуйте ещё раз чуть позже."
   },
   "signInWhy": {
+    "az": "Sürmək üçün lazım deyil. Daxil olsan, gedişlərin tallinntastebuds.ee saytındakı səhifəndə də olur.",
     "en": "Not needed to ride. Signed in, your rides are also on your page on tallinntastebuds.ee.",
     "et": "Sõitmiseks pole vaja. Sisse logituna on sinu sõidud ka sinu lehel saidil tallinntastebuds.ee.",
     "ru": "Для поездок не нужно. Если войти, ваши поездки будут и на вашей странице на tallinntastebuds.ee."
   },
   "statAverage": {
+    "az": "orta",
     "en": "average",
     "et": "keskmine",
     "ru": "в среднем"
   },
   "statAvg": {
+    "az": "km/saat orta",
     "en": "km/h avg",
     "et": "km/h keskm.",
     "ru": "км/ч в ср."
   },
   "statDistance": {
+    "az": "məsafə",
     "en": "distance",
     "et": "vahemaa",
     "ru": "расстояние"
   },
   "statKm": {
+    "az": "km",
     "en": "km",
     "et": "km",
     "ru": "км"
   },
   "statRidingTime": {
+    "az": "sürmə vaxtı",
     "en": "riding time",
     "et": "sõiduaeg",
     "ru": "время в пути"
   },
   "statStarted": {
+    "az": "başladı",
     "en": "started",
     "et": "algus",
     "ru": "старт"
   },
   "statTop": {
+    "az": "ən yüksək sürət",
     "en": "top speed",
     "et": "tippkiirus",
     "ru": "макс. скорость"
   },
   "tabAccount": {
+    "az": "Hesab",
     "en": "Account",
     "et": "Konto",
     "ru": "Аккаунт"
   },
   "tabRecord": {
+    "az": "Yaz",
     "en": "Record",
     "et": "Salvesta",
     "ru": "Запись"
   },
   "tabRides": {
+    "az": "Gedişlərim",
     "en": "My rides",
     "et": "Minu sõidud",
     "ru": "Мои поездки"
   },
   "today": {
+    "az": "Bu gün",
     "en": "Today",
     "et": "Täna",
     "ru": "Сегодня"
   },
   "tryNow": {
+    "az": "İndi yoxla",
     "en": "Try now",
     "et": "Proovi kohe",
     "ru": "Попробовать сейчас"
   },
   "turnAround": {
+    "az": "Geri dön",
     "en": "Turn around",
     "et": "Pööra ümber",
     "ru": "Развернитесь"
   },
   "turnArrive": {
+    "az": "Çatdın",
     "en": "You have arrived",
     "et": "Oled kohal",
     "ru": "Вы на месте"
   },
   "turnKeepLeft": {
+    "az": "Solda qal",
     "en": "Keep left",
     "et": "Hoia vasakule",
     "ru": "Держитесь левее"
   },
   "turnKeepRight": {
+    "az": "Sağda qal",
     "en": "Keep right",
     "et": "Hoia paremale",
     "ru": "Держитесь правее"
   },
   "turnLeft": {
+    "az": "Sola dön",
     "en": "Turn left",
     "et": "Pööra vasakule",
     "ru": "Поверните налево"
   },
   "turnRight": {
+    "az": "Sağa dön",
     "en": "Turn right",
     "et": "Pööra paremale",
     "ru": "Поверните направо"
   },
   "turnRoundabout": {
+    "az": "Dairəvi yol",
     "en": "Roundabout",
     "et": "Ringristmik",
     "ru": "Круговое движение"
   },
   "turnRoundaboutExit": {
+    "az": "Dairəvi yol, {n}-ci çıxış",
     "en": "Roundabout, exit {n}",
     "et": "Ringristmik, {n}. väljasõit",
     "ru": "Круговое движение, съезд {n}"
   },
   "turnSoon": {
+    "az": "200 metrdən sonra",
     "en": "In 200 metres",
     "et": "200 meetri pärast",
     "ru": "Через 200 метров"
   },
   "turnStraight": {
+    "az": "Düz get",
     "en": "Go straight",
     "et": "Sõida otse",
     "ru": "Езжайте прямо"
   },
   "voiceOff": {
+    "az": "Səs sönülüdür",
     "en": "Voice is off",
     "et": "Hääl on väljas",
     "ru": "Голос выключен"
   },
   "voiceOn": {
+    "az": "Səs yanılıdır",
     "en": "Voice is on",
     "et": "Hääl on sees",
     "ru": "Голос включён"
   },
   "whyFast": {
+    "az": "çox sürətli",
     "en": "too fast",
     "et": "liiga kiire",
     "ru": "слишком быстро"
   },
   "whyMalformed": {
+    "az": "oxunmur",
     "en": "not readable",
     "et": "loetamatu",
     "ru": "не читается"
   },
   "whyOutside": {
+    "az": "Tallindən kənarda",
     "en": "outside Tallinn",
     "et": "väljaspool Tallinna",
     "ru": "не в Таллине"
   },
   "whyShort": {
+    "az": "çox qısa",
     "en": "too short",
     "et": "liiga lühike",
     "ru": "слишком коротко"
