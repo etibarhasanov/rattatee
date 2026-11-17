@@ -19,9 +19,9 @@ import Observation
 /// distance but the one: a recording can only say what was recorded. The
 /// street is in the row.
 ///
-/// Where a recording is missing — Azerbaijani is the one language recorded
-/// so far — the
-/// phone's own voice reads the row's words instead, in English and Russian.
+/// Where a recording is missing — Azerbaijani and English are recorded so
+/// far — the phone's own voice reads the row's words instead, in English and
+/// Russian.
 /// iOS has no Estonian or Azerbaijani voice, so in those a missing recording
 /// is silence.
 /// That is a stand-in for trying the thing out, not the plan.
