@@ -134,7 +134,8 @@ a pocket — "In 200 metres, turn right" about two hundred metres before, and
 second it takes, and with the screen locked. The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
 recorded: eight phrases in each language, listed in `docs/voice.md`,
-which is why it says no street names and no distance but the one. Until a
+which is why it says no street names and no distance but the one.
+Azerbaijani is recorded; the other three are not yet. Until a
 phrase is recorded the phone's own voice reads it, in English and Russian;
 iOS has no Estonian or Azerbaijani voice. A roundabout is in the row and
 is not said: a bike is mostly on the path beside one. Further than sixty metres from the way the row
@@ -279,7 +280,7 @@ Rattatee/
             SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et, ru and az
-  Voice/    <lang>-<clip>.m4a   the turns, recorded; empty until they are
+  Voice/    <lang>-<clip>.m4a   the turns, recorded: Azerbaijani so far
   *.lproj/  InfoPlist.strings   the location question, in each language
   PrivacyInfo.xcprivacy         the privacy manifest
 Config/     Info.plist          the two background modes and the languages
