@@ -3,10 +3,13 @@ import SwiftUI
 
 /// Where to? — the search behind the bar on the Record tab.
 ///
-/// One list out of the website's own search: its places first, in the order
-/// it ranks them, then streets and districts. From five letters a last row
-/// offers to look on Google Maps, as the website's find bar does, and what
-/// Google answers with goes to the top of the list. Choosing a row closes
+/// Opened, before a letter is typed, it shows the places nearest the rider out
+/// of the copy the phone keeps (`Venues`), with no wait and no signal needed.
+/// Typed, the phone's copy answers at once, and the website's own search
+/// replaces it when it answers: its places first, in the order it ranks
+/// them, with their addresses, then streets and districts. From five letters
+/// a last row offers to look on Google Maps, as the website's find bar does,
+/// and what Google answers with goes to the top of the list. Choosing a row closes
 /// the sheet and puts the place on the map with the way there.
 struct SearchSheet: View {
     @Environment(Store.self) private var store
@@ -28,12 +31,46 @@ struct SearchSheet: View {
 
     private var q: String { text.trimmingCharacters(in: .whitespaces) }
 
+    /// Whether the site has answered these letters. Until it has, the rows
+    /// are the phone's.
+    private var siteAnswered: Bool { answered == q && !failed }
+
+    /// The rows on screen: the site's answer once it has one, and the
+    /// phone's copy until then — or instead, when the site cannot be reached.
+    private var rows: [Spot] {
+        if q.count < Search.shortest { return [] }
+        if siteAnswered { return found }
+        return Venues.shared.matching(q, near: store.recorder.here)
+    }
+
+    /// Before anything is typed: the nearest places, or with no position
+    /// yet, the places on the map.
+    private var nearby: [Spot] {
+        q.isEmpty ? Venues.shared.nearest(store.recorder.here) : []
+    }
+
     var body: some View {
         NavigationStack {
             List {
-                ForEach(found) { spot in
+                if !nearby.isEmpty {
+                    Section {
+                        ForEach(nearby) { spot in
+                            Button { choose(spot) } label: { SpotRow(spot: spot, here: store.recorder.here) }
+                                .listRowBackground(Theme.card)
+                        }
+                    } header: {
+                        Text(store.recorder.here == nil ? L.t("searchKindMine") : L.t("searchNear"))
+                    }
+                }
+                ForEach(rows) { spot in
                     Button { choose(spot) } label: { SpotRow(spot: spot, here: store.recorder.here) }
                         .listRowBackground(Theme.card)
+                }
+                // The phone's rows are up; the site's are on their way.
+                if !rows.isEmpty && !siteAnswered && !failed {
+                    HStack { Spacer(); ProgressView(); Spacer() }
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                 }
                 if showsGoogle {
                     Section {
@@ -52,7 +89,7 @@ struct SearchSheet: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .background(Theme.paper.ignoresSafeArea())
-            .overlay { if found.isEmpty { empty } }
+            .overlay { if rows.isEmpty && nearby.isEmpty { empty } }
             .navigationTitle(L.t("searchPrompt"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -64,6 +101,9 @@ struct SearchSheet: View {
         }
         .task {
             store.recorder.locate()
+            // The copy the phone keeps is asked for at launch; this is for a
+            // phone that had no signal then.
+            Task { await Venues.shared.refresh() }
             googleReady = await Search.googleReady()
         }
         // Wait for a pause in the typing before asking, as the website does:
@@ -85,7 +125,8 @@ struct SearchSheet: View {
     @ViewBuilder
     private var empty: some View {
         if q.count < Search.shortest {
-            // Nothing typed yet: nothing to say.
+            // Nothing typed yet, and nothing on the phone to show: nothing
+            // to say.
             EmptyView()
         } else if failed {
             ContentUnavailableView(L.t("searchOfflineTitle"), systemImage: "wifi.slash",

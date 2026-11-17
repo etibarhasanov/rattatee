@@ -1,4 +1,9 @@
 {
+  "accountCreate": {
+    "en": "Create account",
+    "et": "Loo konto",
+    "ru": "Создать аккаунт"
+  },
   "accountCurrentPassword": {
     "en": "Current password",
     "et": "Praegune parool",
@@ -24,10 +29,55 @@
     "et": "See eemaldab {name} saidilt: salvestused, nimekirjad, sinu lehe ja kaardipakid. Külastuste arvud jäävad, ilma nimeta.",
     "ru": "Это удалит {name} с сайта: сохранённые места, списки, вашу страницу и колоды. Статистика посещений останется, без имени."
   },
+  "accountErrGeneric": {
+    "en": "Something went wrong. Try again.",
+    "et": "Midagi läks valesti. Proovi uuesti.",
+    "ru": "Что-то пошло не так. Попробуйте снова."
+  },
+  "accountErrNoMatch": {
+    "en": "Wrong username or password.",
+    "et": "Vale kasutajanimi või parool.",
+    "ru": "Неверное имя пользователя или пароль."
+  },
+  "accountErrPassword": {
+    "en": "Password must be at least 8 characters.",
+    "et": "Parool peab olema vähemalt 8 märki.",
+    "ru": "Пароль должен быть не короче 8 символов."
+  },
+  "accountErrSlow": {
+    "en": "Too many tries. Wait a few minutes.",
+    "et": "Liiga palju katseid. Oota mõni minut.",
+    "ru": "Слишком много попыток. Подождите несколько минут."
+  },
+  "accountErrTaken": {
+    "en": "That username is taken.",
+    "et": "See kasutajanimi on juba võetud.",
+    "ru": "Это имя уже занято."
+  },
+  "accountErrUsername": {
+    "en": "Use 3 to 24 letters, numbers, dots, dashes or underscores.",
+    "et": "Kasuta 3–24 tähte, numbrit, punkti, sidekriipsu või alakriipsu.",
+    "ru": "Используйте 3–24 буквы, цифры, точки, дефисы или подчёркивания."
+  },
   "accountGoogle": {
     "en": "Continue with Google",
     "et": "Jätka Google’iga",
     "ru": "Продолжить с Google"
+  },
+  "accountOr": {
+    "en": "or",
+    "et": "või",
+    "ru": "или"
+  },
+  "accountPassword": {
+    "en": "Password",
+    "et": "Parool",
+    "ru": "Пароль"
+  },
+  "accountSignIn": {
+    "en": "Sign in",
+    "et": "Logi sisse",
+    "ru": "Войти"
   },
   "accountSignOut": {
     "en": "Sign out",
@@ -39,6 +89,21 @@
     "et": "Sisse logitud nimega {name}",
     "ru": "Вы вошли как {name}"
   },
+  "accountUsername": {
+    "en": "Username",
+    "et": "Kasutajanimi",
+    "ru": "Имя пользователя"
+  },
+  "accountUsernameHint": {
+    "en": "3–24 letters or numbers. Shown on lists you share.",
+    "et": "3–24 tähte või numbrit. Näha nimekirjades, mida jagad.",
+    "ru": "3–24 буквы или цифры. Видно в списках, которыми вы делитесь."
+  },
+  "accountWorking": {
+    "en": "Working…",
+    "et": "Töötan…",
+    "ru": "Выполняется…"
+  },
   "appApple": {
     "en": "Continue with Apple",
     "et": "Jätka Apple’iga",
@@ -48,6 +113,11 @@
     "en": "An account made with Google or Apple and no password: type your username instead.",
     "et": "Konto, mis on tehtud Google’i või Apple’iga ja millel pole parooli: kirjuta parooli asemel oma kasutajanimi.",
     "ru": "Если аккаунт создан через Google или Apple и пароля у него нет, введите вместо него имя пользователя."
+  },
+  "appNoReset": {
+    "en": "There’s no reset — let your phone save the password.",
+    "et": "Taastamist pole — lase telefonil parool meelde jätta.",
+    "ru": "Восстановления нет — пусть телефон запомнит пароль."
   },
   "badgeNotKept": {
     "en": "Not kept · {why}",
@@ -148,6 +218,16 @@
     "en": "It did not reach the server. It is safe here and will be sent by itself when there is a connection. You can see it under My rides.",
     "et": "See ei jõudnud serverisse. Sõit on siin kindlalt alles ja saadetakse ise ära, kui ühendus on olemas. Selle leiad „Minu sõitude“ alt.",
     "ru": "Она не дошла до сервера. Здесь она в сохранности и отправится сама, когда появится связь. Её видно в разделе «Мои поездки»."
+  },
+  "language": {
+    "en": "Language",
+    "et": "Keel",
+    "ru": "Язык"
+  },
+  "languagePhone": {
+    "en": "Phone’s language",
+    "et": "Telefoni keel",
+    "ru": "Язык телефона"
   },
   "locOffTitle": {
     "en": "Location is off",
@@ -383,6 +463,11 @@
     "en": "Street",
     "et": "Tänav",
     "ru": "Улица"
+  },
+  "searchNear": {
+    "en": "Near you",
+    "et": "Sinu lähedal",
+    "ru": "Рядом с вами"
   },
   "searchNoneTitle": {
     "en": "Nothing found",
