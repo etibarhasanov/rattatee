@@ -43,8 +43,13 @@ struct Spot: Identifiable, Equatable, Codable {
 /// `steps` in /api/route. Each is one recording in `Voice/`, so a word the
 /// website adds later is one this build does not know, and it is left out
 /// rather than guessed at.
+///
+/// And `train`, which is not one of the website's words but this app's: the
+/// corner where a way by train leaves the bike — the station — made here
+/// out of the train in /api/v1/route's `trains`. It has no recording; the
+/// row shows it and the phone's own voice reads it.
 enum Turn: String {
-    case left, right, straight, around, roundabout, arrive
+    case left, right, straight, around, roundabout, arrive, train
     case keepLeft = "keep-left"
     case keepRight = "keep-right"
 
@@ -59,18 +64,21 @@ enum Turn: String {
         case .around: return "arrow.uturn.down"
         case .roundabout: return "arrow.triangle.2.circlepath"
         case .arrive: return "flag.checkered"
+        case .train: return "tram.fill"
         }
     }
 }
 
 /// One corner of a way: which way it bends, the street it is onto, the exit
 /// of a roundabout where the router counted one (nought where it did not),
-/// and how far along the way's own line the corner is.
+/// and how far along the way's own line the corner is. A train's corner
+/// also carries which train, when and to where, for its words.
 struct Step: Equatable {
     let turn: Turn
     let name: String
     let exit: Int
     let along: Double
+    var train: [String: String] = [:]
 
     /// What the row says, and what is said aloud where there is no
     /// recording. Key by key, so the strings check in CI sees each.
@@ -84,6 +92,7 @@ struct Step: Equatable {
         case .around: return L.t("turnAround")
         case .roundabout: return exit > 0 ? L.t("turnRoundaboutExit", ["n": "\(exit)"]) : L.t("turnRoundabout")
         case .arrive: return L.t("turnArrive")
+        case .train: return L.t("turnTrain", train)
         }
     }
 }
@@ -96,6 +105,9 @@ struct Way: Equatable {
     /// Where it turns, in the order the corners come. Empty for a way the
     /// website answered before it sent any, which is then a line and silent.
     var steps: [Step] = []
+    /// Where it is a way by train: what the card and the map say of it.
+    /// Nil for a way that is all bike, which is nearly every one.
+    var train: Train?
 
     /// Further than this from the line is not on it: the turns stop, and
     /// `Store.follow` says the rider is off the way and, if they stay off,
@@ -150,6 +162,7 @@ struct Way: Equatable {
 
     static func == (a: Way, b: Way) -> Bool {
         a.metres == b.metres && a.seconds == b.seconds && a.line.count == b.line.count && a.steps == b.steps
+            && a.train == b.train
     }
 
     /// How much of the way is left from a point: the way from its vertex
@@ -172,6 +185,29 @@ struct Way: Equatable {
             for i in (nearest + 1)..<line.count { rest += metres(line[i - 1], line[i]) }
         }
         return rest
+    }
+}
+
+/// A way by train, out of /api/v1/route's `trains`: ride to a station, the
+/// train with the bike on it, ride on. The way's `line` is all three end to
+/// end, so how much is left, the turns and being off the way all work along
+/// it as along any way; this is what is said and drawn differently.
+struct Train: Equatable {
+    /// Which train, from and to which station, when it leaves, and when to
+    /// set off to catch it — the clock in Tallinn, as the website says it.
+    let name: String
+    let from: String
+    let to: String
+    let at: String
+    let leave: String
+    /// The legs in order, to draw: a ride solid, the rail dashed.
+    let legs: [(bike: Bool, line: [CLLocationCoordinate2D])]
+    /// Where along the way's line the rail runs. A point kept there would
+    /// be the train's, not the bike's, and `Store.add` keeps none.
+    let rail: ClosedRange<Double>
+
+    static func == (a: Train, b: Train) -> Bool {
+        a.name == b.name && a.at == b.at && a.from == b.from && a.to == b.to
     }
 }
 
@@ -226,7 +262,8 @@ struct Lost: Equatable {
 ///
 /// Nothing here is Rattatee's. The places are `GET /api/places?q=`, the one
 /// search of the city the website's find bar and the map app use; the streets
-/// are `GET /api/geocode?q=`; the way and its turns are `GET /api/route` with `mode=bike`;
+/// are `GET /api/geocode?q=`; the way and its turns are `GET /api/v1/route` with `mode=bike`,
+/// or `GET /api/route` where that does not answer;
 /// and what none of them knows is `POST /api/lookup`, the website's **Look
 /// for it on Google Maps**, offered from five letters as it is there. A place
 /// Google answers with is kept by the site, so the next search finds it
@@ -315,19 +352,77 @@ enum Search {
     }
 
     /// The suggested ways by bike, the website's first first and then its
-    /// `others` — up to two more, and mostly none — or nothing where the
-    /// site finds no way at all.
+    /// `others` — up to two more, and mostly none — then its `trains`, at
+    /// most two and mostly none, or nothing where the site finds no way at
+    /// all.
+    ///
+    /// Asked of /api/v1/route, which is /api/route with a version on it and
+    /// the trains. Where it does not answer — a website from before it, or
+    /// a refusal — /api/route is asked as it always was, and the ways come
+    /// without trains: a new app reads an old website. An app from before
+    /// this asks /api/route alone and is never offered a train it could not
+    /// draw.
     static func ways(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) async -> [Way] {
         let query = [
             "from": "\(Geo.round5(from.latitude)),\(Geo.round5(from.longitude))",
             "to": "\(Geo.round5(to.latitude)),\(Geo.round5(to.longitude))",
             "mode": "bike"
         ]
-        guard let object = try? await rows("api/route", query) as? [String: Any],
-              let first = way(object) else { return [] }
+        var object = try? await rows("api/v1/route", query) as? [String: Any]
+        if object?["version"] == nil { object = try? await rows("api/route", query) as? [String: Any] }
+        guard let object, let first = way(object) else { return [] }
         // An answer from before the website offered others has no such
         // field, and is the one way.
         return [first] + (object["others"] as? [[String: Any]] ?? []).compactMap { way($0) }
+            + (object["trains"] as? [[String: Any]] ?? []).compactMap { train($0) }
+    }
+
+    /// One of the website's `trains` as a way: its legs end to end as the
+    /// line, the rides' turns placed along it with the first ride's arrival
+    /// — at the station, which is not arriving — turned into the train's
+    /// own corner. Nil for one in a shape this build does not know.
+    private static func train(_ object: [String: Any]) -> Way? {
+        guard let metres = object["meters"] as? Double, let seconds = object["seconds"] as? Double,
+              let leave = object["leave"] as? String,
+              let raws = object["legs"] as? [[String: Any]], !raws.isEmpty else { return nil }
+        func coords(_ raw: [String: Any]) -> [CLLocationCoordinate2D] {
+            (raw["line"] as? [[Double]] ?? []).compactMap { $0.count > 1 ? CLLocationCoordinate2D(latitude: $0[0], longitude: $0[1]) : nil }
+        }
+        let legs: [(raw: [String: Any], bike: Bool, line: [CLLocationCoordinate2D])] =
+            raws.map { (raw: $0, bike: $0["kind"] as? String == "bike", line: coords($0)) }
+        guard let rail = legs.first(where: { $0.raw["kind"] as? String == "train" }), rail.line.count > 1,
+              legs.allSatisfy({ $0.line.count > 1 }) else { return nil }
+
+        var line: [CLLocationCoordinate2D] = []
+        var start = 0.0
+        var railFrom = 0.0, railTo = 0.0
+        var steps: [Step] = []
+        let said = ["line": rail.raw["name"] as? String ?? "", "at": rail.raw["at"] as? String ?? "",
+                    "to": rail.raw["to"] as? String ?? ""]
+        for (i, leg) in legs.enumerated() {
+            let length = Geo.length(leg.line.map { Point(lat: $0.latitude, lng: $0.longitude, t: 0, acc: 0) })
+            if leg.bike {
+                // Each ride's turns placed on that ride alone, so a turn
+                // cannot snap to another part of the trip that passes by.
+                let ride = Way(metres: length, seconds: 0, line: leg.line)
+                for raw in leg.raw["steps"] as? [[String: Any]] ?? [] {
+                    guard let step = ride.step(raw) else { continue }
+                    if step.turn == .arrive && i < legs.count - 1 { continue }
+                    steps.append(Step(turn: step.turn, name: step.name, exit: step.exit, along: step.along + start))
+                }
+            } else {
+                railFrom = start
+                railTo = start + length
+                steps.append(Step(turn: .train, name: "", exit: 0, along: start, train: said))
+            }
+            line += leg.line
+            start += length
+        }
+        var way = Way(metres: metres, seconds: Int(seconds), line: line, steps: steps.sorted { $0.along < $1.along })
+        way.train = Train(name: said["line"] ?? "", from: rail.raw["from"] as? String ?? "", to: said["to"] ?? "",
+                          at: said["at"] ?? "", leave: leave, legs: legs.map { (bike: $0.bike, line: $0.line) },
+                          rail: railFrom...railTo)
+        return way
     }
 
     /// One way as the website sends it: `meters`, `seconds` and `line`.

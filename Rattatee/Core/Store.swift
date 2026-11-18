@@ -354,6 +354,15 @@ final class Store {
             if d < Self.step { return }
             if d / max(1, point.t - last.t) > Self.jump { return }
         }
+        // On the train of a way by train, the phone is moving and the bike
+        // is not being ridden: a point kept there would save the railway as
+        // a bike route, and the website's doors would read it as a shortcut
+        // across the tracks. So none is, and the ride goes on from the far
+        // station — the clock keeps running, as it does at a red light.
+        if case .found(let way) = goal?.way, let train = way.train {
+            let spot = way.place(of: point.coordinate)
+            if spot.off <= Way.astray && train.rail.contains(spot.along) { return }
+        }
         let before = rides[i].points.last
         rides[i].points.append(point)
         if case .found(let way) = goal?.way {

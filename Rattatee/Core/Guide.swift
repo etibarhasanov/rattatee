@@ -90,8 +90,15 @@ final class Guide {
         // A roundabout is shown and not said, at the owner's word: a bike
         // is mostly on a path beside one, and "take the second exit" is a
         // sentence for a car.
-        guard voice, let next = way.next(from: here), let turn = clip(next.step) else { return }
+        guard voice, let next = way.next(from: here) else { return }
         let corner = "\(Int(next.step.along))"
+        // The station of a way by train: no recording says which train, so
+        // the phone's own voice reads the row, once, on the platform.
+        if next.step.turn == .train {
+            if next.metres <= Self.now, said.insert(corner + "-now").inserted { speak(next.step.words) }
+            return
+        }
+        guard let turn = clip(next.step) else { return }
         if next.metres <= Self.now {
             if said.insert(corner + "-now").inserted { say([turn], next.step.words) }
         } else if next.step.turn != .arrive, Self.soon.contains(next.metres) {
@@ -121,7 +128,7 @@ final class Guide {
         case .straight: return .straight
         case .around: return .around
         case .arrive: return .arrive
-        case .roundabout: return nil
+        case .roundabout, .train: return nil
         }
     }
 
