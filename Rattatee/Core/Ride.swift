@@ -91,6 +91,34 @@ struct Ride: Codable, Identifiable, Equatable {
     /// in the distance, the times or the speeds, and never sent.
     var aside: [[Point]]?
 
+    /// What each stretch of `aside` was, pair for pair: "walk" or
+    /// "vehicle". Optional and possibly shorter, since rides finished
+    /// before it was written have none; a stretch with no word is read as a
+    /// walk, which most were.
+    var asideKinds: [String]?
+    /// Points the recorder would not keep as riding while the ride was
+    /// recorded: too fast for a bike, or on the rails of a way by train.
+    /// They used to be dropped, and a train was then nothing at all on the
+    /// ride. Finish gathers them into the journeys they were and moves those
+    /// to `aside`, as vehicle — `Timeline`. Never sent.
+    var carried: [Point]?
+
+    /// What the stretch at `k` of `aside` was.
+    func asideKind(_ k: Int) -> Part.Kind {
+        guard let kinds = asideKinds, kinds.indices.contains(k) else { return .walk }
+        return kinds[k] == "vehicle" ? .vehicle : .walk
+    }
+
+    /// Add a stretch to `aside` with its word, keeping the two in step
+    /// where the ride has stretches from before there were words.
+    private mutating func setAside(_ stretch: [Point], as kind: String) {
+        let have = aside ?? []
+        var kinds = asideKinds ?? []
+        while kinds.count < have.count { kinds.append("walk") }
+        aside = have + [stretch]
+        asideKinds = kinds + [kind]
+    }
+
     /// How far the stretches set aside go.
     var leftOut: Double {
         (aside ?? []).reduce(0) { $0 + Geo.length($1) }
@@ -124,32 +152,48 @@ struct Ride: Codable, Identifiable, Equatable {
         return active < seconds() || !(aside ?? []).isEmpty
     }
 
-    /// Set aside the points of the stretches that were not ridden, and work
-    /// out the active time: the riding time less those stretches, less any
-    /// part of them that fell in a pause, which was not riding time anyway.
+    /// Set aside what was not riding, and work out the active time. Three
+    /// things, in this order:
+    ///
+    /// - the stretches the phone said were walked or driven go to `aside`,
+    ///   each with its word;
+    /// - the points the recorder carried rather than kept — a train — go
+    ///   there too, as the journeys they were (`Timeline.runs`);
+    /// - and the wandering of a stop is taken out of the points, leaving
+    ///   where the rider arrived and where they left (`Timeline.settled`).
+    ///
+    /// The active time is the riding time less all of that: the stretches
+    /// set aside, and every stop — a leg that stood for `Timeline.stopShortest`
+    /// or more. A wait at a crossing stays in it, as it always has. Counted
+    /// once where two overlap, and less any part that fell in a pause, which
+    /// was not riding time anyway.
+    ///
     /// Asked again after Keep riding, over the whole ride; a stretch whose
-    /// points are already gone takes nothing more off.
+    /// points are already gone takes nothing more off, and the stretches
+    /// already in `aside` are counted from their own first and last points.
     mutating func leaveOut(_ stretches: [Motion.Stretch], at now: Date = Date()) {
         let start = started.timeIntervalSince1970
         let end = pausedAt ?? now.timeIntervalSince1970
         for s in stretches {
             let inside = points.filter { $0.t >= s.from && $0.t <= s.to }
             guard !inside.isEmpty else { continue }
-            aside = (aside ?? []) + [inside]
+            setAside(inside, as: s.driven ? "vehicle" : "walk")
             points.removeAll { $0.t >= s.from && $0.t <= s.to }
         }
+        for run in Timeline.runs(carried ?? []) { setAside(run, as: "vehicle") }
+        carried = nil
+        points = Timeline.settled(points)
 
-        var away = 0.0
-        for s in stretches {
-            let a = max(s.from, start), b = min(s.to, end)
-            guard b > a else { continue }
-            var inside = b - a
-            for pause in breaks ?? [] where pause.count == 2 {
-                inside -= max(0, min(b, pause[1]) - max(a, pause[0]))
-            }
-            away += max(0, inside)
+        var away: [(Double, Double)] = stretches.map { ($0.from, $0.to) }
+        for stretch in aside ?? [] {
+            if let first = stretch.first, let last = stretch.last { away.append((first.t, last.t)) }
         }
-        active = max(0, seconds(at: now) - Int(away.rounded()))
+        for i in points.indices.dropFirst() {
+            let a = points[i - 1], b = points[i]
+            if b.t - a.t >= Timeline.stopShortest && Timeline.still(a, b) { away.append((a.t, b.t)) }
+        }
+        let gone = Timeline.covered(away, from: start, to: end, less: breaks ?? [])
+        active = max(0, seconds(at: now) - Int(gone.rounded()))
     }
 
     /// Average speed over the active time, in km/h, once there is enough of

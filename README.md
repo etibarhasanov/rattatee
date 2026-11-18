@@ -80,8 +80,9 @@ Three tabs.
 
   **A ride, opened.** A row opens its ride on a page of its own
   (`Views/RideView.swift`): the map framed to it, the riding solid, a walk
-  or a drive set aside dotted, a ring where it began and a dot where it
-  ended; the save card's numbers; the fastest kilometre and how long was
+  set aside dotted and a train or a drive dashed, a small grey dot where
+  the rider stopped, a ring where it began and a dot where it ended; the
+  save card's numbers; the ride **part by part** (below); the fastest kilometre and how long was
   spent standing; the speed along the way as a line; and each kilometre's
   time, with a bar for its speed and the fastest one in full colour. All of
   it is the phone's own ride, so it opens with no signal and for a ride saved
@@ -308,8 +309,58 @@ purpose:
   corrected at Finish, not live. A ride with nothing set aside looks as it
   always did.
 - **Motion & Fitness** is asked for at the first Start. Refused, or on a
-  phone without a coprocessor, nothing is set aside and every point is
-  riding, as before.
+  phone without a coprocessor, no walk is set aside. A train and a stop
+  still are: those are read off the points, below.
+
+### A ride is the session it was
+
+The owner rode twelve rides on 2026-11-17 and 18 and read them back out of
+the database, and two things were wrong. A quarter of an hour inside a shop
+was half a kilometre of riding that never happened: indoors the fix wanders
+fifteen or twenty metres, the recorder keeps a point every twelve, and the
+stop was thirty-two points zigzagging over a patch fifty metres by eighty —
+in the distance, halving the average, and sent as a knot of lines where
+somebody had stood. And a train was nothing at all: every point of it was
+dropped as too fast, so the ride began at the far station. The owner's
+words: keep the movement, and show what happened. `Core/Timeline.swift`
+does, and a ride's page lists it under **Part by part**: riding, on foot,
+by train or car, waiting, stopped — each with when it began, how far, how
+long, and the speed where it moved.
+
+- **A train is carried, not dropped.** A point too fast for a bike (over
+  60 km/h from the last one kept), or on the rails of a way by train, goes
+  into `Ride.carried`, one every 50 m. At Finish the carried points are
+  gathered into the journeys they were — cut where two are more than two
+  minutes apart, and only runs of four points and 300 m, since less is the
+  fix jumping — and each goes to `Ride.aside` marked `vehicle` in
+  `Ride.asideKinds`, beside what the coprocessor said was driven. Dashed on
+  the ride's map, where a walk is dotted.
+- **A stop is where the rider arrived, where they left, and the time
+  between.** At Finish, where a run of points stayed within 60 m of its own
+  middle for two minutes or more and went at least three times further
+  than it got, only its first and last points are kept
+  (`Timeline.settled`). Three times further than it got is what tells
+  wandering from a long red light, whose points go straight through. What
+  is left is one leg that took a long time and went nowhere, and that is
+  what a stop is everywhere else in the app: `Insight` already counts it as
+  standing, and the page draws a dot there.
+- **Standing is not stored.** A leg slower than 1 m/s that took thirty
+  seconds is waiting, and one that took two minutes is a stop; both are
+  read off the points each time the page opens. So a ride recorded before
+  this was written has its parts too, though its stops still have their
+  wandering in them.
+- **A stop comes off the active time; a wait does not.** A red light is
+  part of a ride, as it always was. Two minutes standing is not, and
+  thirteen of them made a 12 km/h ride read 5.8. The active time is the
+  riding time less the stretches set aside and the stops, counted once
+  where they overlap and less whatever fell in a pause.
+- **None of it is sent but the riding.** Fewer points and a shorter time,
+  never a label, never a point of a walk, a train or a stop. The website
+  keeps bike routes; the session is the rider's and stays on the phone.
+- **What it does not do yet.** The numbers while riding are still over the
+  whole time, corrected at Finish. A walk with no coprocessor to say so is
+  still riding, slowly. And *by train or car* is one word, because nothing
+  on the phone tells a bus from a train.
 
 ## A ride is never lost
 
@@ -400,6 +451,7 @@ Rattatee/
   Core/     API.swift           the one door to the website
             Recorder.swift      Core Location, in the background too
             Motion.swift        which stretches were walked or driven, asked once at Finish
+            Timeline.swift      the ride part by part: a train carried, a stop settled, what is listed
             Ride.swift          a ride, a point, and the sums
             Insight.swift       a ride's kilometres and speeds, and what the website kept of it
             Store.swift         every ride on the phone, and sending them

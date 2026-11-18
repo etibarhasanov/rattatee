@@ -400,22 +400,37 @@ final class Store {
             if point.t < last.t { return }
             let d = Geo.metres(last, point)
             if d < Self.step { return }
-            if d / max(1, point.t - last.t) > Self.jump { return }
+            // Too fast for a bike is a train, a bus or a car — or the
+            // phone guessing. Not riding either way, but carried rather
+            // than dropped: Finish tells the two apart (`Timeline.runs`).
+            if d / max(1, point.t - last.t) > Self.jump { carry(point, in: i); return }
         }
         // On the train of a way by train, the phone is moving and the bike
         // is not being ridden: a point kept there would save the railway as
         // a bike route, and the website's doors would read it as a shortcut
-        // across the tracks. So none is, and the ride goes on from the far
-        // station — the clock keeps running, as it does at a red light.
+        // across the tracks. So none is kept as riding: it is carried, the
+        // ride goes on from the far station, and the ride's page shows the
+        // train as a train.
         if case .found(let way) = goal?.way, let train = way.train {
             let spot = way.place(of: point.coordinate)
-            if spot.off <= Way.astray && train.rail.contains(spot.along) { return }
+            if spot.off <= Way.astray && train.rail.contains(spot.along) { carry(point, in: i); return }
         }
         let before = rides[i].points.last
         rides[i].points.append(point)
         if case .found(let way) = goal?.way {
             follow(point, after: before, on: way, ridden: rides[i].metres)
         }
+        unwritten += 1
+        if unwritten >= Self.writeEvery { write(rides[i]) }
+    }
+
+    /// Keep a point that is not riding — `Ride.carried` — once it is
+    /// `Timeline.carriedStep` from the last one carried.
+    private func carry(_ point: Point, in i: Int) {
+        if let last = rides[i].carried?.last {
+            if point.t <= last.t || Geo.metres(last, point) < Timeline.carriedStep { return }
+        }
+        rides[i].carried = (rides[i].carried ?? []) + [point]
         unwritten += 1
         if unwritten >= Self.writeEvery { write(rides[i]) }
     }
