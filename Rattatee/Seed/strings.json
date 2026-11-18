@@ -302,7 +302,7 @@
   "greetLate": {
     "az": "Gecə gəzintisi, getdik!",
     "en": "Riding late, let's go",
-    "et": "Hilja juba, lähme",
+    "et": "Liiga hilja? Lähme ikka!",
     "ru": "Поздновато, поехали"
   },
   "greetMorning": {
@@ -518,7 +518,7 @@
   "lostBack": {
     "az": "Yanlış istiqamətdə gedirsən",
     "en": "Going the wrong way",
-    "et": "Sõidad vales suunas",
+    "et": "Vale suund",
     "ru": "Вы едете не в ту сторону"
   },
   "lostBackWhy": {
@@ -554,7 +554,7 @@
   "lostOff": {
     "az": "Yoldan çıxdın",
     "en": "You're off the way",
-    "et": "Oled teelt kõrvale kaldunud",
+    "et": "Oled teelt maas",
     "ru": "Вы сошли с пути"
   },
   "lostOffFrom": {
