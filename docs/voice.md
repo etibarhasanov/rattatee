@@ -38,7 +38,7 @@ comes while it is still playing cuts it off.
 | `morning` | 05:00–11:59 | Good morning, let's go | Tere hommikust, lähme | Доброе утро, поехали | Sabahın xeyir, gedək |
 | `afternoon` | 12:00–17:59 | Good afternoon, let's go | Tere päevast, lähme | Добрый день, поехали | Günortan xeyir, gedək |
 | `evening` | 18:00–21:59 | Good evening, let's go | Tere õhtust, lähme | Добрый вечер, поехали | Axşamın xeyir, gedək |
-| `late` | 22:00–04:59 | Riding late, let's go | Hilja juba, lähme | Поздновато, поехали | Gec saatdır, gedək |
+| `late` | 22:00–04:59 | Riding late, let's go | Hilja juba, lähme | Поздновато, поехали | Gecə gəzintisi, getdik! |
 
 The words the phone reads until these are recorded are the `greet…` keys
 in `Rattatee/Seed/strings.json`; change them there too if you say it
