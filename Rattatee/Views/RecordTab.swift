@@ -195,8 +195,18 @@ struct RideMap: View {
                                 .stroke(Theme.accent.opacity(0.3), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
                         }
                     }
-                    MapPolyline(coordinates: way.line)
-                        .stroke(Theme.accent.opacity(0.75), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                    if let train = way.train {
+                        // A way by train: the rides solid, as any way, and
+                        // the rail dashed, so it is not read as a road.
+                        ForEach(Array(train.legs.enumerated()), id: \.offset) { _, leg in
+                            MapPolyline(coordinates: leg.line)
+                                .stroke(Theme.accent.opacity(0.75), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round,
+                                                                                         dash: leg.bike ? [] : [8, 8]))
+                        }
+                    } else {
+                        MapPolyline(coordinates: way.line)
+                            .stroke(Theme.accent.opacity(0.75), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                    }
                 } else if goal.way == .looking, points.isEmpty, let here {
                     // As the crow flies, until the website says how a bike
                     // goes. Dotted, so it is not read as a way to ride.
@@ -356,8 +366,7 @@ struct GoalCard: View {
                     Button {
                         store.choose(way: index)
                     } label: {
-                        Text(L.t("goalWayChip", ["min": String(max(1, Int((Double(way.seconds) / 60).rounded()))),
-                                                 "dist": L.distance(way.metres)]))
+                        Text(chip(way))
                             .font(.footnote.weight(.semibold))
                             .monospacedDigit()
                             .padding(.horizontal, 12)
@@ -372,13 +381,26 @@ struct GoalCard: View {
         .padding(.top, 10)
     }
 
+    /// A way's button: how long and how far, or for a way by train how
+    /// long and when the train goes, since that is what it hangs on.
+    private func chip(_ way: Way) -> String {
+        let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
+        if let train = way.train { return L.t("goalTrainChip", ["min": min, "at": train.at]) }
+        return L.t("goalWayChip", ["min": min, "dist": L.distance(way.metres)])
+    }
+
     private var line: String {
         var parts = goal.spot.detail.isEmpty ? [] : [goal.spot.detail]
         switch goal.way {
         case .looking: parts.append(L.t("goalFinding"))
         case .found(let way):
-            parts.append(L.t("goalWay", ["dist": L.distance(way.metres),
-                                         "min": String(max(1, Int((Double(way.seconds) / 60).rounded())))]))
+            let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
+            if let train = way.train {
+                parts.append(L.t("goalTrain", ["leave": train.leave, "from": train.from, "line": train.name,
+                                               "at": train.at, "to": train.to, "min": min]))
+            } else {
+                parts.append(L.t("goalWay", ["dist": L.distance(way.metres), "min": min]))
+            }
         case .missing: break
         }
         return parts.joined(separator: " · ")

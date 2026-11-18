@@ -263,6 +263,18 @@
     "et": "Sihtkoht: {name}",
     "ru": "Цель: {name}"
   },
+  "goalTrain": {
+    "az": "{leave} çıxın: {from} stansiyasına sürün, {at} {line} qatarı ilə {to} stansiyasına, sonra sürün · {min} dəq",
+    "en": "Leave at {leave}: ride to {from}, the {line} at {at} to {to}, ride on · {min} min",
+    "et": "Hakka minema {leave}: sõida {from} jaama, rong {line} kell {at} jaama {to}, sõida edasi · {min} min",
+    "ru": "Выезжайте в {leave}: до станции {from}, поезд {line} в {at} до {to}, дальше на велосипеде · {min} мин"
+  },
+  "goalTrainChip": {
+    "az": "{min} dəq · qatar {at}",
+    "en": "{min} min · train {at}",
+    "et": "{min} min · rong {at}",
+    "ru": "{min} мин · поезд {at}"
+  },
   "goalWay": {
     "az": "{dist} · velosipedlə təxminən {min} dəq",
     "en": "{dist} · about {min} min by bike",
@@ -934,6 +946,12 @@
     "en": "Go straight",
     "et": "Sõida otse",
     "ru": "Езжайте прямо"
+  },
+  "turnTrain": {
+    "az": "{at} {line} qatarı ilə {to} stansiyasına",
+    "en": "Train {line} at {at} to {to}",
+    "et": "Rong {line} kell {at} jaama {to}",
+    "ru": "Поезд {line} в {at} до {to}"
   },
   "voiceOff": {
     "az": "Səs sönülüdür",

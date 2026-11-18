@@ -125,6 +125,21 @@ the rider leaves it; and arriving finishes nothing — Finish is still a
 button. What is saved is the way really ridden, never the suggestion and
 never the destination.
 
+**Or by train.** An Elron train takes a bike, and from the right corner of
+the city it is quicker: ride to Ülemiste, the train two stops, ride on. Where
+the website finds one that is — `trains` in `GET /api/v1/route`, counted
+from setting off and leaving within the hour — it is one more button after
+the bike ways, *15 min · train 09:31*, and the card says *Leave at 09:25:
+ride to Ülemiste, the RE34 at 09:31 to Kitseküla, ride on*. The rides are
+the solid line and the rail dashed. While riding, the station is a corner
+like any other, with a train in the row in place of an arrow — *Train RE34
+at 09:31 to Kitseküla* — read once by the phone's own voice on the platform,
+since no recording says which train. On the train nothing is recorded: a
+point on the rail stretch of the way is not kept, so a saved ride is never
+a railway, and it goes on from the far station. The clock keeps running, as
+it does at a red light. A website from before the trains answers without
+them, and the app offers the bike ways as it always did.
+
 **The turns, shown and said.** The website says where the way turns, and
 under the numbers a row shows the next corner: an arrow, how far, what to
 do and the street it is onto. A voice says the same, since the phone is in
@@ -231,6 +246,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
+| `GET /api/v1/route?from=&to=&mode=bike` | asked first: everything `/api/route` answers below, with `version: 1`, and `trains` — each `seconds`, `meters`, `leave`, and `legs`, a ride (`kind: "bike"`, `meters`, `seconds`, `line`, `steps`) or the train (`kind: "train"`, `name`, `from`, `to`, `at`, `until`, `meters`, `line`). An answer without `version`, or none, and `/api/route` is asked instead |
 | `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields; and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout` and `arrive`; one the app does not know is left out |
 | `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
 | `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
