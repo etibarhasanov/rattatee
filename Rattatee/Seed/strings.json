@@ -1205,6 +1205,12 @@
     "et": "Rong {line} kell {at} jaama {to}",
     "ru": "Поезд {line} в {at} до {to}"
   },
+  "turnTunnel": {
+    "az": "Tunelə gir",
+    "en": "Enter the tunnel",
+    "et": "Sõida tunnelisse",
+    "ru": "Въезжайте в тоннель"
+  },
   "voiceOff": {
     "az": "Səs sönülüdür",
     "en": "Voice is off",

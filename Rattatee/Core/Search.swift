@@ -39,17 +39,21 @@ struct Spot: Identifiable, Equatable, Codable {
     var onRoll: Bool { [.mine, .place, .google].contains(kind) }
 }
 
-/// Which way a way bends at a corner: the website's own eight words, under
+/// Which way a way bends at a corner: the website's own nine words, under
 /// `steps` in /api/route. Each is one recording in `Voice/`, so a word the
 /// website adds later is one this build does not know, and it is left out
 /// rather than guessed at.
+///
+/// `tunnel` is one of the website's words and not a corner: where the way
+/// goes into a tunnel, said so a rider in a pocket knows the dark ahead is
+/// the way.
 ///
 /// And `train`, which is not one of the website's words but this app's: the
 /// corner where a way by train leaves the bike — the station — made here
 /// out of the train in /api/v1/route's `trains`. It has no recording; the
 /// row shows it and the phone's own voice reads it.
 enum Turn: String {
-    case left, right, straight, around, roundabout, arrive, train
+    case left, right, straight, around, roundabout, arrive, tunnel, train
     case keepLeft = "keep-left"
     case keepRight = "keep-right"
 
@@ -64,6 +68,7 @@ enum Turn: String {
         case .around: return "arrow.uturn.down"
         case .roundabout: return "arrow.triangle.2.circlepath"
         case .arrive: return "flag.checkered"
+        case .tunnel: return "arrow.up"
         case .train: return "tram.fill"
         }
     }
@@ -92,6 +97,7 @@ struct Step: Equatable {
         case .around: return L.t("turnAround")
         case .roundabout: return exit > 0 ? L.t("turnRoundaboutExit", ["n": "\(exit)"]) : L.t("turnRoundabout")
         case .arrive: return L.t("turnArrive")
+        case .tunnel: return L.t("turnTunnel")
         case .train: return L.t("turnTrain", train)
         }
     }
