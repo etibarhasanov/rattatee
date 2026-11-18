@@ -277,12 +277,32 @@ final class Store {
         self.goal?.way = .found(first)
     }
 
-    /// Go by another of the ways on offer: the card's row of them.
+    /// Go by another of the ways on offer: the card's row of them before a
+    /// ride, or the same row under the numbers after a new way mid-ride,
+    /// where a press is the rider choosing and the choice is over.
     func choose(way index: Int) {
-        guard let goal, goal.ways.indices.contains(index) else { return }
-        self.goal?.chosen = index
-        self.goal?.way = .found(goal.ways[index])
+        guard var goal, goal.ways.indices.contains(index) else { return }
+        take(index, in: &goal)
+        endPicking(&goal)
+        self.goal = goal
+    }
+
+    /// Make one of the ways on offer the way: followed from wherever the
+    /// rider is on it, and its turns said from the start.
+    private func take(_ index: Int, in goal: inout Goal) {
+        goal.chosen = index
+        goal.way = .found(goal.ways[index])
+        goal.lost = nil
+        goal.along = 0
+        goal.back = 0
+        goal.astray = 0
         guide.forget()
+    }
+
+    private func endPicking(_ goal: inout Goal) {
+        goal.picking = nil
+        goal.aloneOn = nil
+        goal.alonePoints = 0
     }
 
     // MARK: Off the way
@@ -301,13 +321,21 @@ final class Store {
     /// Not asked again sooner than this after it answered nothing, so a
     /// tunnel or a dead signal is not a request every point.
     static let rerouteEvery: TimeInterval = 30
+    /// After a new way, how far the rider may ride before its others stop
+    /// being a choice and the first is simply the way. By then the ways
+    /// have long parted, or are so nearly one that it makes no difference.
+    static let pickFor: Double = 800
 
     /// One kept point of a ride with somewhere to go: on the way, the turns
     /// are said as before; off it or going backwards along it, the row says
     /// so, once, and a new way is asked for when the rider is plainly not
-    /// coming back to it.
-    private func follow(_ point: Point, after before: Point?, on way: Way, ridden: Double) {
+    /// coming back to it. Just after a new way with others, `pick` has the
+    /// point first.
+    private func follow(_ point: Point, after before: Point?, ridden: Double) {
         guard var goal = self.goal, goal.lost?.finding != true else { return }
+        if pick(point, in: &goal, ridden: ridden) { self.goal = goal; return }
+        // Read after `pick`, which may have made another of the ways the way.
+        guard case .found(let way) = goal.way else { return }
         let spot = way.place(of: point.coordinate)
         let off = spot.off > Way.astray
 
@@ -360,29 +388,70 @@ final class Store {
         self.goal = goal
     }
 
+    /// Just after a new way, while the website's others are still a choice:
+    /// which of them the rider is riding. Nothing is said and nothing is
+    /// asked — the phone is in a pocket — and the bike chooses: two points
+    /// in a row on one way and off every other, and that one is the way,
+    /// the first included. Until then the turns are the first way's, said
+    /// only while the rider is on it, and being off it is not "off the way"
+    /// while they are on another. Off all of them, or past `pickFor`, the
+    /// choice is over and the way is followed as any way is.
+    ///
+    /// True when the point is dealt with here, and `follow` has nothing
+    /// more to do with it.
+    private func pick(_ point: Point, in goal: inout Goal, ridden: Double) -> Bool {
+        guard let since = goal.picking else { return false }
+        let on = goal.ways.indices.filter { goal.ways[$0].place(of: point.coordinate).off <= Way.astray }
+        if on.isEmpty || ridden - since >= Self.pickFor {
+            endPicking(&goal)
+            return false
+        }
+        if on.count == 1 {
+            goal.alonePoints = goal.aloneOn == on[0] ? goal.alonePoints + 1 : 1
+            goal.aloneOn = on[0]
+        } else {
+            goal.aloneOn = nil
+            goal.alonePoints = 0
+        }
+        if let only = goal.aloneOn, goal.alonePoints >= Self.astrayPoints {
+            if only != goal.chosen { take(only, in: &goal) }
+            endPicking(&goal)
+            return false
+        }
+        // On the way chosen, its turns as ever; on others only, quiet.
+        return !on.contains(goal.chosen)
+    }
+
     /// A new way to the same place, from where the rider is now and setting
     /// off the way they are going: somebody who has ridden this far past
     /// "Going the wrong way" means it, and a new way that began "Turn
     /// around" would only say it again. It takes the place of the old one,
     /// turns and all, and the voice starts over on it; with no answer, the
     /// old one stays and it is asked again later.
+    ///
+    /// Where the website answers more than one — up to three — the first
+    /// is the way and the others are drawn faint beside it with a button
+    /// each, and whichever the rider rides on becomes the way (`pick`).
+    /// Ways by train are left out: a station is not something to turn
+    /// towards mid-ride without being asked.
     private func reroute(from here: CLLocationCoordinate2D, heading: Int?) async {
-        guard let goal else { return }
-        let ways = await Search.ways(from: here, to: goal.spot.coordinate, heading: heading)
-        guard self.goal?.spot.id == goal.spot.id else { return }
-        guard let first = ways.first else {
-            self.goal?.lost?.finding = false
-            self.goal?.lost?.failed = Date()
+        guard let asked = goal else { return }
+        let ways = await Search.ways(from: here, to: asked.spot.coordinate, heading: heading)
+            .filter { $0.train == nil }
+        guard var goal = self.goal, goal.spot.id == asked.spot.id else { return }
+        guard !ways.isEmpty else {
+            goal.lost?.finding = false
+            goal.lost?.failed = Date()
+            self.goal = goal
             return
         }
-        self.goal?.ways = ways
-        self.goal?.chosen = 0
-        self.goal?.way = .found(first)
-        self.goal?.lost = nil
-        self.goal?.along = 0
-        self.goal?.back = 0
-        self.goal?.astray = 0
-        guide.forget()
+        goal.ways = ways
+        take(0, in: &goal)
+        endPicking(&goal)
+        // Measured from where the ride is now, not where it was asked: the
+        // rider has gone on while the website answered.
+        if ways.count > 1 { goal.picking = current?.metres ?? 0 }
+        self.goal = goal
     }
 
     /// Save: on disk as waiting first, then sent.
@@ -424,8 +493,8 @@ final class Store {
         }
         let before = rides[i].points.last
         rides[i].points.append(point)
-        if case .found(let way) = goal?.way {
-            follow(point, after: before, on: way, ridden: rides[i].metres)
+        if case .found = goal?.way {
+            follow(point, after: before, ridden: rides[i].metres)
         }
         unwritten += 1
         if unwritten >= Self.writeEvery { write(rides[i]) }

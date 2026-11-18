@@ -233,6 +233,15 @@ struct Goal: Equatable {
     var along = 0.0
     var back = 0.0
     var astray = 0
+    /// After a new way off the old one, while its others are still a choice:
+    /// how far the ride was, in metres, when it opened. Nil the rest of the
+    /// time, which is before a ride, after the choice is made, and whenever
+    /// the website answered one way. `Store.pick` keeps it.
+    var picking: Double?
+    /// Which of `ways` the rider has been on alone — on it and off every
+    /// other — and for how many points in a row, while `picking`.
+    var aloneOn: Int?
+    var alonePoints = 0
 }
 
 /// The rider has left the way to `Goal`, in one of two ways, and the row on
@@ -244,7 +253,9 @@ struct Goal: Equatable {
 /// from where the rider is and setting off the way they are riding, by
 /// itself and with no button, since the phone is in a pocket. That is the
 /// owner's word: say it, then recalculate once the rider is really going
-/// wrong, in the direction they plainly want to go.
+/// wrong, in the direction they plainly want to go. Where the website has
+/// more than one new way, all of them are offered, quietly, and the one the
+/// rider rides on is the one they get: `Goal.picking`.
 struct Lost: Equatable {
     enum Kind: Equatable { case off, back }
     var kind: Kind
