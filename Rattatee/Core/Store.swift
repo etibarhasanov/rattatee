@@ -334,18 +334,22 @@ final class Store {
                 // while it is out do not ask it again.
                 goal.lost?.finding = true
                 let here = point.coordinate
-                Task { await reroute(from: here) }
+                let heading = Geo.heading(current?.points ?? [])
+                Task { await reroute(from: here, heading: heading) }
             }
         }
         self.goal = goal
     }
 
-    /// A new way to the same place, from where the rider is now. It takes
-    /// the place of the old one, turns and all, and the voice starts over on
-    /// it; with no answer, the old one stays and it is asked again later.
-    private func reroute(from here: CLLocationCoordinate2D) async {
+    /// A new way to the same place, from where the rider is now and setting
+    /// off the way they are going: somebody who has ridden this far past
+    /// "Going the wrong way" means it, and a new way that began "Turn
+    /// around" would only say it again. It takes the place of the old one,
+    /// turns and all, and the voice starts over on it; with no answer, the
+    /// old one stays and it is asked again later.
+    private func reroute(from here: CLLocationCoordinate2D, heading: Int?) async {
         guard let goal else { return }
-        let ways = await Search.ways(from: here, to: goal.spot.coordinate)
+        let ways = await Search.ways(from: here, to: goal.spot.coordinate, heading: heading)
         guard self.goal?.spot.id == goal.spot.id else { return }
         guard let first = ways.first else {
             self.goal?.lost?.finding = false

@@ -241,9 +241,10 @@ struct Goal: Equatable {
 /// First it is only said: off by a street or turned round for a few dozen
 /// metres is often on purpose — a shop, a shortcut, a closed path. Ridden
 /// on until it is plainly not that, the app asks the website for a new way
-/// from where the rider is, by itself and with no button, since the phone
-/// is in a pocket. That is the owner's word: say it, then recalculate once
-/// the rider is really going wrong.
+/// from where the rider is and setting off the way they are riding, by
+/// itself and with no button, since the phone is in a pocket. That is the
+/// owner's word: say it, then recalculate once the rider is really going
+/// wrong, in the direction they plainly want to go.
 struct Lost: Equatable {
     enum Kind: Equatable { case off, back }
     var kind: Kind
@@ -362,12 +363,15 @@ enum Search {
     /// without trains: a new app reads an old website. An app from before
     /// this asks /api/route alone and is never offered a train it could not
     /// draw.
-    static func ways(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) async -> [Way] {
-        let query = [
+    static func ways(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, heading: Int? = nil) async -> [Way] {
+        var query = [
             "from": "\(Geo.round5(from.latitude)),\(Geo.round5(from.longitude))",
             "to": "\(Geo.round5(to.latitude)),\(Geo.round5(to.longitude))",
             "mode": "bike"
         ]
+        // Asked mid-ride, the way is to set off the way the rider is going:
+        // the website's `heading`, which one from before it simply ignores.
+        if let heading { query["heading"] = "\(heading)" }
         var object = try? await rows("api/v1/route", query) as? [String: Any]
         if object?["version"] == nil { object = try? await rows("api/route", query) as? [String: Any] }
         guard let object, let first = way(object) else { return [] }

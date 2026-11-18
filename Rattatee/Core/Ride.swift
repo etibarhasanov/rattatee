@@ -208,6 +208,18 @@ enum Geo {
         return (x * x + y * y).squareRoot() * 6_371_000
     }
 
+    /// The way a line is going at its end, in whole degrees from north:
+    /// from the last point at least `over` metres behind its end to the
+    /// end, so one fix wandering sideways does not turn it. Nil for a line
+    /// that has not gone that far yet.
+    static func heading(_ points: [Point], over: Double = 30) -> Int? {
+        guard let end = points.last, let from = points.last(where: { metres($0, end) >= over }) else { return nil }
+        let rad = Double.pi / 180
+        let east = (end.lng - from.lng) * cos((from.lat + end.lat) / 2 * rad)
+        let north = end.lat - from.lat
+        return (Int((atan2(east, north) / rad).rounded()) + 360) % 360
+    }
+
     /// Two points further apart than this are a gap, not a step: the server
     /// cuts the line there and keeps each side as a ride of its own — `GAP`
     /// in the website's `functions/api/_sections.js`. A gap is where a walk,

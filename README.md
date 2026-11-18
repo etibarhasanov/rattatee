@@ -202,9 +202,12 @@ ridden since it was said — the app asks the website for a new way from
 where they are, by itself and with no button, since the phone is in a
 pocket. The new way takes the old one's place and its first turn is said
 as any way's is. With no signal the row says "No new way yet" and it asks
-again thirty seconds later. The website's route knows nothing of which way
-the rider is facing, so a new way can still begin "Turn around" where that
-really is the shortest (`Store.follow`).
+again thirty seconds later. The question carries which way the rider is
+going — `heading`, worked out from the last thirty metres of the ride —
+and the website answers a way that sets off that way, so somebody who
+rode on past "Going the wrong way" is taken on from where they are headed
+and not told to turn around a second time (`Store.follow`,
+`Store.reroute`).
 
 **Add to a list.** Signed in, the card of somewhere to go has **Add to a
 list** beside Go: the rider's lists on the website, a press each, and a new
