@@ -287,6 +287,30 @@
     "et": "{min} min · {dist}",
     "ru": "{min} мин · {dist}"
   },
+  "greetAfternoon": {
+    "az": "Günortan xeyir, gedək",
+    "en": "Good afternoon, let's go",
+    "et": "Tere päevast, lähme",
+    "ru": "Добрый день, поехали"
+  },
+  "greetEvening": {
+    "az": "Axşamın xeyir, gedək",
+    "en": "Good evening, let's go",
+    "et": "Tere õhtust, lähme",
+    "ru": "Добрый вечер, поехали"
+  },
+  "greetLate": {
+    "az": "Gec saatdır, gedək",
+    "en": "Riding late, let's go",
+    "et": "Hilja juba, lähme",
+    "ru": "Поздновато, поехали"
+  },
+  "greetMorning": {
+    "az": "Sabahın xeyir, gedək",
+    "en": "Good morning, let's go",
+    "et": "Tere hommikust, lähme",
+    "ru": "Доброе утро, поехали"
+  },
   "keptTitle": {
     "az": "Bu telefonda saxlanıldı",
     "en": "Kept on this phone",

@@ -137,6 +137,8 @@ final class Store {
         rides.insert(ride, at: 0)
         shown = nil
         write(ride)
+        // A new ride only: `resume()` does not greet.
+        guide.greet()
         recorder.start()
     }
 

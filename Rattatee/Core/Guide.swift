@@ -37,7 +37,8 @@ import Observation
 ///
 /// Nothing here knows about a ride. The Store hands it each point it keeps
 /// while there is a way, so paused is silent, and so is a ride with nowhere
-/// to go.
+/// to go — but for the one line when a ride starts, "Good morning, let's
+/// go", which the Store asks for (`greet`) with or without a way.
 @MainActor
 @Observable
 final class Guide {
@@ -60,6 +61,7 @@ final class Guide {
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
         case soon, left, right, straight, around, arrive, off
+        case morning, afternoon, evening, late
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
         case wrongWay = "wrong-way"
@@ -116,6 +118,25 @@ final class Guide {
         switch kind {
         case .off: say([.off], L.t("lostOff"))
         case .back: say([.wrongWay], L.t("lostBack"))
+        }
+    }
+
+    /// A new ride has started: one line for the time of day, said once.
+    /// Not on a resume — the Store calls this from `start()` only — and the
+    /// first turn, if it comes while this is still playing, cuts it off.
+    func greet(at now: Date = Date()) {
+        guard voice else { return }
+        let (clip, key) = Self.greeting(hour: Calendar.current.component(.hour, from: now))
+        say([clip], L.t(key))
+    }
+
+    /// Which greeting an hour of the phone's clock gets.
+    static func greeting(hour: Int) -> (Clip, String) {
+        switch hour {
+        case 5..<12: return (.morning, "greetMorning")
+        case 12..<18: return (.afternoon, "greetAfternoon")
+        case 18..<22: return (.evening, "greetEvening")
+        default: return (.late, "greetLate")
         }
     }
 

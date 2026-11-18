@@ -1,8 +1,8 @@
 # The voice: what to record
 
 The turns of a way are said aloud in recordings of the owner's voice — see
-`Rattatee/Core/Guide.swift`. This is the dictionary: ten phrases, each in
-English, Estonian, Russian and Azerbaijani, forty recordings in all.
+`Rattatee/Core/Guide.swift`. This is the dictionary: fourteen phrases, each in
+English, Estonian, Russian and Azerbaijani, fifty-six recordings in all.
 
 The app joins them. Before a corner it plays **In 200 metres** and then the
 turn; at the corner it plays the turn alone. So each phrase is recorded on
@@ -21,6 +21,23 @@ its own, as a whole sentence, with no "and then".
 | `off` | You're off the way | Oled teelt kõrvale kaldunud | Вы сошли с пути | Yoldan çıxdın |
 | `wrong-way` | Going the wrong way | Sõidad vales suunas | Вы едете не в ту сторону | Yanlış istiqamətdə gedirsən |
 
+## The greeting
+
+When a new ride starts — not on a resume — one line is said for the time
+of day on the phone's clock (`Guide.greet`), before any turn. A turn that
+comes while it is still playing cuts it off.
+
+| File | When | English (`en-`) | Estonian (`et-`) | Russian (`ru-`) | Azerbaijani (`az-`) |
+|---|---|---|---|---|---|
+| `morning` | 05:00–11:59 | Good morning, let's go | Tere hommikust, lähme | Доброе утро, поехали | Sabahın xeyir, gedək |
+| `afternoon` | 12:00–17:59 | Good afternoon, let's go | Tere päevast, lähme | Добрый день, поехали | Günortan xeyir, gedək |
+| `evening` | 18:00–21:59 | Good evening, let's go | Tere õhtust, lähme | Добрый вечер, поехали | Axşamın xeyir, gedək |
+| `late` | 22:00–04:59 | Riding late, let's go | Hilja juba, lähme | Поздновато, поехали | Gec saatdır, gedək |
+
+The words the phone reads until these are recorded are the `greet…` keys
+in `Rattatee/Seed/strings.json`; change them there too if you say it
+differently.
+
 There is nothing for a roundabout, on purpose: the app is for a bike, which
 is mostly on the path beside one. Where the way does go through one, the row
 on screen says so — "Roundabout, exit 2" — and the voice says nothing.
@@ -31,8 +48,8 @@ it is right. Only the meaning has to match the file.
 **Recorded so far: Azerbaijani and English**, the first eight of each, on
 2026-11-17. Estonian and Russian are still to do, and so are `off` and
 `wrong-way` in all four — said when the rider leaves the way
-(`Guide.warn`), and read by the phone's voice in English and Russian
-until they are recorded.
+(`Guide.warn`) — and the four greetings in all four. Until they are
+recorded the phone's voice reads them in English and Russian.
 
 ## Recording
 
