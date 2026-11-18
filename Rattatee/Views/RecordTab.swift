@@ -10,7 +10,8 @@ import SwiftUI
 ///   Going somewhere  the place, the suggested way in blue, and Go
 ///   Location is off  what to choose in Settings (or Precise Location is)
 ///   Recording        the screen changes: distance, average and when it
-///                    began over the map, Pause and Finish under it
+///                    began over the map, Pause and Finish under it, and
+///                    "Where to?" still over the map, to choose mid-ride
 ///   Paused           the same, greyed; Resume and Finish
 ///   Save this ride?  a name, Save ride, Throw it away   (FinishCards.swift)
 ///   Too short        Keep riding, Throw it away
@@ -38,10 +39,15 @@ struct RecordTab: View {
                     goal: store.goal,
                     here: store.recorder.here,
                     follow: !store.demo && !planning && (ride == nil || ride?.status == .recording),
-                    // Somewhere to go is chosen before a ride, never during.
-                    tap: ride == nil ? { name, point in store.tapped(name: name, at: point) } : nil)
+                    // Somewhere to go is chosen before a ride or during one,
+                    // with no need to pause or finish. While riding, a tap
+                    // chooses only where there is nowhere to go yet: a hand
+                    // on the handlebar brushing the screen should not throw
+                    // away a way the rider is following. Where to? and its
+                    // cross change it on purpose.
+                    tap: canTap ? { name, point in store.tapped(name: name, at: point) } : nil)
                 .overlay(alignment: .top) {
-                    if ride == nil { searchBar }
+                    if ride == nil || riding != nil { searchBar }
                 }
             card(current: store.current, outcome: outcome)
         }
@@ -57,15 +63,29 @@ struct RecordTab: View {
         .onAppear { if store.recorder.allowed { store.recorder.locate() } }
     }
 
-    /// "Where to?", or the place chosen with a cross to let it go. Only
-    /// before a ride: once riding, the destination is on the card.
+    /// Whether a tap on the map is somewhere to go: before a ride, and
+    /// while riding or paused with nowhere to go yet — never on the save
+    /// card or after it.
+    private var canTap: Bool {
+        guard let current = store.current else { return store.ride(store.shown) == nil }
+        return [.recording, .paused].contains(current.status) && store.goal == nil
+    }
+
+    /// "Where to?", or the place chosen with a cross to let it go. Before a
+    /// ride and while riding: a destination can be chosen, changed or let go
+    /// mid-ride, and the recording goes on underneath.
     private var searchBar: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass").foregroundStyle(Theme.muted)
             if let goal = store.goal {
                 Text(goal.spot.name).fontWeight(.semibold).foregroundStyle(Theme.ink).lineLimit(1)
                 Spacer()
-                Button { store.goal = nil } label: {
+                Button {
+                    // Mid-ride the voice was following it too: it starts
+                    // afresh on whatever is chosen next.
+                    store.goal = nil
+                    store.guide.forget()
+                } label: {
                     Image(systemName: "xmark").foregroundStyle(Theme.muted).frame(width: 32, height: 44)
                 }
             } else {
@@ -108,8 +128,8 @@ struct RecordTab: View {
     }
 }
 
-/// The map: where the phone is, and the line ridden so far. Before a ride a
-/// tap on it is somewhere to go: a place Apple's map names, or anywhere.
+/// The map: where the phone is, and the line ridden so far. A tap on it is
+/// somewhere to go, before a ride or during one with nowhere to go yet: a place Apple's map names, or anywhere.
 ///
 /// THE CAMERA MOVES ONCE FOR SOMEWHERE TO GO
 ///
@@ -141,7 +161,8 @@ struct RideMap: View {
     /// Keep the phone's position in the middle, or show the whole line.
     let follow: Bool
     /// A tap: the name of the place Apple's map drew there, if it drew one,
-    /// and the point. Nil while riding, when taps do nothing.
+    /// and the point. Nil when taps do nothing: on the save card, and
+    /// while riding to somewhere already chosen.
     var tap: ((String?, CLLocationCoordinate2D) -> Void)?
 
     private static let tallinn = MKCoordinateRegion(
