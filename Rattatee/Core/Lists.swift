@@ -110,9 +110,14 @@ final class ListBook {
         }
     }
 
-    /// Send whatever is waiting, in the order it was added.
-    func sendWaiting() async {
+    /// Send whatever is waiting, in the order it was added. After a failure
+    /// the next try waits, a minute doubling to six hours, as a waiting
+    /// ride does — A RIDE THAT FAILS WAITS LONGER EACH TIME in Store.swift —
+    /// unless `now`, a person asking. Kept in memory: a relaunch starts the
+    /// wait again, which is one request.
+    func sendWaiting(now: Bool = false) async {
         guard !sending, !waiting.isEmpty else { return }
+        if !now, let notBefore, notBefore > Date() { return }
         sending = true
         defer { sending = false }
         while let next = waiting.first {
@@ -121,12 +126,19 @@ final class ListBook {
             } catch let refusal as API.Refusal where refusal.status < 500 {
                 // Refused for good: dropped, below.
             } catch {
-                return // No signal, or a 5xx: try again next time.
+                // No signal, or a 5xx: try again later.
+                failures += 1
+                notBefore = Date().addingTimeInterval(Store.retryWait(failures))
+                return
             }
+            failures = 0
+            notBefore = nil
             waiting.removeFirst()
             Self.write(waiting, Self.waitingFile)
         }
     }
+    @ObservationIgnored private var failures = 0
+    @ObservationIgnored private var notBefore: Date?
 
     /// Signed out: the lists were somebody's, and so were the adds.
     func forget() {
