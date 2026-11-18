@@ -248,6 +248,21 @@ rode on past "Going the wrong way" is taken on from where they are headed
 and not told to turn around a second time (`Store.follow`,
 `Store.reroute`).
 
+**And where there is more than one, the bike chooses.** The website may
+answer a new way with up to two others beside it — often it has none, since
+a way that must set off the way the rider is going leaves the router few —
+and all of them are offered, every time the rider leaves the way, and
+without a word. The first is the way, solid, its turns shown and said; the
+others are faint beside it, and the buttons of the card before a ride,
+*9 min · 2.4 km*, sit under the turn. A press chooses one. So does riding
+it: two points in a row on one of the ways and off the other two, and that
+one is the way, its turns said from there on, and the buttons and faint
+lines go. Riding one of the others is not "off the way" while it lasts.
+Still on the first after 800 m, or off all three, the choice is over and
+the way is followed as any way is. Ways by train are not offered here: a
+station is not something to turn towards mid-ride unasked (`Store.pick`,
+`Views/RecordTab.swift`'s `WayChips`).
+
 **Add to a list.** Signed in, the card of somewhere to go has **Add to a
 list** beside Go: the rider's lists on the website, a press each, and a new
 one made on the spot. A place the website does not have — one only Apple's

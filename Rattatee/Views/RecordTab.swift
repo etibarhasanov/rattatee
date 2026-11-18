@@ -212,9 +212,10 @@ struct RideMap: View {
             if let goal {
                 if case .found(let way) = goal.way {
                     // The ways on offer and not chosen, faint under the
-                    // one that is: before a ride only, while it is still
-                    // a choice.
-                    if points.isEmpty {
+                    // one that is, while it is still a choice: before a
+                    // ride, and just after a new way mid-ride until the
+                    // rider has ridden onto one (`Store.pick`).
+                    if points.isEmpty || goal.picking != nil {
                         ForEach(Array(goal.ways.enumerated()).filter { $0.offset != goal.chosen }, id: \.offset) { _, other in
                             MapPolyline(coordinates: other.line)
                                 .stroke(Theme.accent.opacity(0.3), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
@@ -373,7 +374,7 @@ struct GoalCard: View {
         SheetCard {
             Text(goal.spot.name).font(.title2.bold()).foregroundStyle(Theme.ink).lineLimit(2)
             Text(line).font(.subheadline).foregroundStyle(Theme.muted)
-            if goal.ways.count > 1 { ways }
+            if goal.ways.count > 1 { WayChips(goal: goal) }
             // "No way found" outranks the sign-in line: it is about the ride.
             Note(text: listable && store.user == nil && goal.way != .missing ? L.t("goalListSignIn") : note)
                 .padding(.top, 10).padding(.bottom, 14)
@@ -387,11 +388,39 @@ struct GoalCard: View {
         .sheet(isPresented: $listing) { ListPicker(spot: goal.spot) }
     }
 
-    /// The ways on offer, a small button each — how long and how far, as
-    /// on the website's route bar, and nothing about which is nicer, since
-    /// the router does not say. The one chosen is filled, and is the solid
-    /// line on the map; Go starts with it.
-    private var ways: some View {
+    private var line: String {
+        var parts = goal.spot.detail.isEmpty ? [] : [goal.spot.detail]
+        switch goal.way {
+        case .looking: parts.append(L.t("goalFinding"))
+        case .found(let way):
+            let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
+            if let train = way.train {
+                parts.append(L.t("goalTrain", ["leave": train.leave, "from": train.from, "line": train.name,
+                                               "at": train.at, "to": train.to, "min": min]))
+            } else {
+                parts.append(L.t("goalWay", ["dist": L.distance(way.metres), "min": min]))
+            }
+        case .missing: break
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    private var note: String {
+        goal.way == .missing ? L.t("goalNoWay") : L.t("goalNote")
+    }
+}
+
+/// The ways on offer, a small button each — how long and how far, as on the
+/// website's route bar, and nothing about which is nicer, since the router
+/// does not say. The one chosen is filled, and is the solid line on the map.
+/// On the card before a ride, where Go starts with the one chosen; and under
+/// the numbers just after a new way mid-ride, where riding one chooses it
+/// just as well as a press does.
+struct WayChips: View {
+    @Environment(Store.self) private var store
+    let goal: Goal
+
+    var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
                 ForEach(Array(goal.ways.enumerated()), id: \.offset) { index, way in
@@ -420,27 +449,6 @@ struct GoalCard: View {
         let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
         if let train = way.train { return L.t("goalTrainChip", ["min": min, "at": train.at]) }
         return L.t("goalWayChip", ["min": min, "dist": L.distance(way.metres)])
-    }
-
-    private var line: String {
-        var parts = goal.spot.detail.isEmpty ? [] : [goal.spot.detail]
-        switch goal.way {
-        case .looking: parts.append(L.t("goalFinding"))
-        case .found(let way):
-            let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
-            if let train = way.train {
-                parts.append(L.t("goalTrain", ["leave": train.leave, "from": train.from, "line": train.name,
-                                               "at": train.at, "to": train.to, "min": min]))
-            } else {
-                parts.append(L.t("goalWay", ["dist": L.distance(way.metres), "min": min]))
-            }
-        case .missing: break
-        }
-        return parts.joined(separator: " · ")
-    }
-
-    private var note: String {
-        goal.way == .missing ? L.t("goalNoWay") : L.t("goalNote")
     }
 }
 
@@ -488,6 +496,13 @@ struct RideDash: View {
             } else if let next {
                 Divider().overlay(Theme.hairline).padding(.top, 10)
                 TurnRow(step: next.step, metres: next.metres).padding(.top, 10)
+            }
+
+            // A new way off the old one, with others beside it: the same
+            // buttons as on the card before a ride, for as long as riding
+            // has not chosen. Nothing is said about them.
+            if let goal = store.goal, goal.picking != nil, goal.ways.count > 1 {
+                WayChips(goal: goal)
             }
         }
         .padding(.horizontal, 20)
