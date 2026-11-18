@@ -126,17 +126,19 @@ final class Guide {
     /// first turn, if it comes while this is still playing, cuts it off.
     func greet(at now: Date = Date()) {
         guard voice else { return }
-        let (clip, key) = Self.greeting(hour: Calendar.current.component(.hour, from: now))
-        say([clip], L.t(key))
+        let (clip, text) = Self.greeting(hour: Calendar.current.component(.hour, from: now))
+        say([clip], text)
     }
 
-    /// Which greeting an hour of the phone's clock gets.
+    /// Which greeting an hour of the phone's clock gets: its recording, and
+    /// its words for the phone's voice where there is none. Written out key
+    /// by key so the strings check in CI can see every key the app asks for.
     static func greeting(hour: Int) -> (Clip, String) {
         switch hour {
-        case 5..<12: return (.morning, "greetMorning")
-        case 12..<18: return (.afternoon, "greetAfternoon")
-        case 18..<22: return (.evening, "greetEvening")
-        default: return (.late, "greetLate")
+        case 5..<12: return (.morning, L.t("greetMorning"))
+        case 12..<18: return (.afternoon, L.t("greetAfternoon"))
+        case 18..<22: return (.evening, L.t("greetEvening"))
+        default: return (.late, L.t("greetLate"))
         }
     }
 

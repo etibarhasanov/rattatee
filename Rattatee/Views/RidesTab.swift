@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// My rides: every ride recorded on this phone, newest first, each with
-/// whether it reached the server.
+/// whether it reached the server. A row opens the ride (`RideView`).
 ///
 /// The list is the phone's own. The server has a list of its own now
 /// (`GET /api/rides?mine=1`, which the website's account page reads), but it
@@ -10,9 +10,17 @@ import SwiftUI
 /// an account to a new phone, is the next thing this tab would grow.
 struct RidesTab: View {
     @Environment(Store.self) private var store
+    /// The ride open over the list, by its id. CI's `-kOpen YES` starts on
+    /// the newest, so the ride page can be photographed.
+    @State private var path: [String] = {
+        #if DEBUG
+        if LaunchScript.open { return ["first"] }
+        #endif
+        return []
+    }()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if listed.isEmpty {
                     ContentUnavailableView {
@@ -27,6 +35,9 @@ struct RidesTab: View {
             }
             .background(Theme.paper.ignoresSafeArea())
             .navigationTitle(L.t("tabRides"))
+            .navigationDestination(for: String.self) { id in
+                RideView(id: id == "first" ? listed.first?.id ?? id : id)
+            }
         }
     }
 
@@ -59,7 +70,7 @@ struct RidesTab: View {
             ForEach(months, id: \.title) { month in
                 Section {
                     ForEach(month.rides) { ride in
-                        RideRow(ride: ride)
+                        NavigationLink(value: ride.id) { RideRow(ride: ride) }
                             .swipeActions {
                                 // Only a ride the server has answered for
                                 // good; a waiting one is never thrown away
@@ -116,13 +127,17 @@ struct RideRow: View {
                     .foregroundStyle(Theme.muted)
             }
             Spacer(minLength: 8)
-            badge
+            StatusPill(ride: ride)
         }
         .padding(.vertical, 2)
     }
+}
 
-    @ViewBuilder
-    private var badge: some View {
+/// Saved, Waiting, or Not kept and why: a row's, and a ride page's.
+struct StatusPill: View {
+    let ride: Ride
+
+    var body: some View {
         switch ride.status {
         case .saved:
             pill(L.t("badgeSaved"), Theme.good, Theme.goodWash)

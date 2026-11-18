@@ -23,6 +23,9 @@ enum LaunchScript {
     /// says it offers, so they can be photographed.
     static var doors: Bool { UserDefaults.standard.bool(forKey: "kDoors") }
 
+    /// `-kOpen YES` on the My rides tab opens its newest ride.
+    static var open: Bool { UserDefaults.standard.bool(forKey: "kOpen") }
+
     /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides,
     /// and goal and going, which have somewhere to ride to.
     @MainActor
@@ -104,7 +107,9 @@ enum LaunchScript {
     }
 
     /// A line of about `metres` through the middle of Tallinn, a point every
-    /// twelve metres, zig-zagging the way streets do.
+    /// twelve metres, zig-zagging the way streets do, at a speed that swells
+    /// and falls by about a third five times over, so a ride's page has a
+    /// speed line with something in it. The whole takes `seconds` exactly.
     private static func path(metres: Double, from start: Date, seconds: Int) -> [Point] {
         let count = max(2, Int(metres / 12))
         var points: [Point] = []
@@ -115,10 +120,16 @@ enum LaunchScript {
             lat += north ? 0.000108 : 0.000012
             lng += north ? 0.000030 : 0.000205
             points.append(Point(lat: Geo.round5(lat), lng: Geo.round5(lng),
-                                t: start.timeIntervalSince1970 + Double(seconds) * Double(i) / Double(count),
+                                t: start.timeIntervalSince1970 + Double(seconds) * clock(Double(i) / Double(count)),
                                 acc: 5))
         }
         return points
+    }
+
+    /// The share of the time gone by the time `f` of the way is: always
+    /// rising, and 0 and 1 at the ends.
+    private static func clock(_ f: Double) -> Double {
+        f + 0.01 * sin(f * 10 * .pi)
     }
     #endif
 }

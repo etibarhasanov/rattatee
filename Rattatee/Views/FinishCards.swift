@@ -7,8 +7,9 @@ private func summary(_ ride: Ride) -> String {
     L.distance(ride.metres) + " · " + L.duration(ride.ridden())
 }
 
-/// "Today 08:12 – 08:49" under a card's title: when the ride began and ended.
-private func when(_ ride: Ride) -> String {
+/// "Today 08:12 – 08:49" under a card's title, and under a ride's own page:
+/// when the ride began and ended.
+func when(_ ride: Ride) -> String {
     guard let (from, to) = ride.span else { return L.date(ride.started) }
     let day = Calendar.current.isDateInToday(from) ? L.t("today") : L.date(from)
     return "\(day) \(L.time(from)) – \(L.time(to))"
@@ -30,25 +31,25 @@ struct RideNumbers: View {
         Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 12) {
             if ride.trimmed {
                 GridRow {
-                    cell(L.distance(ride.metres), L.t("statDistanceRidden"))
+                    Figure(value: L.distance(ride.metres), label: L.t("statDistanceRidden"))
                     Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
                 }
                 GridRow {
-                    cell(L.clock(ride.ridden()), L.t("statActiveTime"))
-                    cell(L.clock(ride.seconds()), L.t("statTotalTime"))
+                    Figure(value: L.clock(ride.ridden()), label: L.t("statActiveTime"))
+                    Figure(value: L.clock(ride.seconds()), label: L.t("statTotalTime"))
                 }
                 GridRow {
-                    cell(speed, L.t("statAverageActive"))
-                    cell(top, L.t("statTop"))
+                    Figure(value: speed, label: L.t("statAverageActive"))
+                    Figure(value: top, label: L.t("statTop"))
                 }
             } else {
                 GridRow {
-                    cell(L.distance(ride.metres), L.t("statDistance"))
-                    cell(L.clock(ride.seconds()), L.t("statRidingTime"))
+                    Figure(value: L.distance(ride.metres), label: L.t("statDistance"))
+                    Figure(value: L.clock(ride.seconds()), label: L.t("statRidingTime"))
                 }
                 GridRow {
-                    cell(speed, L.t("statAverage"))
-                    cell(top, L.t("statTop"))
+                    Figure(value: speed, label: L.t("statAverage"))
+                    Figure(value: top, label: L.t("statTop"))
                 }
             }
         }
@@ -58,7 +59,15 @@ struct RideNumbers: View {
     private var speed: String { ride.average.map { String(format: "%.1f km/h", $0) } ?? "–" }
     private var top: String { ride.topSpeed.map { String(format: "%.0f km/h", $0) } ?? "–" }
 
-    private func cell(_ value: String, _ label: String) -> some View {
+}
+
+/// One of a ride's numbers, large, with what it is under it in capitals: the
+/// save card's and the ride page's.
+struct Figure: View {
+    let value: String
+    let label: String
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(value)
                 .font(.system(size: 26, weight: .bold))
