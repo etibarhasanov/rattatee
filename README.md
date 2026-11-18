@@ -584,8 +584,8 @@ launched in each state and photographed. The pictures are the run's
 ### The icon
 
 `docs/icon.html` is the icon as a page: the owner's own blue single-speed
-with its red mudguard, leant on the parapet at Toompea with the Old Town
-behind it. Photograph it at 1024 × 1024 into
+with its red mudguard, on the Estonian flag, the top of the black band cut
+into the Old Town as it stands seen from the harbour. Photograph it at 1024 × 1024 into
 `Rattatee/Assets.xcassets/AppIcon.appiconset/icon-1024.png` with any
 headless browser, and save it as RGB with no alpha channel — App Store
 Connect refuses an icon that has one, even a fully opaque one.
