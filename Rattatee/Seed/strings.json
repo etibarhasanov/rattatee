@@ -947,6 +947,72 @@
     "et": "koguaeg",
     "ru": "общее время"
   },
+  "statsAll": {
+    "az": "Hamısı",
+    "en": "All",
+    "et": "Kõik",
+    "ru": "Все"
+  },
+  "statsMonth": {
+    "az": "Ay",
+    "en": "Month",
+    "et": "Kuu",
+    "ru": "Месяц"
+  },
+  "statsNoneMonth": {
+    "az": "Bu ay hələ gediş yoxdur",
+    "en": "No ride yet this month",
+    "et": "Sel kuul veel sõitu pole",
+    "ru": "В этом месяце поездок пока нет"
+  },
+  "statsNoneToday": {
+    "az": "Bu gün hələ gediş yoxdur",
+    "en": "No ride yet today",
+    "et": "Täna veel sõitu pole",
+    "ru": "Сегодня поездок пока нет"
+  },
+  "statsNoneWeek": {
+    "az": "Bu həftə hələ gediş yoxdur",
+    "en": "No ride yet this week",
+    "et": "Sel nädalal veel sõitu pole",
+    "ru": "На этой неделе поездок пока нет"
+  },
+  "statsRidesMany": {
+    "az": "{n} gediş",
+    "en": "{n} rides",
+    "et": "{n} sõitu",
+    "ru": "Поездок: {n}"
+  },
+  "statsRidesOne": {
+    "az": "1 gediş",
+    "en": "1 ride",
+    "et": "1 sõit",
+    "ru": "1 поездка"
+  },
+  "statsRiding": {
+    "az": "{time} sürüş",
+    "en": "{time} riding",
+    "et": "{time} sõiduaega",
+    "ru": "{time} в пути"
+  },
+  "statsSpan": {
+    "az": "Dövr",
+    "en": "Period",
+    "et": "Periood",
+    "ru": "Период"
+  },
+  "statsToday": {
+    "az": "Bu gün",
+    "en": "Today",
+    "et": "Täna",
+    "ru": "Сегодня"
+  },
+  "statsWeek": {
+    "az": "Həftə",
+    "en": "Week",
+    "et": "Nädal",
+    "ru": "Неделя"
+  },
   "tabAccount": {
     "az": "Hesab",
     "en": "Account",

@@ -63,6 +63,8 @@ struct RidesTab: View {
 
     private var list: some View {
         List {
+            Section { StatsCard(rides: listed) }
+                .listRowBackground(Theme.card)
             if !store.waiting.isEmpty {
                 Section { banner }
                     .listRowBackground(Theme.wash)
