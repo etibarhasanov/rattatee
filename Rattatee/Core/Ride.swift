@@ -130,8 +130,13 @@ struct Ride: Codable, Identifiable, Equatable {
     /// The server's word for the last refusal: "often", "short", "fast",
     /// "malformed", or "offline" for no answer at all.
     var problem: String?
-    /// "often" means not again before the next UTC midnight.
+    /// "often" means not again before the next UTC midnight; any other
+    /// failure means not again before a wait that doubles with `tries`.
     var notBefore: Date?
+    /// Sends that failed in a row for a reason sending again might change —
+    /// no answer, or a refusal that is not final. Nil once saved, and on a
+    /// ride from before this field, which decodes the same.
+    var tries: Int?
 
     /// Riding time, pauses left out.
     func seconds(at now: Date = Date()) -> Int {

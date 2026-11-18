@@ -69,7 +69,7 @@ extension Store {
 
     private func arrive(_ answer: [String: Any]) async {
         user = answer["user"] as? String
-        await sendWaiting()
+        await sendWaiting(now: true)
     }
 
     func signOut() async {

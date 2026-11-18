@@ -463,7 +463,7 @@ final class Store {
         guide.forget()
         shown = rides[i].id
         write(rides[i])
-        await sendWaiting()
+        await sendWaiting(now: true)
     }
 
     /// One fix from the recorder: kept or not by the website's rules.
@@ -539,25 +539,43 @@ final class Store {
     /// as often as anything likes: a second call while one is running
     /// returns at once, and the running one picks up rides that started
     /// waiting meanwhile, since it looks for the next one afresh each time.
-    func sendWaiting() async {
+    ///
+    /// A RIDE THAT FAILS WAITS LONGER EACH TIME
+    ///
+    /// The app comes to the front and the network comes back many times a
+    /// day, and each used to send every waiting ride again. A ride the
+    /// server keeps refusing with a word it has no sentence for — or a
+    /// server that is out of its day's database reads — was sent again on
+    /// every one of them, by every phone, for as long as the app was
+    /// installed. Every request costs the site rows read out of a free five
+    /// million a day, so now each failure puts the ride off for `retryWait`,
+    /// a minute doubling to a cap of six hours. `now` is a person asking —
+    /// Save, Try now — and goes past the wait, though never past "often",
+    /// which is the server's own date.
+    func sendWaiting(now: Bool = false) async {
         guard !sendingNow, !demo else { return }
         sendingNow = true
         defer { sendingNow = false; sendingId = nil }
 
         var tried = Set<String>()
-        while let next = rides.first(where: { $0.status == .waiting && !tried.contains($0.id) && canSend($0) }) {
+        while let next = rides.first(where: { $0.status == .waiting && !tried.contains($0.id) && canSend($0, now: now) }) {
             tried.insert(next.id)
             sendingId = next.id
             await send(next.id)
         }
         // Then any place waiting to go on a list, after the rides: a ride is
         // what the app is for.
-        await ListBook.shared.sendWaiting()
+        await ListBook.shared.sendWaiting(now: now)
     }
 
-    private func canSend(_ ride: Ride) -> Bool {
-        if let notBefore = ride.notBefore, notBefore > Date() { return false }
-        return true
+    private func canSend(_ ride: Ride, now: Bool) -> Bool {
+        guard let notBefore = ride.notBefore, notBefore > Date() else { return true }
+        return now && ride.problem != "often"
+    }
+
+    /// How long a ride waits after its `tries`-th failure in a row.
+    static func retryWait(_ tries: Int) -> TimeInterval {
+        min(60 * pow(2, Double(max(0, tries - 1))), 6 * 3600)
     }
 
     private func send(_ id: String) async {
@@ -589,6 +607,7 @@ final class Store {
                 outcome.serverMeters = saved?["meters"] as? Int
                 outcome.problem = nil
                 outcome.notBefore = nil
+                outcome.tries = nil
             } catch let refusal as API.Refusal {
                 outcome.problem = refusal.code
                 switch refusal.code {
@@ -599,11 +618,14 @@ final class Store {
                 default:
                     // 503 not-ready, no-salt, anything new: try again later.
                     // That includes `signed-out` from a server that does not
-                    // take `anon` yet.
-                    break
+                    // take `anon` yet. Later, not at once — see sendWaiting().
+                    outcome.tries = (outcome.tries ?? 0) + 1
+                    outcome.notBefore = Date().addingTimeInterval(Self.retryWait(outcome.tries ?? 1))
                 }
             } catch {
                 outcome.problem = "offline"
+                outcome.tries = (outcome.tries ?? 0) + 1
+                outcome.notBefore = Date().addingTimeInterval(Self.retryWait(outcome.tries ?? 1))
             }
         }
 

@@ -104,7 +104,7 @@ struct RidesTab: View {
             if store.sendingId != nil {
                 ProgressView()
             } else {
-                Button(L.t("tryNow")) { Task { await store.sendWaiting() } }.fontWeight(.semibold)
+                Button(L.t("tryNow")) { Task { await store.sendWaiting(now: true) } }.fontWeight(.semibold)
             }
         }
         .font(.footnote)
