@@ -88,8 +88,8 @@ struct SaveCard: View {
             Text(when(ride)).font(.subheadline).foregroundStyle(Theme.muted)
             RideNumbers(ride: ride)
             // Fifty metres is a fix wandering, not a walk worth a sentence.
-            if let out = ride.leftOut, out >= 50 {
-                Note(text: L.t("rideLeftOut", ["dist": L.distance(out)])).padding(.bottom, 12)
+            if ride.leftOut >= 50 {
+                Note(text: L.t("rideLeftOut", ["dist": L.distance(ride.leftOut)])).padding(.bottom, 12)
             }
 
             HStack {

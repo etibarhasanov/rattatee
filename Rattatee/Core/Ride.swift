@@ -85,9 +85,16 @@ struct Ride: Codable, Identifiable, Equatable {
     /// the phone could not ask about. It is what is sent as the ride's
     /// seconds and what the average is taken over.
     var active: Int?
-    /// How many metres of points were left out at Finish for not being
-    /// ridden.
-    var leftOut: Double?
+    /// The points Finish found were walked or driven, a stretch each. Kept
+    /// on the phone and drawn on the map, dotted, so the rider sees the
+    /// whole of where they went — but not riding: never in `points`, never
+    /// in the distance, the times or the speeds, and never sent.
+    var aside: [[Point]]?
+
+    /// How far the stretches set aside go.
+    var leftOut: Double {
+        (aside ?? []).reduce(0) { $0 + Geo.length($1) }
+    }
 
     /// What the server answered.
     var serverId: String?
@@ -114,10 +121,10 @@ struct Ride: Codable, Identifiable, Equatable {
     /// and total time apart.
     var trimmed: Bool {
         guard let active else { return false }
-        return active < seconds() || (leftOut ?? 0) > 0
+        return active < seconds() || !(aside ?? []).isEmpty
     }
 
-    /// Take out the points of the stretches that were not ridden, and work
+    /// Set aside the points of the stretches that were not ridden, and work
     /// out the active time: the riding time less those stretches, less any
     /// part of them that fell in a pause, which was not riding time anyway.
     /// Asked again after Keep riding, over the whole ride; a stretch whose
@@ -125,9 +132,12 @@ struct Ride: Codable, Identifiable, Equatable {
     mutating func leaveOut(_ stretches: [Motion.Stretch], at now: Date = Date()) {
         let start = started.timeIntervalSince1970
         let end = pausedAt ?? now.timeIntervalSince1970
-        let was = metres
-        points.removeAll { p in stretches.contains { p.t >= $0.from && p.t <= $0.to } }
-        leftOut = (leftOut ?? 0) + max(0, was - metres)
+        for s in stretches {
+            let inside = points.filter { $0.t >= s.from && $0.t <= s.to }
+            guard !inside.isEmpty else { continue }
+            aside = (aside ?? []) + [inside]
+            points.removeAll { $0.t >= s.from && $0.t <= s.to }
+        }
 
         var away = 0.0
         for s in stretches {
@@ -213,6 +223,25 @@ enum Geo {
             if d <= gap { m += d }
         }
         return m
+    }
+
+    /// The ridden line in the pieces it is drawn in: cut where two points
+    /// are a gap apart, and where a stretch set aside fell between them, so
+    /// a walk is a dotted line on the map and never a straight solid one
+    /// across it.
+    static func runs(_ points: [Point], around aside: [[Point]]) -> [[Point]] {
+        var runs: [[Point]] = []
+        var run: [Point] = []
+        for p in points {
+            if let last = run.last,
+               metres(last, p) > gap || aside.contains(where: { s in s.contains { $0.t > last.t && $0.t < p.t } }) {
+                runs.append(run)
+                run = []
+            }
+            run.append(p)
+        }
+        if !run.isEmpty { runs.append(run) }
+        return runs
     }
 
     static func round5(_ x: Double) -> Double { (x * 100_000).rounded() / 100_000 }

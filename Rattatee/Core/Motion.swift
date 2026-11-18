@@ -8,10 +8,11 @@ import Foundation
 /// The rider presses Start at the door and Finish at the next one, and in
 /// between they may push the bike up a hill, walk it through a market or
 /// carry it into a shop. Those stretches are not bike routes, and the rides
-/// are collected to become a map of bike routes, so they are left out —
-/// on the phone, before anything is sent. The server receives the same
-/// request it always has, with fewer points in it: never a label saying what
-/// the rider was doing, never the points that were left out.
+/// are collected to become a map of bike routes, so they are set aside — on
+/// the phone, before anything is sent. They are kept there and drawn on the
+/// ride's map, dotted (`Ride.aside`), but never counted as riding. The
+/// server receives the same request it always has, with fewer points in it:
+/// never a label saying what the rider was doing, never the points set aside.
 ///
 /// The iPhone's motion coprocessor notes all day long whether its owner is
 /// walking, running, cycling, in a car or still, and keeps a week of it,

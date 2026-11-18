@@ -52,7 +52,7 @@ Three tabs.
     average is taken over stops. **Resume**, Finish.
   - *Nice ride* — when it began and ended, and the ride's own numbers:
     distance, riding time, average speed and top speed — or, where a walk
-    or a drive was left out (**Only the riding is sent**), distance ridden,
+    or a drive was set aside (**Only the riding is sent**), distance ridden,
     active and total time, and the average over the active time. Then an optional
     name (60 characters), **Save ride** and **Throw it away** (asked twice),
     and the two things worth knowing first: no name is ever shown with a
@@ -216,8 +216,8 @@ same kind of line:
 
 Start is pressed at one door and Finish at the next, and in between the
 bike may be pushed up a hill, walked through a market or put in a car.
-Those stretches are not bike routes, so they are left out, on the phone,
-before anything is sent. `Core/Motion.swift` does it, and it is cheap on
+Those stretches are not bike routes, so they are set aside, on the phone,
+before anything is sent: kept and drawn, but never counted as riding. `Core/Motion.swift` does it, and it is cheap on
 purpose:
 
 - **Nothing listens while riding.** The iPhone's motion coprocessor notes
@@ -225,27 +225,32 @@ purpose:
   keeps a week of it. At Finish the app asks it once what it noted between
   Start and now — one question a ride — and then shows the save card. A ride
   whose app was killed half way is covered too.
-- **What is left out**: a stretch the phone was at least fairly sure was
+- **What is set aside**: a stretch the phone was at least fairly sure was
   walking, running or driving, and not cycling, for a minute or more. Still
   and unknown count as riding, so a red light never cuts a ride. A "walk"
   whose points went by faster than 10 km/h was a ride the coprocessor
   misread, and is kept.
-- **What is sent** is what was always sent, with fewer points: the server
-  never hears what the rider was doing, nor the points left out. Where a
-  stretch left out is longer than 250 m, the server's `GAP`, it cuts the
+- **What is kept** is all of it, on the phone. The stretches set aside are
+  drawn on the ride's map as a faint dotted line, so the rider sees the
+  whole of where they went, and the solid line of the riding is broken
+  where they are. They are not in the distance, the times or the speeds.
+- **What is sent** is what was always sent, with fewer points: the riding
+  only. The server never hears what the rider was doing, nor the points
+  set aside. Where a
+  stretch set aside is longer than 250 m, the server's `GAP`, it cuts the
   line there and keeps each side as a ride of its own; a shorter one is
   joined by a straight step, as a lost signal is. The ride's `seconds` are
-  the **active time** — the riding time less the stretches left out — so the
+  the **active time** — the riding time less the stretches set aside — so the
   server's speed check and the time it shares out between pieces are about
   riding.
 - **The save card** then shows distance ridden, active time and total time
   apart, the average over the active time, and *"1.2 km on foot or by car
-  left out"*. While riding, the numbers stay over the whole time: they are
-  corrected at Finish, not live. A ride with nothing left out looks as it
+  — dotted on the map, kept on this phone, not sent as riding"*. While riding, the numbers stay over the whole time: they are
+  corrected at Finish, not live. A ride with nothing set aside looks as it
   always did.
 - **Motion & Fitness** is asked for at the first Start. Refused, or on a
-  phone without a coprocessor, nothing is left out and every point is kept,
-  as before.
+  phone without a coprocessor, nothing is set aside and every point is
+  riding, as before.
 
 ## A ride is never lost
 

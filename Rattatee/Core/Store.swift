@@ -180,7 +180,7 @@ final class Store {
     /// Pause, ask the phone which stretches were walked or driven, leave
     /// them out, and only then show the save card — the question takes a
     /// moment, and the card should not show numbers that are about to change.
-    /// With nothing to ask, nothing is left out and the active time is the
+    /// With nothing to ask, nothing is set aside and the active time is the
     /// riding time.
     func finish() {
         pause()

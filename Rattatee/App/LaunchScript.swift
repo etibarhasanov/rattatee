@@ -78,9 +78,12 @@ enum LaunchScript {
         case "walked":
             // A ride with a walk left out of it at Finish: the save card with
             // active and total time apart, and the sentence under them.
-            var walked = ride(.finished, metres: 8200, seconds: 2770)
+            // The middle 1.2 km of a 9.4 km ride, a hundred points, set aside.
+            var walked = ride(.finished, metres: 9400, seconds: 2770)
+            let from = walked.points.count * 45 / 100
+            walked.aside = [Array(walked.points[from..<from + 100])]
+            walked.points.removeSubrange(from..<from + 100)
             walked.active = 1900
-            walked.leftOut = 1200
             store.pretend([walked])
         case "short": store.pretend([ride(.finished, metres: 400, seconds: 120)])
         case "saved":

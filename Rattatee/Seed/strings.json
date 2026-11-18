@@ -600,10 +600,10 @@
     "ru": "Ехать дальше"
   },
   "rideLeftOut": {
-    "az": "Piyada və ya maşınla keçilən {dist} çıxarıldı — yalnız velosiped sürüşü göndərilir.",
-    "en": "{dist} on foot or by car left out — only the riding is sent.",
-    "et": "{dist} jalgsi või autoga jäeti välja — saadetakse ainult rattasõit.",
-    "ru": "{dist} пешком или на машине не учтены — отправляется только езда на велосипеде."
+    "az": "{dist} piyada və ya maşınla — xəritədə nöqtələrlə, yalnız bu telefonda qalır, velosiped sürüşü kimi göndərilmir.",
+    "en": "{dist} on foot or by car — dotted on the map, kept on this phone, not sent as riding.",
+    "et": "{dist} jalgsi või autoga — kaardil punktiiriga, jääb sellesse telefoni, rattasõiduna ei saadeta.",
+    "ru": "{dist} пешком или на машине — пунктиром на карте, остаётся на этом телефоне и не отправляется как езда на велосипеде."
   },
   "rideName": {
     "az": "Ad (istəyə görə)",
