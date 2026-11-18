@@ -599,6 +599,12 @@
     "et": "Sõida edasi",
     "ru": "Ехать дальше"
   },
+  "rideLeftOut": {
+    "az": "Piyada və ya maşınla keçilən {dist} çıxarıldı — yalnız velosiped sürüşü göndərilir.",
+    "en": "{dist} on foot or by car left out — only the riding is sent.",
+    "et": "{dist} jalgsi või autoga jäeti välja — saadetakse ainult rattasõit.",
+    "ru": "{dist} пешком или на машине не учтены — отправляется только езда на велосипеде."
+  },
   "rideName": {
     "az": "Ad (istəyə görə)",
     "en": "Name (optional)",
@@ -839,11 +845,23 @@
     "et": "Sõitmiseks pole vaja. Sisse logituna on sinu sõidud ka sinu lehel saidil tallinntastebuds.ee.",
     "ru": "Для поездок не нужно. Если войти, ваши поездки будут и на вашей странице на tallinntastebuds.ee."
   },
+  "statActiveTime": {
+    "az": "aktiv vaxt",
+    "en": "active time",
+    "et": "aktiivne aeg",
+    "ru": "активное время"
+  },
   "statAverage": {
     "az": "orta",
     "en": "average",
     "et": "keskmine",
     "ru": "в среднем"
+  },
+  "statAverageActive": {
+    "az": "orta (aktiv)",
+    "en": "average (active)",
+    "et": "keskmine (aktiivne)",
+    "ru": "средняя (активная)"
   },
   "statAvg": {
     "az": "km/saat orta",
@@ -856,6 +874,12 @@
     "en": "distance",
     "et": "vahemaa",
     "ru": "расстояние"
+  },
+  "statDistanceRidden": {
+    "az": "sürülən məsafə",
+    "en": "distance ridden",
+    "et": "sõidetud",
+    "ru": "проехано"
   },
   "statKm": {
     "az": "km",
@@ -880,6 +904,12 @@
     "en": "top speed",
     "et": "tippkiirus",
     "ru": "макс. скорость"
+  },
+  "statTotalTime": {
+    "az": "ümumi vaxt",
+    "en": "total time",
+    "et": "koguaeg",
+    "ru": "общее время"
   },
   "tabAccount": {
     "az": "Hesab",

@@ -1,1 +1,2 @@
 "NSLocationWhenInUseUsageDescription" = "Rattatee gediş zamanı velosipedlə getdiyin yolu yazır, ekran kilidli və telefon cibdə olanda da. Sürmədiyin vaxt heç nə yazılmır.";
+"NSMotionUsageDescription" = "Gediş bitəndə Rattatee telefondan onun hansı hissələrini piyada və ya maşınla keçdiyini soruşur və onları çıxarır. Yalnız velosiped sürüşü göndərilir.";

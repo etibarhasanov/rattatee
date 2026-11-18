@@ -75,6 +75,13 @@ enum LaunchScript {
         case "recording": store.pretend([ride(.recording)])
         case "paused": store.pretend([ride(.paused)])
         case "save": store.pretend([ride(.finished, metres: 8600, seconds: 2040)])
+        case "walked":
+            // A ride with a walk left out of it at Finish: the save card with
+            // active and total time apart, and the sentence under them.
+            var walked = ride(.finished, metres: 8200, seconds: 2770)
+            walked.active = 1900
+            walked.leftOut = 1200
+            store.pretend([walked])
         case "short": store.pretend([ride(.finished, metres: 400, seconds: 120)])
         case "saved":
             let done = ride(.saved, name: "Kalamaja", metres: 8600, seconds: 2040)

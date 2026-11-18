@@ -72,6 +72,23 @@ struct Ride: Codable, Identifiable, Equatable {
     /// When the current stretch of riding began; nil while not recording.
     var since: Date?
 
+    /// When Pause was last pressed, in seconds since 1970; nil while riding.
+    var pausedAt: Double?
+    /// Every pause that was resumed from, as `[from, to]` in seconds since
+    /// 1970: the time in them is not riding, so a walk during one is not
+    /// taken off the active time twice. Optional, since rides recorded
+    /// before it was written have none.
+    var breaks: [[Double]]?
+
+    /// Riding time with the stretches the phone was walked or driven taken
+    /// off — `Motion` — worked out at Finish; nil before that, and for a ride
+    /// the phone could not ask about. It is what is sent as the ride's
+    /// seconds and what the average is taken over.
+    var active: Int?
+    /// How many metres of points were left out at Finish for not being
+    /// ridden.
+    var leftOut: Double?
+
     /// What the server answered.
     var serverId: String?
     var serverMeters: Int?
@@ -88,10 +105,47 @@ struct Ride: Codable, Identifiable, Equatable {
 
     var metres: Double { Geo.length(points) }
 
-    /// Average speed over the riding time, in km/h, once there is enough of
+    /// The active time where Finish found one, else the riding time.
+    func ridden(at now: Date = Date()) -> Int {
+        active ?? seconds(at: now)
+    }
+
+    /// Whether Finish took anything off: the save card then shows active
+    /// and total time apart.
+    var trimmed: Bool {
+        guard let active else { return false }
+        return active < seconds() || (leftOut ?? 0) > 0
+    }
+
+    /// Take out the points of the stretches that were not ridden, and work
+    /// out the active time: the riding time less those stretches, less any
+    /// part of them that fell in a pause, which was not riding time anyway.
+    /// Asked again after Keep riding, over the whole ride; a stretch whose
+    /// points are already gone takes nothing more off.
+    mutating func leaveOut(_ stretches: [Motion.Stretch], at now: Date = Date()) {
+        let start = started.timeIntervalSince1970
+        let end = pausedAt ?? now.timeIntervalSince1970
+        let was = metres
+        points.removeAll { p in stretches.contains { p.t >= $0.from && p.t <= $0.to } }
+        leftOut = (leftOut ?? 0) + max(0, was - metres)
+
+        var away = 0.0
+        for s in stretches {
+            let a = max(s.from, start), b = min(s.to, end)
+            guard b > a else { continue }
+            var inside = b - a
+            for pause in breaks ?? [] where pause.count == 2 {
+                inside -= max(0, min(b, pause[1]) - max(a, pause[0]))
+            }
+            away += max(0, inside)
+        }
+        active = max(0, seconds(at: now) - Int(away.rounded()))
+    }
+
+    /// Average speed over the active time, in km/h, once there is enough of
     /// a ride for one to mean anything.
     var average: Double? {
-        let s = seconds()
+        let s = ridden()
         guard s >= 10, metres >= 50 else { return nil }
         return metres / 1000 / (Double(s) / 3600)
     }
@@ -144,10 +198,20 @@ enum Geo {
         return (x * x + y * y).squareRoot() * 6_371_000
     }
 
+    /// Two points further apart than this are a gap, not a step: the server
+    /// cuts the line there and keeps each side as a ride of its own — `GAP`
+    /// in the website's `functions/api/_sections.js`. A gap is where a walk,
+    /// a train or a lost signal was left out, and it was not ridden, so it is
+    /// not counted in a ride's length either.
+    static let gap: Double = 250
+
     static func length(_ points: [Point]) -> Double {
         guard points.count > 1 else { return 0 }
         var m = 0.0
-        for i in 1..<points.count { m += metres(points[i - 1], points[i]) }
+        for i in 1..<points.count {
+            let d = metres(points[i - 1], points[i])
+            if d <= gap { m += d }
+        }
         return m
     }
 

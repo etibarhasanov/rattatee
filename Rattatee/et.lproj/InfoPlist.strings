@@ -1,1 +1,2 @@
 "NSLocationWhenInUseUsageDescription" = "Rattatee salvestab sõidu ajal tee, mida mööda sa rattaga sõidad, ka siis, kui ekraan on lukus ja telefon taskus. Kui sa ei sõida, ei salvestata midagi.";
+"NSMotionUsageDescription" = "Kui sõit on lõppenud, küsib Rattatee telefonilt, milliseid selle osi sa kõndisid või sõitsid autoga, ja jätab need välja. Saadetakse ainult rattasõit.";

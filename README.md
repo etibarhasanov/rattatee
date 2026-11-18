@@ -51,7 +51,9 @@ Three tabs.
   - *Paused* — the same, greyed; nothing is recorded and the clock the
     average is taken over stops. **Resume**, Finish.
   - *Nice ride* — when it began and ended, and the ride's own numbers:
-    distance, riding time, average speed and top speed. Then an optional
+    distance, riding time, average speed and top speed — or, where a walk
+    or a drive was left out (**Only the riding is sent**), distance ridden,
+    active and total time, and the average over the active time. Then an optional
     name (60 characters), **Save ride** and **Throw it away** (asked twice),
     and the two things worth knowing first: no name is ever shown with a
     ride, and the first and last 200 m are left off. There are no totals
@@ -210,6 +212,41 @@ same kind of line:
   `Core/Recorder.swift` says why that is enough.
 - There is no auto-pause. Pause is a button.
 
+### Only the riding is sent
+
+Start is pressed at one door and Finish at the next, and in between the
+bike may be pushed up a hill, walked through a market or put in a car.
+Those stretches are not bike routes, so they are left out, on the phone,
+before anything is sent. `Core/Motion.swift` does it, and it is cheap on
+purpose:
+
+- **Nothing listens while riding.** The iPhone's motion coprocessor notes
+  all day whether it is walking, running, cycling, in a car or still, and
+  keeps a week of it. At Finish the app asks it once what it noted between
+  Start and now — one question a ride — and then shows the save card. A ride
+  whose app was killed half way is covered too.
+- **What is left out**: a stretch the phone was at least fairly sure was
+  walking, running or driving, and not cycling, for a minute or more. Still
+  and unknown count as riding, so a red light never cuts a ride. A "walk"
+  whose points went by faster than 10 km/h was a ride the coprocessor
+  misread, and is kept.
+- **What is sent** is what was always sent, with fewer points: the server
+  never hears what the rider was doing, nor the points left out. Where a
+  stretch left out is longer than 250 m, the server's `GAP`, it cuts the
+  line there and keeps each side as a ride of its own; a shorter one is
+  joined by a straight step, as a lost signal is. The ride's `seconds` are
+  the **active time** — the riding time less the stretches left out — so the
+  server's speed check and the time it shares out between pieces are about
+  riding.
+- **The save card** then shows distance ridden, active time and total time
+  apart, the average over the active time, and *"1.2 km on foot or by car
+  left out"*. While riding, the numbers stay over the whole time: they are
+  corrected at Finish, not live. A ride with nothing left out looks as it
+  always did.
+- **Motion & Fitness** is asked for at the first Start. Refused, or on a
+  phone without a coprocessor, nothing is left out and every point is kept,
+  as before.
+
 ## A ride is never lost
 
 A ride is a file on the phone from the moment Start is pressed
@@ -290,6 +327,7 @@ Rattatee/
             LaunchScript.swift  launch arguments, for CI's screenshots
   Core/     API.swift           the one door to the website
             Recorder.swift      Core Location, in the background too
+            Motion.swift        which stretches were walked or driven, asked once at Finish
             Ride.swift          a ride, a point, and the sums
             Store.swift         every ride on the phone, and sending them
             Search.swift        places, streets, Google, and the way there and its turns
@@ -311,7 +349,7 @@ Rattatee/
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et, ru and az
   Voice/    <lang>-<clip>.m4a   the turns, recorded: Azerbaijani and English so far
-  *.lproj/  InfoPlist.strings   the location question, in each language
+  *.lproj/  InfoPlist.strings   the location and motion questions, in each language
   PrivacyInfo.xcprivacy         the privacy manifest
 Config/     Info.plist          the two background modes and the languages
             Rattatee.entitlements  Sign in with Apple, Release only
@@ -357,6 +395,9 @@ launched in each state and photographed. The pictures are the run's
 - **The location purpose string** is `NSLocationWhenInUseUsageDescription`,
   in the project's build settings in English and in
   `Rattatee/<lang>.lproj/InfoPlist.strings` for each language.
+- **The motion purpose string** is `NSMotionUsageDescription`, the same
+  two places. Motion activity never leaves the phone, so it is not a data
+  type under App Privacy.
 - **Background location** has to be justified in the review notes. In one
   line: *the app records a bike ride the user starts with a button, with the
   screen locked, until they press Finish; nothing is recorded otherwise.* A
