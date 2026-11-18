@@ -19,9 +19,9 @@ import Observation
 /// distance but the one: a recording can only say what was recorded. The
 /// street is in the row.
 ///
-/// Where a recording is missing — Azerbaijani and English are recorded so
-/// far — the phone's own voice reads the row's words instead, in English and
-/// Russian.
+/// Where a recording is missing — only Azerbaijani's and English's eight
+/// turns are recorded so far — the phone's own voice reads the row's words
+/// instead, in English and Russian.
 /// iOS has no Estonian or Azerbaijani voice, so in those a missing recording
 /// is silence.
 /// That is a stand-in for trying the thing out, not the plan.
@@ -46,7 +46,8 @@ import Observation
 /// Nothing here knows about a ride. The Store hands it each point it keeps
 /// while there is a way, so paused is silent, and so is a ride with nowhere
 /// to go — but for the one line when a ride starts, "Good morning, let's
-/// go", which the Store asks for (`greet`) with or without a way.
+/// go", and the one at Finish, "Ride over, well done", which the Store
+/// asks for (`greet`, `farewell`) with or without a way.
 @MainActor
 @Observable
 final class Guide {
@@ -68,11 +69,13 @@ final class Guide {
 
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
-        case soon, left, right, straight, around, arrive, off
+        case soon, left, right, straight, around, arrive, off, finish
         case morning, afternoon, evening, late
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
         case wrongWay = "wrong-way"
+        case backOn = "back-on"
+        case newWay = "new-way"
     }
 
     /// What has been said on this way, so each corner is said twice and no
@@ -143,6 +146,28 @@ final class Guide {
         case .off: say([.off], L.t("lostOff"))
         case .back: say([.wrongWay], L.t("lostBack"))
         }
+    }
+
+    /// The rider was off the way, or going backwards along it, and is on
+    /// it again by themselves: said once, so the warning has an end. Not
+    /// after a new way was found — that one says `found` instead.
+    func back() {
+        guard voice else { return }
+        say([.backOn], L.t("voiceBackOn"))
+    }
+
+    /// A new way has taken the place of the one the rider left. Its first
+    /// turn follows on its own, as any way's does.
+    func found() {
+        guard voice else { return }
+        say([.newWay], L.t("voiceNewWay"))
+    }
+
+    /// Finish was pressed: the last line of a ride, with or without
+    /// somewhere to go, as the greeting was the first.
+    func farewell() {
+        guard voice else { return }
+        say([.finish], L.t("voiceFinish"))
     }
 
     /// A new ride has started: one line for the time of day, said once.

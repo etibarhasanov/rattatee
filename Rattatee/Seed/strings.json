@@ -1205,6 +1205,24 @@
     "et": "Rong {line} kell {at} jaama {to}",
     "ru": "Поезд {line} в {at} до {to}"
   },
+  "voiceBackOn": {
+    "az": "Yola qayıtdın",
+    "en": "Back on the way",
+    "et": "Oled jälle teel",
+    "ru": "Вы снова на пути"
+  },
+  "voiceFinish": {
+    "az": "Sürüş bitdi, afərin",
+    "en": "Ride over, well done",
+    "et": "Sõit läbi, tubli",
+    "ru": "Поездка окончена, молодец"
+  },
+  "voiceNewWay": {
+    "az": "Yeni yol tapıldı",
+    "en": "Found a new way",
+    "et": "Leidsin uue tee",
+    "ru": "Новый путь найден"
+  },
   "voiceOff": {
     "az": "Səs sönülüdür",
     "en": "Voice is off",

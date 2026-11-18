@@ -197,6 +197,8 @@ final class Store {
         radio.halt()
         guard let i = currentIndex, rides[i].status == .paused, !finishing else { return }
         finishing = true
+        // After the radio has stopped, so it is said into the quiet.
+        guide.farewell()
         let id = rides[i].id, started = rides[i].started
         Task {
             var found: [Motion.Stretch] = []
@@ -329,7 +331,9 @@ final class Store {
         let back = !off && goal.back >= Self.backSoon
 
         if !surelyOff && !back {
-            // On the way, or not yet surely off it.
+            // On the way, or not yet surely off it. Having been told they
+            // were off, the rider is told they are back.
+            if goal.lost != nil { guide.back() }
             goal.lost = nil
             self.goal = goal
             if !off { guide.hear(point.coordinate, on: way) }
@@ -383,6 +387,7 @@ final class Store {
         self.goal?.back = 0
         self.goal?.astray = 0
         guide.forget()
+        guide.found()
     }
 
     /// Save: on disk as waiting first, then sent.

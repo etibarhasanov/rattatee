@@ -1,8 +1,8 @@
 # The voice: what to record
 
 The turns of a way are said aloud in recordings of the owner's voice — see
-`Rattatee/Core/Guide.swift`. This is the dictionary: fourteen phrases, each in
-English, Estonian, Russian and Azerbaijani, fifty-six recordings in all.
+`Rattatee/Core/Guide.swift`. This is the dictionary: seventeen phrases, each in
+English, Estonian, Russian and Azerbaijani, sixty-eight recordings in all.
 
 The app joins them. Before a corner it plays **In 200 metres** and then the
 turn; at the corner it plays the turn alone. So each phrase is recorded on
@@ -20,6 +20,17 @@ its own, as a whole sentence, with no "and then".
 | `arrive` | You have arrived | Oled kohal | Вы на месте | Çatdın |
 | `off` | You're off the way | Oled teelt kõrvale kaldunud | Вы сошли с пути | Yoldan çıxdın |
 | `wrong-way` | Going the wrong way | Sõidad vales suunas | Вы едете не в ту сторону | Yanlış istiqamətdə gedirsən |
+| `back-on` | Back on the way | Oled jälle teel | Вы снова на пути | Yola qayıtdın |
+| `new-way` | Found a new way | Leidsin uue tee | Новый путь найден | Yeni yol tapıldı |
+| `finish` | Ride over, well done | Sõit läbi, tubli | Поездка окончена, молодец | Sürüş bitdi, afərin |
+
+`back-on` is said when a rider who was told `off` or `wrong-way` is on the
+way again by themselves (`Guide.back`), so the warning has an end;
+`new-way` when the app has found a new way instead (`Guide.found`), and its
+first turn follows as any way's does; `finish` when Finish is pressed, after
+the radio has stopped (`Guide.farewell`), with or without somewhere to go.
+Their words for the phone's voice are `voiceBackOn`, `voiceNewWay` and
+`voiceFinish` in `Rattatee/Seed/strings.json`.
 
 ## The greeting
 
@@ -46,10 +57,80 @@ The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
 **Recorded so far: Azerbaijani and English**, the first eight of each, on
-2026-11-17. Estonian and Russian are still to do, and so are `off` and
-`wrong-way` in all four — said when the rider leaves the way
-(`Guide.warn`) — and the four greetings in all four. Until they are
-recorded the phone's voice reads them in English and Russian.
+2026-11-17. Fifty-two are left, and the sheet below is all of them. Until
+they are recorded the phone's voice reads them in English and Russian.
+
+## The sheet: what is left, in reading order
+
+One take a language, top to bottom, two seconds between lines. The file
+name is in brackets so whoever cuts the take knows what each line becomes.
+
+**English — nine left**
+
+1. You're off the way *(off)*
+2. Going the wrong way *(wrong-way)*
+3. Back on the way *(back-on)*
+4. Found a new way *(new-way)*
+5. Ride over, well done *(finish)*
+6. Good morning, let's go *(morning)*
+7. Good afternoon, let's go *(afternoon)*
+8. Good evening, let's go *(evening)*
+9. Riding late, let's go *(late)*
+
+**Azerbaijani — nine left**
+
+1. Yoldan çıxdın *(off)*
+2. Yanlış istiqamətdə gedirsən *(wrong-way)*
+3. Yola qayıtdın *(back-on)*
+4. Yeni yol tapıldı *(new-way)*
+5. Sürüş bitdi, afərin *(finish)*
+6. Sabahın xeyir, gedək *(morning)*
+7. Günortan xeyir, gedək *(afternoon)*
+8. Axşamın xeyir, gedək *(evening)*
+9. Gec saatdır, gedək *(late)*
+
+**Estonian — all seventeen**
+
+1. Kahesaja meetri pärast *(soon)*
+2. Pööra vasakule *(left)*
+3. Pööra paremale *(right)*
+4. Hoia vasakule *(keep-left)*
+5. Hoia paremale *(keep-right)*
+6. Sõida otse *(straight)*
+7. Pööra ümber *(around)*
+8. Oled kohal *(arrive)*
+9. Oled teelt kõrvale kaldunud *(off)*
+10. Sõidad vales suunas *(wrong-way)*
+11. Oled jälle teel *(back-on)*
+12. Leidsin uue tee *(new-way)*
+13. Sõit läbi, tubli *(finish)*
+14. Tere hommikust, lähme *(morning)*
+15. Tere päevast, lähme *(afternoon)*
+16. Tere õhtust, lähme *(evening)*
+17. Hilja juba, lähme *(late)*
+
+**Russian — all seventeen**
+
+1. Через двести метров *(soon)*
+2. Поверните налево *(left)*
+3. Поверните направо *(right)*
+4. Держитесь левее *(keep-left)*
+5. Держитесь правее *(keep-right)*
+6. Езжайте прямо *(straight)*
+7. Развернитесь *(around)*
+8. Вы на месте *(arrive)*
+9. Вы сошли с пути *(off)*
+10. Вы едете не в ту сторону *(wrong-way)*
+11. Вы снова на пути *(back-on)*
+12. Новый путь найден *(new-way)*
+13. Поездка окончена, молодец *(finish)*
+14. Доброе утро, поехали *(morning)*
+15. Добрый день, поехали *(afternoon)*
+16. Добрый вечер, поехали *(evening)*
+17. Поздновато, поехали *(late)*
+
+Cross a line off here, in the same commit as its file, so this stays the
+list of what is left.
 
 ## Recording
 

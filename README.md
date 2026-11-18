@@ -196,10 +196,13 @@ a pocket — "In 200 metres, turn right" about two hundred metres before, and
 "Turn right" at the corner — over music, which is turned down for the
 second it takes, and with the screen locked. The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
-recorded: ten phrases in each language, listed in `docs/voice.md`,
-which is why it says no street names and no distance but the one.
-Azerbaijani and English are recorded, all but the two said off the way;
-Estonian and Russian are not yet.
+recorded: seventeen phrases in each language, listed in `docs/voice.md`
+with a sheet of the ones still to record, which is why it says no street
+names and no distance but the one. Azerbaijani and English have their eight
+turns recorded; Estonian and Russian are not yet. Beside the turns and the
+greeting it says three things more: "Back on the way" when a rider who was
+told they were off is on it again, "Found a new way" when one takes the
+place of the old, and "Ride over, well done" at Finish.
 Until a phrase is recorded the phone's own voice reads it, in Russian;
 iOS has no Estonian or Azerbaijani voice. A roundabout is in the row and
 is not said: a bike is mostly on the path beside one. A ride with nowhere
