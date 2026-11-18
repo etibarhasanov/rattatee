@@ -1,6 +1,6 @@
 name: build
 
-# Builds the app for the simulator on every push, so a change that does not
+# Builds the app for the simulator when asked, so a change that does not
 # compile is caught here rather than the next time someone opens Xcode. The
 # same arrangement as Kohuke's workflow, which this is copied from.
 
@@ -9,14 +9,13 @@ name: build
 permissions:
   contents: write
 
+# Switched off on 2026-11-18: it ran on every push and every pull request,
+# about twenty minutes of a macOS runner each, and failed once in sixty runs.
+# It now runs only when somebody asks: Actions -> build -> Run workflow, on
+# the branch to check. Press it before a release or after a change to how the
+# app looks, when the screenshots are worth having. To turn it back on, put
+# the push and pull_request triggers back above workflow_dispatch.
 on:
-  push:
-    branches: [main, 'claude/**']
-    # A change to the words about the app is not a change to the app, and a
-    # macOS runner is the dearest minute GitHub sells.
-    paths-ignore: ['**.md', 'docs/**']
-  pull_request:
-    paths-ignore: ['**.md', 'docs/**']
   workflow_dispatch:
 
 # A newer push to the same branch makes the older build moot. Packages are
