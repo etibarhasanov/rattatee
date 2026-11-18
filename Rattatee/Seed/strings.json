@@ -581,6 +581,12 @@
     "et": "Privaatsus",
     "ru": "Конфиденциальность"
   },
+  "rideEachKm": {
+    "en": "Each kilometre",
+    "et": "Iga kilomeeter",
+    "ru": "Каждый километр",
+    "az": "Hər kilometr"
+  },
   "rideFast": {
     "az": "Bu, velosipedin getdiyindən sürətli idi, ona görə saxlanıla bilməz.",
     "en": "That was faster than a bike rides, so it cannot be kept.",
@@ -598,6 +604,18 @@
     "en": "Keep riding",
     "et": "Sõida edasi",
     "ru": "Ехать дальше"
+  },
+  "rideKeptDrawn": {
+    "en": "The solid line is what the website kept, {dist}, with no name on it. The faint ends are on this phone only: the first and last 200 m are left off.",
+    "et": "Täisljoon on see, mille sait alles hoidis, {dist}, ilma nimeta. Kahvatud otsad on ainult selles telefonis: esimesed ja viimased 200 m jäetakse ära.",
+    "ru": "Сплошная линия — то, что сохранил сайт, {dist}, без имени. Бледные концы есть только на этом телефоне: первые и последние 200 м отрезаются.",
+    "az": "Bütöv xətt saytın saxladığıdır, {dist}, adsız. Solğun uclar yalnız bu telefondadır: ilk və son 200 m kəsilir."
+  },
+  "rideKeptMetres": {
+    "en": "The website kept {dist} of it, with no name on it: the first and last 200 m are left off.",
+    "et": "Sait hoidis sellest alles {dist}, ilma nimeta: esimesed ja viimased 200 m jäetakse ära.",
+    "ru": "Сайт сохранил из неё {dist}, без имени: первые и последние 200 м отрезаются.",
+    "az": "Sayt bundan {dist} saxladı, adsız: ilk və son 200 m kəsilir."
   },
   "rideLeftOut": {
     "az": "{dist} piyada və ya maşınla — xəritədə nöqtələrlə, yalnız bu telefonda qalır, velosiped sürüşü kimi göndərilmir.",
@@ -706,6 +724,12 @@
     "en": "A ride has to be longer than {dist} to be kept.",
     "et": "Sõit peab alles jäämiseks olema pikem kui {dist}.",
     "ru": "Чтобы сохранить поездку, она должна быть длиннее {dist}."
+  },
+  "rideSpeedAlong": {
+    "en": "Speed along the way",
+    "et": "Kiirus teekonnal",
+    "ru": "Скорость по пути",
+    "az": "Yol boyu sürət"
   },
   "rideStart": {
     "az": "Başla",
@@ -881,6 +905,12 @@
     "et": "sõidetud",
     "ru": "проехано"
   },
+  "statFastestKm": {
+    "en": "fastest km",
+    "et": "kiireim km",
+    "ru": "самый быстрый км",
+    "az": "ən sürətli km"
+  },
   "statKm": {
     "az": "km",
     "en": "km",
@@ -898,6 +928,12 @@
     "en": "started",
     "et": "algus",
     "ru": "старт"
+  },
+  "statStopped": {
+    "en": "stopped",
+    "et": "seisatud",
+    "ru": "на месте",
+    "az": "dayanma"
   },
   "statTop": {
     "az": "ən yüksək sürət",

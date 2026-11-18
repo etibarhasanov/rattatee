@@ -68,6 +68,29 @@ Three tabs.
   **Waiting** or **Not kept · why**. A banner says how many are waiting,
   with **Try now**. A ride the server has answered can be swiped off the
   phone; a waiting one cannot.
+
+  **A ride, opened.** A row opens its ride on a page of its own
+  (`Views/RideView.swift`): the map framed to it, the riding solid, a walk
+  or a drive set aside dotted, a ring where it began and a dot where it
+  ended; the save card's numbers; the fastest kilometre and how long was
+  spent standing; the speed along the way as a line; and each kilometre's
+  time, with a bar for its speed and the fastest one in full colour. All of
+  it is the phone's own ride, so it opens with no signal and for a ride saved
+  with no account. The sums are the website's — `rideInsight()` in its
+  `functions/api/_rides.js`, ported step for step to `Core/Insight.swift` —
+  so a ride reads the same here, on the website and in the map app, less the
+  website's top speed over 200 m, since the save card's over half a minute is
+  already on the page.
+
+  What the website has of it is on the page too. Signed in, a saved ride is
+  asked for by its id, `GET /api/rides/<id>`, and the line the website keeps
+  is drawn solid over the phone's, which goes faint: what is left of the
+  phone's at each end is the 200 m that was never kept. A ride saved with no
+  account cannot be asked for — the website answers a ride only to the
+  account it is under — so its page says how much was kept, from the
+  answer to its save. Waiting and Not kept are in the pill under the title.
+  **Remove from this phone** is at the foot, as the swipe is, and never for
+  a ride still waiting.
 - **Account.** **Create account** or **Sign in** with a username and a
   password, as in Kohuke, or continue with Apple or Google where the
   website offers them — the same accounts as the site and Kohuke, made on
@@ -284,6 +307,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | | |
 |---|---|
 | `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
 | `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
@@ -334,6 +358,7 @@ Rattatee/
             Recorder.swift      Core Location, in the background too
             Motion.swift        which stretches were walked or driven, asked once at Finish
             Ride.swift          a ride, a point, and the sums
+            Insight.swift       a ride's kilometres and speeds, and what the website kept of it
             Store.swift         every ride on the phone, and sending them
             Search.swift        places, streets, Google, and the way there and its turns
             Guide.swift         the voice that says the turns
@@ -349,6 +374,7 @@ Rattatee/
             ListPicker.swift    Add to a list
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
+            RideView.swift      one ride, opened
             AccountView.swift   the Account tab, the colours, deleting an account
             SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
