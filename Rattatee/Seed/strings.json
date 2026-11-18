@@ -300,9 +300,9 @@
     "ru": "Добрый вечер, поехали"
   },
   "greetLate": {
-    "az": "Gec saatdır, gedək",
+    "az": "Gecə gəzintisi, getdik!",
     "en": "Riding late, let's go",
-    "et": "Hilja juba, lähme",
+    "et": "Liiga hilja? Lähme ikka!",
     "ru": "Поздновато, поехали"
   },
   "greetMorning": {
@@ -518,7 +518,7 @@
   "lostBack": {
     "az": "Yanlış istiqamətdə gedirsən",
     "en": "Going the wrong way",
-    "et": "Sõidad vales suunas",
+    "et": "Vale suund",
     "ru": "Вы едете не в ту сторону"
   },
   "lostBackWhy": {
@@ -554,7 +554,7 @@
   "lostOff": {
     "az": "Yoldan çıxdın",
     "en": "You're off the way",
-    "et": "Oled teelt kõrvale kaldunud",
+    "et": "Oled teelt maas",
     "ru": "Вы сошли с пути"
   },
   "lostOffFrom": {
@@ -1204,6 +1204,12 @@
     "en": "Train {line} at {at} to {to}",
     "et": "Rong {line} kell {at} jaama {to}",
     "ru": "Поезд {line} в {at} до {to}"
+  },
+  "turnTunnel": {
+    "az": "Tunelə gir",
+    "en": "Enter the tunnel",
+    "et": "Sõida tunnelisse",
+    "ru": "Въезжайте в тоннель"
   },
   "voiceOff": {
     "az": "Səs sönülüdür",

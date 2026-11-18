@@ -196,14 +196,14 @@ a pocket — "In 200 metres, turn right" about two hundred metres before, and
 "Turn right" at the corner — over music, which is turned down for the
 second it takes, and with the screen locked. The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
-recorded: ten phrases in each language, listed in `docs/voice.md`,
+recorded: eleven phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
-Azerbaijani and English are recorded, all but the two said off the way;
-Estonian and Russian are not yet.
-Until a phrase is recorded the phone's own voice reads it, in Russian;
-iOS has no Estonian or Azerbaijani voice. A roundabout is in the row and
-is not said: a bike is mostly on the path beside one. A ride with nowhere
-to go has no row and no voice (`Core/Guide.swift`).
+Azerbaijani, English and Estonian are recorded, all fifteen phrases of
+each; Russian is not yet, and until it is the phone's own voice reads it. A roundabout is in the row and
+is not said: a bike is mostly on the path beside one. A tunnel is said
+at its entrance, "Enter the tunnel", and with the turn before it where it
+starts just past one, as the Veerenni path under the railway does. A ride
+with nowhere to go has no row and no voice (`Core/Guide.swift`).
 
 **A radio, under the voice.** At the foot of the riding screen, over Pause
 and Finish, a row says **📻 Play radio**. A tap plays a station: Raadio
@@ -429,7 +429,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
 | `GET /api/v1/route?from=&to=&mode=bike` | asked first: everything `/api/route` answers below, with `version: 1`, and `trains` — each `seconds`, `meters`, `leave`, and `legs`, a ride (`kind: "bike"`, `meters`, `seconds`, `line`, `steps`) or the train (`kind: "train"`, `name`, `from`, `to`, `at`, `until`, `meters`, `line`). An answer without `version`, or none, and `/api/route` is asked instead |
-| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields; and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout` and `arrive`; one the app does not know is left out |
+| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields; and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout`, `arrive` and `tunnel`, where the way goes into one; one the app does not know is left out |
 | `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
 | `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |

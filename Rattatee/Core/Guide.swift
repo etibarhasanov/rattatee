@@ -19,8 +19,8 @@ import Observation
 /// distance but the one: a recording can only say what was recorded. The
 /// street is in the row.
 ///
-/// Where a recording is missing — Azerbaijani and English are recorded so
-/// far — the phone's own voice reads the row's words instead, in English and
+/// Where a recording is missing — Russian is the one language not recorded
+/// yet — the phone's own voice reads the row's words instead, in English and
 /// Russian.
 /// iOS has no Estonian or Azerbaijani voice, so in those a missing recording
 /// is silence.
@@ -68,7 +68,7 @@ final class Guide {
 
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
-        case soon, left, right, straight, around, arrive, off
+        case soon, left, right, straight, around, arrive, tunnel, off
         case morning, afternoon, evening, late
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
@@ -126,7 +126,17 @@ final class Guide {
         }
         guard let turn = clip(next.step) else { return }
         if next.metres <= Self.now {
-            if said.insert(corner + "-now").inserted { say([turn], next.step.words) }
+            guard said.insert(corner + "-now").inserted else { return }
+            // A tunnel just past the corner is said with it — "Turn left,
+            // enter the tunnel" — since said on its own it would cut the
+            // turn off a few metres later, which is the Veerenni path under
+            // the railway exactly.
+            if let after = way.steps.first(where: { $0.along > next.step.along }), after.turn == .tunnel,
+               after.along - next.step.along <= Self.now,
+               said.insert("\(Int(after.along))-now").inserted {
+                return say([turn, .tunnel], next.step.words + ", " + after.words)
+            }
+            say([turn], next.step.words)
         } else if next.step.turn != .arrive, Self.soon.contains(next.metres) {
             if said.insert(corner + "-soon").inserted {
                 say([.soon, turn], L.t("turnSoon") + ", " + next.step.words)
@@ -175,6 +185,7 @@ final class Guide {
         case .straight: return .straight
         case .around: return .around
         case .arrive: return .arrive
+        case .tunnel: return .tunnel
         case .roundabout, .train: return nil
         }
     }
