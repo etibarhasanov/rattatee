@@ -422,7 +422,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 
 | | |
 |---|---|
-| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
 | `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
 | `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |

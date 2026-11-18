@@ -127,10 +127,15 @@ extension Recorder: CLLocationManagerDelegate {
             for fix in locations {
                 // A negative accuracy is no fix at all.
                 guard fix.horizontalAccuracy >= 0, fix.horizontalAccuracy <= Self.sure else { continue }
+                // The height comes with the fix, above mean sea level; a
+                // vertical accuracy of zero or less means there is none.
+                // How sure it is decides nothing: a point is kept for where
+                // it was, and its height is only ever read as a trend.
                 onPoint?(Point(lat: Geo.round5(fix.coordinate.latitude),
                                lng: Geo.round5(fix.coordinate.longitude),
                                t: fix.timestamp.timeIntervalSince1970,
-                               acc: (fix.horizontalAccuracy * 10).rounded() / 10))
+                               acc: (fix.horizontalAccuracy * 10).rounded() / 10,
+                               alt: fix.verticalAccuracy > 0 ? (fix.altitude * 10).rounded() / 10 : nil))
             }
         }
     }
