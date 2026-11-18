@@ -51,11 +51,11 @@ on screen says so — "Roundabout, exit 2" — and the voice says nothing.
 The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
-**Recorded so far: Azerbaijani and English**, the first eight of each, on
-2026-11-17. Estonian and Russian are still to do, and so are `tunnel`,
-`off` and `wrong-way` in all four — said when the rider leaves the way
-(`Guide.warn`) — and the four greetings in all four. Until they are
-recorded the phone's voice reads them in English and Russian.
+**Recorded so far: Azerbaijani, all fifteen**, on 2026-11-18 — the first
+eight recorded again with the rest, so the whole language is one take — and
+**English, the first eight**, on 2026-11-17. The rest of English, and all of
+Estonian and Russian, are still to do. Until they are recorded the phone's
+voice reads them in English and Russian.
 
 ## Recording
 

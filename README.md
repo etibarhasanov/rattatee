@@ -198,8 +198,7 @@ second it takes, and with the screen locked. The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
 recorded: eleven phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
-Azerbaijani and English are recorded, all but the tunnel and the two said
-off the way;
+Azerbaijani is recorded, all fifteen phrases; English has its first eight;
 Estonian and Russian are not yet.
 Until a phrase is recorded the phone's own voice reads it, in English and
 Russian;
