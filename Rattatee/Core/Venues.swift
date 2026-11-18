@@ -27,6 +27,12 @@ import Observation
 /// yesterday is not on the phone yet, and the live search finds it the
 /// moment somebody types. Asking costs nothing to record and a failure costs
 /// nothing at all: the phone keeps what it had.
+///
+/// A failure does cost the site, though: it is asked from launch and from
+/// every opening of Where to?, so a phone with no copy and a site having a
+/// bad day asked for the whole roll every time — eleven hundred rows read,
+/// out of the five million a day the site has. After a failure it waits
+/// `Store.retryWait`, a minute doubling to six hours, as a waiting ride does.
 @MainActor
 @Observable
 final class Venues {
@@ -48,6 +54,8 @@ final class Venues {
     /// Each name folded the way a search is (`fold`), in the order of `all`.
     @ObservationIgnored private var keys: [String] = []
     @ObservationIgnored private var asking = false
+    @ObservationIgnored private var failures = 0
+    @ObservationIgnored private var notBefore: Date?
 
     private static var file: URL {
         Disk.support.appendingPathComponent("venues.json")
@@ -70,10 +78,11 @@ final class Venues {
         guard !asking else { return }
         let modified = (try? FileManager.default.attributesOfItem(atPath: Self.file.path))?[.modificationDate] as? Date
         if !all.isEmpty, let modified, Date().timeIntervalSince(modified) < Self.week { return }
+        if let notBefore, notBefore > Date() { return }
         asking = true
         defer { asking = false }
         guard let data = try? await API.data("api/places"),
-              let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]] else { return }
+              let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]] else { return failed() }
         let list: [Venue] = rows.compactMap { row in
             guard let id = row["id"] as? String, let name = row["name"] as? String,
                   let lat = row["lat"] as? Double, let lng = row["lng"] as? Double else { return nil }
@@ -81,9 +90,16 @@ final class Venues {
         }
         // An empty answer is the site having a bad moment, not Tallinn
         // having no places: keep what the phone had.
-        guard !list.isEmpty, let out = try? JSONEncoder().encode(list) else { return }
+        guard !list.isEmpty, let out = try? JSONEncoder().encode(list) else { return failed() }
         try? out.write(to: Self.file, options: .atomic)
         keep(list)
+        failures = 0
+        notBefore = nil
+    }
+
+    private func failed() {
+        failures += 1
+        notBefore = Date().addingTimeInterval(Store.retryWait(failures))
     }
 
     /// The places whose names hold these letters — a name starting with them

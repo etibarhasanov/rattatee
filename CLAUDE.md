@@ -34,7 +34,8 @@ designed with its frequency in mind before it is written:
 4. **Typing is debounced and has a floor**: 300 ms and three letters, as
    Where to? is.
 5. **Keep what does not change.** The places roll is kept a week in
-   `venues.json`.
+   `venues.json`, and a failed fetch of it waits `Store.retryWait` like
+   everything else.
 6. **Rerouting is bounded by distance and, after a miss, by time** —
    `rerouteEvery` in `Core/Store.swift`. A new rule that asks more often
    says how often, in requests per ridden hour.
