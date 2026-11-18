@@ -285,8 +285,8 @@ struct Lost: Equatable {
 /// that fails says so and Start still works.
 enum Search {
     /// The fewest letters worth asking the website — one or two are
-    /// answered by the phone alone, from where the rider has been and its
-    /// copy of the places, which is a request saved at every search — and
+    /// answered by the phone alone, from where the rider has been, which is
+    /// a request saved at every search — and
     /// the fewest before Google is offered, the website's five.
     static let shortest = 3
     static let googleFrom = 5

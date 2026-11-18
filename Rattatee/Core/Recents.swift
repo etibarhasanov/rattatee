@@ -52,9 +52,17 @@ final class Recents {
 
     /// The ones whose names hold these letters, newest first.
     func matching(_ q: String) -> [Spot] {
-        let needle = Venues.fold(q)
+        let needle = Self.fold(q)
         guard !needle.isEmpty else { return [] }
-        return all.filter { Venues.fold($0.name).contains(needle) }
+        return all.filter { Self.fold($0.name).contains(needle) }
+    }
+
+    /// Lower case, no accents, anything that is not a letter or a digit a
+    /// space: "Põhjala Tap Room" and "pohjala-tap" meet in the middle.
+    static func fold(_ text: String) -> String {
+        let plain = text.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil).lowercased()
+        let spaced = String(plain.map { $0.isLetter || $0.isNumber ? $0 : " " })
+        return spaced.split(separator: " ").joined(separator: " ")
     }
 
     /// The same place twice: the same id, or the same name on the same

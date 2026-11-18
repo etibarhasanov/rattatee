@@ -33,9 +33,11 @@ designed with its frequency in mind before it is written:
    now, but for ever.
 4. **Typing is debounced and has a floor**: 300 ms and three letters, as
    Where to? is.
-5. **Keep what does not change.** The places roll is kept a week in
-   `venues.json`, and a failed fetch of it waits `Store.retryWait` like
-   everything else.
+5. **Search only when somebody types.** Nothing asks the website for places
+   until a third letter is typed, and then only `GET /api/places?q=`. The
+   whole roll — that route with no query — is the site's dearest answer,
+   about twelve hundred rows a time, and the app stopped keeping a copy of
+   it on 2026-11-18. Do not bring it back to answer the first letters.
 6. **Rerouting is bounded by distance and, after a miss, by time** —
    `rerouteEvery` in `Core/Store.swift`. A new rule that asks more often
    says how often, in requests per ridden hour.

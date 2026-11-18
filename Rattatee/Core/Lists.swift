@@ -11,9 +11,8 @@ import Observation
 ///
 /// TWO KINDS OF PLACE
 ///
-/// A place off the website's search, or one a tap on the map found in the
-/// phone's copy of the roll, is on the roll already and goes on a list as it
-/// is. A place only Apple's map names, or a pin, is not: it is added first as
+/// A place off the website's search is on the roll already and goes on a
+/// list as it is. A place tapped on Apple's map, or a pin, is not: it is added first as
 /// the rider's own place (`action: place` with a name and a point), the
 /// website's way of letting somebody put on a list a place the roll does
 /// not have. It is seen only on their lists, and it does not touch Google.

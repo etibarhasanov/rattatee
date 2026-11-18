@@ -118,13 +118,13 @@ A ride needs no destination, but it can have one. **Where to?** opens with
 the keyboard up and the last three places the rider chose — kept on the
 phone and nowhere else (`Core/Recents.swift`; swipe one away to forget it)
 — and nothing else. Typing takes those away. One letter or two are answered
-by the phone alone, the rider's own places first and then a copy the phone
-keeps of every place the website's search knows: a name and a pin each, and
-nothing else (`Core/Venues.swift`). The copy is the website's whole roll,
-`GET /api/places` with no query, about 75 KB, asked for when the app opens
-if the phone's is missing or a week old — one request a week a phone, which
-is what lets opening the sheet and the first letters ask the website for
-nothing at all. From the third letter the website's own search is asked and
+by the phone alone, out of those same places the rider has chosen before,
+and nothing is asked of the website until somebody types. The phone kept a
+copy of every place the website's search knows until 2026-11-18 — its whole
+roll, `GET /api/places` with no query, once a week a phone — and took it
+out: it was the site's dearest answer, about twelve hundred rows of its
+database a time, and most phones that asked for it never typed that week.
+From the third letter the website's own search is asked and
 replaces those rows when it answers: its places first, then
 streets and districts, each with how far it is. From five letters a last row offers **Look for "…" on
 Google Maps**, exactly as the website's find bar does; what Google answers
@@ -133,8 +133,7 @@ search — here, in the map app or on the site — finds it without asking
 Google.
 
 Or tap the map. A place Apple's map names is somewhere to go under that
-name — and if the phone's copy of the website's places has it within a
-street's width, it is the website's place, under the website's id. A tap
+name, and put on a list it goes on as the rider's own place. A tap
 anywhere else drops a pin, whose street the phone works out for itself.
 Neither asks Google or the website for anything but the way there.
 
@@ -424,7 +423,6 @@ repository's `CLAUDE.md` under **What the app reads**.
 |---|---|
 | `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
 | `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
-| `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
@@ -487,7 +485,6 @@ Rattatee/
             Search.swift        places, streets, Google, and the way there and its turns
             Guide.swift         the voice that says the turns
             Radio.swift         the radio on a ride, and going under that voice
-            Venues.swift        the places kept on the phone, a name and a pin each
             Recents.swift       where the rider has gone before, newest first
             Lists.swift         the rider's lists, and adds waiting for signal
             Account.swift       signing in and out

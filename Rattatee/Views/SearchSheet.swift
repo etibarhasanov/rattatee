@@ -10,10 +10,9 @@ import SwiftUI
 /// read as the app fetching things, though it never left the phone.
 ///
 /// Typing takes the recent rows away. One letter or two are answered by the
-/// phone alone, out of its copy of the website's places (`Venues`), the
-/// rider's own places first. From the third letter the website's own search
-/// is asked, after a pause in the typing, and replaces the phone's rows when
-/// it answers: its places first, in the order it ranks them, with their
+/// phone alone, out of the places the rider has chosen before (`Recents`).
+/// From the third letter the website's own search is asked, after a pause in
+/// the typing, and replaces the phone's rows when it answers: its places first, in the order it ranks them, with their
 /// addresses, then streets and districts. From five letters a last row
 /// offers to look on Google Maps, as the website's find bar does, and what
 /// Google answers with goes to the top of the list. Choosing a row closes
@@ -25,7 +24,18 @@ import SwiftUI
 /// the sheet opening, a letter — and kept in `@State`. They
 /// were computed properties once, and SwiftUI asks a computed property again
 /// at every redraw and every place the body names it: eleven hundred
-/// distances sorted three times over whenever anything on the sheet moved.
+/// distances sorted three times over whenever anything on the sheet moved,
+/// when the phone still kept a copy of every place the website knows.
+///
+/// WHY THE PHONE KEEPS NO COPY OF THE PLACES
+///
+/// It did until 2026-11-18: `GET /api/places` with no query, the website's
+/// whole roll, once a week a phone, so one letter or two could be answered
+/// from it. That answer is the site's dearest — about twelve hundred rows of
+/// its database, read again in every Cloudflare isolate that has not read it
+/// in the last five minutes — and most of the phones that asked for it never
+/// typed a letter that week. Nothing is searched now until somebody types,
+/// and then only by `?q=`.
 struct SearchSheet: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -126,10 +136,6 @@ struct SearchSheet: View {
             store.recorder.locate()
             recent = Array(Recents.shared.all.prefix(Recents.shown))
             typing = true
-            // The copy the phone keeps is asked for at launch; this is for a
-            // phone that had no signal then, and asks nothing of one that
-            // has a copy less than a week old.
-            await Venues.shared.refresh()
         }
         // Wait for a pause in the typing before asking, as the website does:
         // the task is cancelled and begun again at every keystroke.
@@ -149,12 +155,10 @@ struct SearchSheet: View {
         }
     }
 
-    /// The phone's answer to these letters: the rider's own places first,
-    /// then its copy of the website's.
+    /// The phone's answer to these letters: the places the rider has chosen
+    /// before, and nothing asked of anybody.
     private func phone(_ q: String) -> [Spot] {
-        let own = Recents.shared.matching(q)
-        let known = Set(own.map(\.id))
-        return own + Venues.shared.matching(q, near: store.recorder.here).filter { !known.contains($0.id) }
+        Recents.shared.matching(q)
     }
 
     private func forget(_ spot: Spot) {

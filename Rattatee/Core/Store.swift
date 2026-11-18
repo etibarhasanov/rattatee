@@ -233,19 +233,21 @@ final class Store {
     }
 
     /// A tap on the map before a ride, or during one: a place Apple's map
-    /// names, or anywhere at all. Nothing here asks Google or the website's search —
-    /// a named place is looked for in the phone's copy of the roll first
-    /// (`Venues.same`), so a café the website knows is that café under its
-    /// own id; anything else is Apple's name, or a pin whose street the
-    /// phone itself works out. Then it is somewhere to go, like a search row.
+    /// names, or anywhere at all. Nothing here asks Google or the website's
+    /// search: a named place is Apple's name, and anywhere else a pin whose
+    /// street the phone itself works out. Then it is somewhere to go, like a
+    /// search row. A tap once found the café in the phone's copy of the
+    /// website's places, under the website's id; there is no copy now
+    /// (WHY THE PHONE KEEPS NO COPY OF THE PLACES in `SearchSheet.swift`), so
+    /// put on a list it is added as the rider's own place, as any of Apple's
+    /// is.
     func tapped(name: String?, at point: CLLocationCoordinate2D) {
         // Before a ride, or while one is being ridden — never on the save
         // card, where somewhere to go would outlive the ride it was for.
         if let current, ![.recording, .paused].contains(current.status) { return }
         let lat = Geo.round5(point.latitude), lng = Geo.round5(point.longitude)
         if let name, !name.isEmpty {
-            head(to: Venues.shared.same(as: name, at: point)
-                 ?? Spot(id: "apple-\(lat)-\(lng)", name: name, detail: "", lat: lat, lng: lng, kind: .apple))
+            head(to: Spot(id: "apple-\(lat)-\(lng)", name: name, detail: "", lat: lat, lng: lng, kind: .apple))
             return
         }
         let pin = Spot(id: "pin-\(lat)-\(lng)", name: L.t("pinName"), detail: "", lat: lat, lng: lng, kind: .pin)

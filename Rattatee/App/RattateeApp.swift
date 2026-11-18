@@ -25,9 +25,10 @@ struct RattateeApp: App {
                     #if DEBUG
                     LaunchScript.stage(store)
                     #endif
-                    // The places Where to? opens on, if the phone's copy
-                    // is missing or a week old (Core/Venues.swift).
-                    if !store.demo { Task { await Venues.shared.refresh() } }
+                    // The copy of the website's places a phone kept until
+                    // 2026-11-18, which nothing reads now (WHY THE PHONE
+                    // KEEPS NO COPY OF THE PLACES in Views/SearchSheet.swift).
+                    try? FileManager.default.removeItem(at: Disk.support.appendingPathComponent("venues.json"))
                     await store.whoAmI()
                 }
         }

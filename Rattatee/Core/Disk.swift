@@ -11,8 +11,8 @@ import Foundation
 /// new one, never half of each.
 enum Disk {
     /// Application Support, made if it is not there yet — which it is not on
-    /// a phone that has never recorded a ride. The copy of the places
-    /// (`Venues`) and the lists (`ListBook`) are kept here, beside `rides/`.
+    /// a phone that has never recorded a ride. The lists (`ListBook`) and
+    /// where the rider has been (`Recents`) are kept here, beside `rides/`.
     static var support: URL {
         let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         if !FileManager.default.fileExists(atPath: root.path) {
