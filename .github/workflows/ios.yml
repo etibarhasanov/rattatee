@@ -102,7 +102,7 @@ jobs:
           check "motion permission"   '"NSMotionUsageDescription"'
           check "background location" '0 => "location"'
           check "background audio"    '1 => "audio"'
-          for f in PrivacyInfo.xcprivacy strings.json et.lproj/InfoPlist.strings ru.lproj/InfoPlist.strings az.lproj/InfoPlist.strings az-left.m4a en-left.m4a; do
+          for f in PrivacyInfo.xcprivacy strings.json et.lproj/InfoPlist.strings ru.lproj/InfoPlist.strings az.lproj/InfoPlist.strings az-left.m4a en-left.m4a stations.json; do
             if [ -e "$app/$f" ]; then echo "ok: $f is in the bundle"; else echo "::error::$f is missing from the bundle"; fail=1; fi
           done
           exit $fail
@@ -155,6 +155,10 @@ jobs:
           shot 16-goal -kDemo goal
           shot 17-going -kDemo going
           shot 18-search -kSheet search
+          # The radio: on, with no signal, and its list of stations.
+          shot 26-radio -kDemo going -kRadio playing
+          shot 27-radio-lost -kDemo recording -kRadio lost
+          shot 28-stations -kDemo recording -kRadio playing -kSheet stations
           shot 09-rides-empty -kDemo none -kTab 1
           shot 10-account -kTab 2 -kDoors YES
           # The other two languages, and the night style.

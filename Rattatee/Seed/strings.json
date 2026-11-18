@@ -581,6 +581,66 @@
     "et": "Privaatsus",
     "ru": "Конфиденциальность"
   },
+  "radioHold": {
+    "az": "Bütün stansiyalar üçün basıb saxlayın",
+    "en": "Hold for all stations",
+    "et": "Hoia all, et näha kõiki jaamu",
+    "ru": "Удерживайте — все станции"
+  },
+  "radioLost": {
+    "az": "Siqnal yoxdur",
+    "en": "No signal",
+    "et": "Signaali pole",
+    "ru": "Нет сигнала"
+  },
+  "radioNext": {
+    "az": "Növbəti stansiya",
+    "en": "Next station",
+    "et": "Järgmine jaam",
+    "ru": "Следующая станция"
+  },
+  "radioOf": {
+    "az": "{n} / {total}",
+    "en": "{n} of {total}",
+    "et": "{n} / {total}",
+    "ru": "{n} из {total}"
+  },
+  "radioPlay": {
+    "az": "Radionu aç",
+    "en": "Play radio",
+    "et": "Mängi raadiot",
+    "ru": "Включить радио"
+  },
+  "radioPrev": {
+    "az": "Əvvəlki stansiya",
+    "en": "Previous station",
+    "et": "Eelmine jaam",
+    "ru": "Предыдущая станция"
+  },
+  "radioRetry": {
+    "az": "Yenidən cəhd üçün toxunun",
+    "en": "Tap to try again",
+    "et": "Puuduta, et uuesti proovida",
+    "ru": "Нажмите, чтобы повторить"
+  },
+  "radioStop": {
+    "az": "Radionu söndür",
+    "en": "Stop the radio",
+    "et": "Pane raadio kinni",
+    "ru": "Выключить радио"
+  },
+  "radioTitle": {
+    "az": "Radio",
+    "en": "Radio",
+    "et": "Raadio",
+    "ru": "Радио"
+  },
+  "radioTuning": {
+    "az": "Qoşulur…",
+    "en": "Tuning in…",
+    "et": "Häälestan…",
+    "ru": "Настраиваю…"
+  },
   "rideEachKm": {
     "en": "Each kilometre",
     "et": "Iga kilomeeter",

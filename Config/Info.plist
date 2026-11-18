@@ -16,7 +16,8 @@
 	     way somewhere (Core/Guide.swift): a recording a second long, played
 	     with the screen locked, which iOS lets an app start from the
 	     background only with this. Nothing plays for a ride with nowhere to
-	     go, or with the voice switched off.
+	     go, or with the voice switched off. It is also what keeps the radio
+	     (Core/Radio.swift) playing in a pocket, for a rider who turned it on.
 
 	     CFBundleLocalizations tells iOS the app speaks Estonian, Russian and Azerbaijani as
 	     well as English, so the permission prompt is asked in the phone's

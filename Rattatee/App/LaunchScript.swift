@@ -15,7 +15,8 @@ import Foundation
 /// app with arguments.
 enum LaunchScript {
     static var tab: Int { UserDefaults.standard.integer(forKey: "kTab") }
-    /// `-kSheet search` opens the search over the Record tab.
+    /// `-kSheet search` opens the search over the Record tab, and `-kSheet
+    /// stations` the radio's list over a ride.
     static var sheet: String? { UserDefaults.standard.string(forKey: "kSheet") }
 
     #if DEBUG
@@ -31,6 +32,14 @@ enum LaunchScript {
     @MainActor
     static func stage(_ store: Store) {
         guard let demo = UserDefaults.standard.string(forKey: "kDemo") else { return }
+        // `-kRadio playing`, `tuning` or `lost`: the radio's row in that
+        // state, drawn and not played.
+        switch UserDefaults.standard.string(forKey: "kRadio") {
+        case "playing": store.radio.pretend(.playing)
+        case "tuning": store.radio.pretend(.tuning)
+        case "lost": store.radio.pretend(.lost)
+        default: break
+        }
         let now = Date()
         func ride(_ status: Ride.Status, name: String = "", metres: Double = 4200, seconds: Int = 1028,
                   ago: TimeInterval = 0, problem: String? = nil) -> Ride {
