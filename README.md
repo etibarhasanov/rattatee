@@ -69,6 +69,15 @@ Three tabs.
   with **Try now**. A ride the server has answered can be swiped off the
   phone; a waiting one cannot.
 
+  **How far, at the top.** A card over the list adds up the kilometres,
+  the rides and the riding time for **Today**, **Week**, **Month** or
+  **All**, with a bar a day for the week (`Views/StatsCard.swift`). A week
+  starts on Monday and a month on its 1st, in the phone's time zone. Saved
+  and waiting rides count; a ride Not kept does not. It is added up on the
+  phone from the rides already there, so it asks the website for nothing
+  and works with no signal — the server could not say it better anyway,
+  since a ride saved with no account is nobody's there from the next day.
+
   **A ride, opened.** A row opens its ride on a page of its own
   (`Views/RideView.swift`): the map framed to it, the riding solid, a walk
   or a drive set aside dotted, a ring where it began and a dot where it
@@ -374,6 +383,7 @@ Rattatee/
             ListPicker.swift    Add to a list
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
+            StatsCard.swift     how far today, this week, this month, in all
             RideView.swift      one ride, opened
             AccountView.swift   the Account tab, the colours, deleting an account
             SignIn.swift        the username form and the Apple and Google buttons
