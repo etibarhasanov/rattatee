@@ -10,8 +10,19 @@ import Foundation
 /// anybody. The time is kept here as a clock time, since that is also how
 /// the riding time of a ride interrupted by a killed app is worked out.
 ///
-/// Stored as a four-number array rather than an object, since a long ride is
-/// thousands of them and is rewritten every few points.
+/// And how high it was. Since 2026-11-18 a fix's altitude above the sea is
+/// kept too, and sent as a fifth number — `[lat, lng, t, acc, alt]` — which
+/// the server keeps in `rides.track` beside the time and the accuracy, so a
+/// ride can one day say where it climbed, which a line on a flat map cannot.
+/// It is the GPS height Core Location gives with the fix, good to ten or
+/// twenty metres a point: a climb is a trend across many points, never the
+/// step between two. A fix with no valid height has none, and is sent as
+/// four numbers; the server then keeps no heights for that ride at all,
+/// rather than heights that do not line up.
+///
+/// Stored as a four- or five-number array rather than an object, since a long
+/// ride is thousands of them and is rewritten every few points. A ride
+/// recorded before heights were kept reads back with none.
 struct Point: Codable, Equatable {
     var lat: Double
     var lng: Double
@@ -19,9 +30,11 @@ struct Point: Codable, Equatable {
     var t: Double
     /// Horizontal accuracy in metres.
     var acc: Double
+    /// Altitude above mean sea level in metres, or nil where the fix had none.
+    var alt: Double?
 
-    init(lat: Double, lng: Double, t: Double, acc: Double) {
-        self.lat = lat; self.lng = lng; self.t = t; self.acc = acc
+    init(lat: Double, lng: Double, t: Double, acc: Double, alt: Double? = nil) {
+        self.lat = lat; self.lng = lng; self.t = t; self.acc = acc; self.alt = alt
     }
 
     init(from decoder: Decoder) throws {
@@ -30,11 +43,13 @@ struct Point: Codable, Equatable {
         lng = try row.decode(Double.self)
         t = try row.decode(Double.self)
         acc = try row.decode(Double.self)
+        alt = try row.isAtEnd ? nil : row.decodeIfPresent(Double.self)
     }
 
     func encode(to encoder: Encoder) throws {
         var row = encoder.unkeyedContainer()
         try row.encode(lat); try row.encode(lng); try row.encode(t); try row.encode(acc)
+        if let alt { try row.encode(alt) }
     }
 
     var coordinate: CLLocationCoordinate2D { CLLocationCoordinate2D(latitude: lat, longitude: lng) }
@@ -318,7 +333,8 @@ enum Geo {
     static let maxPoints = 3500
 
     /// The line as the server takes it: `[lat, lng, t, acc]` — five decimals,
-    /// whole seconds since the first point, whole metres — inside the box, and
+    /// whole seconds since the first point, whole metres — and `alt` after
+    /// them in whole metres where the fix had a height, inside the box, and
     /// no more than `maxPoints` of it. The server keeps the last two only if
     /// every point has them and they are sane (a `t` from 0 to a day, an
     /// accuracy up to a kilometre), which these always are short of a ride
@@ -336,7 +352,8 @@ enum Geo {
         // Counted from the first point kept, as the website's recorder counts.
         let zero = points.first?.t ?? 0
         return kept.map {
-            [round5($0.lat), round5($0.lng), max(0, ($0.t - zero).rounded()), $0.acc.rounded()]
+            let row = [round5($0.lat), round5($0.lng), max(0, ($0.t - zero).rounded()), $0.acc.rounded()]
+            return $0.alt.map { row + [$0.rounded()] } ?? row
         }
     }
 }
