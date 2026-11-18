@@ -198,6 +198,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Rattatee records the way you cycle while a ride is being recorded, also with the screen locked and the phone in your pocket. Nothing is recorded when you are not riding.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Rattatee asks the phone, once a ride is finished, which parts of it you walked or went by car, and leaves those out. Only the riding is sent.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -229,6 +230,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Rattatee records the way you cycle while a ride is being recorded, also with the screen locked and the phone in your pocket. Nothing is recorded when you are not riding.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Rattatee asks the phone, once a ride is finished, which parts of it you walked or went by car, and leaves those out. Only the riding is sent.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;

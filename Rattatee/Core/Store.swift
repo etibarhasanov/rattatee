@@ -68,6 +68,8 @@ final class Store {
 
     @ObservationIgnored private var unwritten = 0
     @ObservationIgnored private var sendingNow = false
+    /// Finish is asking the phone what was not ridden: a second press waits.
+    @ObservationIgnored private var finishing = false
     @ObservationIgnored private let network = NWPathMonitor()
 
     /// The shortest ride worth saving. The server's `MIN_METERS` (300) is
@@ -98,6 +100,9 @@ final class Store {
             if let since = rides[i].since, let last = rides[i].points.last {
                 rides[i].before += max(0, Int(last.t - since.timeIntervalSince1970))
             }
+            // The pause began where the points stopped, not when the app
+            // opened again.
+            rides[i].pausedAt = rides[i].points.last?.t ?? Date().timeIntervalSince1970
             rides[i].since = nil
             rides[i].status = .paused
             write(rides[i])
@@ -140,6 +145,9 @@ final class Store {
         // A new ride only: `resume()` does not greet.
         guide.greet()
         recorder.start()
+        // Motion & Fitness is asked here, the first time, rather than at
+        // Finish: `Motion` says why it is wanted at all.
+        Motion.askOnce()
     }
 
     func pause() {
@@ -147,6 +155,7 @@ final class Store {
         recorder.stop()
         rides[i].before = rides[i].seconds()
         rides[i].since = nil
+        rides[i].pausedAt = Date().timeIntervalSince1970
         rides[i].status = .paused
         write(rides[i])
     }
@@ -155,17 +164,38 @@ final class Store {
     func resume() {
         guard let i = currentIndex, rides[i].status != .recording else { return }
         guard recorder.allowed, recorder.precise else { return }
-        rides[i].since = Date()
+        let now = Date()
+        if let from = rides[i].pausedAt {
+            rides[i].breaks = (rides[i].breaks ?? []) + [[from, now.timeIntervalSince1970]]
+        }
+        rides[i].pausedAt = nil
+        // Riding again: Finish works the active time out afresh.
+        rides[i].active = nil
+        rides[i].since = now
         rides[i].status = .recording
         write(rides[i])
         recorder.start()
     }
 
+    /// Pause, ask the phone which stretches were walked or driven, leave
+    /// them out, and only then show the save card — the question takes a
+    /// moment, and the card should not show numbers that are about to change.
+    /// With nothing to ask, nothing is set aside and the active time is the
+    /// riding time.
     func finish() {
         pause()
-        guard let i = currentIndex else { return }
-        rides[i].status = .finished
-        write(rides[i])
+        guard let i = currentIndex, rides[i].status == .paused, !finishing else { return }
+        finishing = true
+        let id = rides[i].id, started = rides[i].started
+        Task {
+            var found: [Motion.Stretch] = []
+            if !demo { found = await Motion.stretches(from: started, to: Date()) }
+            finishing = false
+            guard let j = rides.firstIndex(where: { $0.id == id }), rides[j].status == .paused else { return }
+            rides[j].leaveOut(Motion.notRidden(found, by: rides[j].points))
+            rides[j].status = .finished
+            write(rides[j])
+        }
     }
 
     func throwAway() {
@@ -440,7 +470,9 @@ final class Store {
                     // session wins and the ride is on the account.
                     "anon": true,
                     "name": ride.name,
-                    "seconds": max(1, ride.seconds()),
+                    // The active time: what the server shares out between
+                    // the pieces and judges the speed over.
+                    "seconds": max(1, ride.ridden()),
                     "line": line
                 ])
                 let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]

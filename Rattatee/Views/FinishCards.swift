@@ -4,7 +4,7 @@ import SwiftUI
 
 /// "8.6 km · 34 min" under a card's title.
 private func summary(_ ride: Ride) -> String {
-    L.distance(ride.metres) + " · " + L.duration(ride.seconds())
+    L.distance(ride.metres) + " · " + L.duration(ride.ridden())
 }
 
 /// "Today 08:12 – 08:49" under a card's title: when the ride began and ended.
@@ -18,22 +18,45 @@ private func when(_ ride: Ride) -> String {
 /// fastest half-minute — a ride's own numbers and no totals, since the point
 /// of the app is the ride and nothing round it. A number there is not enough
 /// of the ride for is a dash.
+///
+/// Where Finish left a walk or a drive out (`Motion`), the time is shown
+/// twice — active, which the average is taken over, and total, Start to
+/// Finish without the pauses — and the distance is the distance ridden. A
+/// ride with nothing left out looks as it always did.
 struct RideNumbers: View {
     let ride: Ride
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 12) {
-            GridRow {
-                cell(L.distance(ride.metres), L.t("statDistance"))
-                cell(L.clock(ride.seconds()), L.t("statRidingTime"))
-            }
-            GridRow {
-                cell(ride.average.map { String(format: "%.1f km/h", $0) } ?? "–", L.t("statAverage"))
-                cell(ride.topSpeed.map { String(format: "%.0f km/h", $0) } ?? "–", L.t("statTop"))
+            if ride.trimmed {
+                GridRow {
+                    cell(L.distance(ride.metres), L.t("statDistanceRidden"))
+                    Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+                }
+                GridRow {
+                    cell(L.clock(ride.ridden()), L.t("statActiveTime"))
+                    cell(L.clock(ride.seconds()), L.t("statTotalTime"))
+                }
+                GridRow {
+                    cell(speed, L.t("statAverageActive"))
+                    cell(top, L.t("statTop"))
+                }
+            } else {
+                GridRow {
+                    cell(L.distance(ride.metres), L.t("statDistance"))
+                    cell(L.clock(ride.seconds()), L.t("statRidingTime"))
+                }
+                GridRow {
+                    cell(speed, L.t("statAverage"))
+                    cell(top, L.t("statTop"))
+                }
             }
         }
         .padding(.vertical, 12)
     }
+
+    private var speed: String { ride.average.map { String(format: "%.1f km/h", $0) } ?? "–" }
+    private var top: String { ride.topSpeed.map { String(format: "%.0f km/h", $0) } ?? "–" }
 
     private func cell(_ value: String, _ label: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -64,6 +87,10 @@ struct SaveCard: View {
             Text(L.t("rideNice")).font(.title2.bold()).foregroundStyle(Theme.ink)
             Text(when(ride)).font(.subheadline).foregroundStyle(Theme.muted)
             RideNumbers(ride: ride)
+            // Fifty metres is a fix wandering, not a walk worth a sentence.
+            if ride.leftOut >= 50 {
+                Note(text: L.t("rideLeftOut", ["dist": L.distance(ride.leftOut)])).padding(.bottom, 12)
+            }
 
             HStack {
                 TextField(L.t("rideName"), text: $name)

@@ -1,3 +1,7 @@
 /* The question iOS asks before the first ride. Restated in English as the
    NSLocationWhenInUseUsageDescription build setting in the project. */
 "NSLocationWhenInUseUsageDescription" = "Rattatee records the way you cycle while a ride is being recorded, also with the screen locked and the phone in your pocket. Nothing is recorded when you are not riding.";
+
+/* The question iOS asks at the first Start, for Core/Motion.swift. Restated
+   in English as the NSMotionUsageDescription build setting in the project. */
+"NSMotionUsageDescription" = "Rattatee asks the phone, once a ride is finished, which parts of it you walked or went by car, and leaves those out. Only the riding is sent.";

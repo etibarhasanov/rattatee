@@ -34,6 +34,7 @@ struct RecordTab: View {
         VStack(spacing: 0) {
             if let riding { RideDash(ride: riding) }
             RideMap(points: ride?.points ?? [],
+                    aside: ride?.aside ?? [],
                     goal: store.goal,
                     here: store.recorder.here,
                     follow: !store.demo && !planning && (ride == nil || ride?.status == .recording),
@@ -128,6 +129,9 @@ struct RecordTab: View {
 /// the way then settles inside nearly the same frame.
 struct RideMap: View {
     let points: [Point]
+    /// The stretches Finish set aside as walked or driven: dotted and faint,
+    /// so they read as where the rider went and not as a way to ride.
+    var aside: [[Point]] = []
     /// Where the rider is going and the suggested way there, in the accent
     /// under the line actually ridden.
     var goal: Goal?
@@ -215,9 +219,17 @@ struct RideMap: View {
                 }
                 Marker(goal.spot.name, coordinate: goal.spot.coordinate).tint(Theme.accent)
             }
-            if points.count > 1 {
-                MapPolyline(coordinates: points.map(\.coordinate))
-                    .stroke(Theme.here, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+            ForEach(Array(aside.enumerated()), id: \.offset) { _, stretch in
+                if stretch.count > 1 {
+                    MapPolyline(coordinates: stretch.map(\.coordinate))
+                        .stroke(Theme.muted, style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: [1, 8]))
+                }
+            }
+            ForEach(Array(Geo.runs(points, around: aside).enumerated()), id: \.offset) { _, run in
+                if run.count > 1 {
+                    MapPolyline(coordinates: run.map(\.coordinate))
+                        .stroke(Theme.here, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                }
             }
         }
         .mapFeatureSelectionDisabled { feature in tap == nil || feature.kind != .pointOfInterest }

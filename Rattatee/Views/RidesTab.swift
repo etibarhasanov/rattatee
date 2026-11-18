@@ -110,7 +110,7 @@ struct RideRow: View {
                     .font(.body.weight(ride.name.isEmpty ? .medium : .semibold))
                     .foregroundStyle(ride.name.isEmpty ? Theme.muted : Theme.ink)
                     .lineLimit(1)
-                Text([L.distance(ride.metres), L.duration(ride.seconds()),
+                Text([L.distance(ride.metres), L.duration(ride.ridden()),
                       L.date(ride.started) + " " + L.time(ride.started)].joined(separator: " · "))
                     .font(.footnote)
                     .foregroundStyle(Theme.muted)

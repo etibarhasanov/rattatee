@@ -99,6 +99,7 @@ jobs:
           check "encryption answer"   '"ITSAppUsesNonExemptEncryption"'
           check "launch screen colour" '"UIColorName" => "LaunchPaper"'
           check "location permission" '"NSLocationWhenInUseUsageDescription"'
+          check "motion permission"   '"NSMotionUsageDescription"'
           check "background location" '0 => "location"'
           check "background audio"    '1 => "audio"'
           for f in PrivacyInfo.xcprivacy strings.json et.lproj/InfoPlist.strings ru.lproj/InfoPlist.strings az.lproj/InfoPlist.strings az-left.m4a en-left.m4a; do
@@ -144,6 +145,7 @@ jobs:
           shot 02-recording -kDemo recording
           shot 03-paused -kDemo paused
           shot 04-save -kDemo save
+          shot 04-save-walked -kDemo walked
           shot 05-too-short -kDemo short
           shot 06-saved -kDemo saved
           shot 07-kept -kDemo kept
