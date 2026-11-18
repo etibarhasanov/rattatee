@@ -319,7 +319,10 @@ shows every screen, but only a phone on a bike records a ride.
   team, with the **Sign in with Apple** capability on the app id
   `ee.tallinntastebuds.rattatee`.
 
-**Every push is built on GitHub**, `.github/workflows/ios.yml`: the strings
+**A build on GitHub, when asked**, `.github/workflows/ios.yml` — Actions →
+build → Run workflow, on the branch to check. Since 2026-11-18 a push no
+longer starts it, since twenty minutes of a macOS runner a push was failing
+once in sixty. It checks the strings
 are checked, the app is built for the simulator, the built `Info.plist` is
 checked for the permission text and the background mode, and the app is
 launched in each state and photographed. The pictures are the run's

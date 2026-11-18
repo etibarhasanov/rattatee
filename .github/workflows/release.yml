@@ -1,9 +1,9 @@
 name: package
 
 # Makes a signed build of the app and, unless told not to, sends it to
-# TestFlight. It is the other half of build.yml: that one runs on every push
-# and only proves the app still compiles for the simulator; this one runs
-# only when somebody asks for a package, so a push never spends a build
+# TestFlight. It is the other half of ios.yml: that one only proves the app
+# still compiles for the simulator; this one makes a package, and like it runs
+# only when somebody asks, so a push never spends a build
 # number, a signing round-trip or forty minutes of a macOS runner on a
 # package nobody is going to install.
 #
