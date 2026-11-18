@@ -232,14 +232,16 @@ final class Store {
         Task { await findWay() }
     }
 
-    /// A tap on the map before a ride: a place Apple's map names, or
-    /// anywhere at all. Nothing here asks Google or the website's search —
+    /// A tap on the map before a ride, or during one: a place Apple's map
+    /// names, or anywhere at all. Nothing here asks Google or the website's search —
     /// a named place is looked for in the phone's copy of the roll first
     /// (`Venues.same`), so a café the website knows is that café under its
     /// own id; anything else is Apple's name, or a pin whose street the
     /// phone itself works out. Then it is somewhere to go, like a search row.
     func tapped(name: String?, at point: CLLocationCoordinate2D) {
-        guard current == nil else { return }
+        // Before a ride, or while one is being ridden — never on the save
+        // card, where somewhere to go would outlive the ride it was for.
+        if let current, ![.recording, .paused].contains(current.status) { return }
         let lat = Geo.round5(point.latitude), lng = Geo.round5(point.longitude)
         if let name, !name.isEmpty {
             head(to: Venues.shared.same(as: name, at: point)
@@ -260,7 +262,12 @@ final class Store {
 
     func findWay() async {
         guard !demo, let goal, goal.way == .looking, let here = recorder.here else { return }
-        let ways = await Search.ways(from: here, to: goal.spot.coordinate)
+        // Chosen mid-ride, the way sets off the way the rider is already
+        // going, as a new way off the old one does (`reroute`): nil before
+        // a ride, when there is no line to take a heading from.
+        let riding = current.map { [.recording, .paused].contains($0.status) } ?? false
+        let heading = riding ? Geo.heading(current?.points ?? []) : nil
+        let ways = await Search.ways(from: here, to: goal.spot.coordinate, heading: heading)
         // Only if it is still the place that was asked about.
         // By id: a pin's address may have arrived meanwhile.
         guard self.goal?.spot.id == goal.spot.id else { return }

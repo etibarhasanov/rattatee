@@ -37,7 +37,8 @@ Three tabs.
 
 - **Record.** A map and a card at its foot, which is one of:
   - *Ready* — one big **Start** and nothing to read. **Where to?** over
-    the map is optional: see **Search and go** below.
+    the map is optional, before a ride or during one: see **Search and
+    go** below.
   - *Location is off* — what to choose in Settings, and a button to it.
   - *Recording* — the screen changes. Across the top, large enough to
     read off a handlebar, three numbers and no more: distance, average
@@ -135,8 +136,21 @@ Or tap the map. A place Apple's map names is somewhere to go under that
 name — and if the phone's copy of the website's places has it within a
 street's width, it is the website's place, under the website's id. A tap
 anywhere else drops a pin, whose street the phone works out for itself.
-Neither asks Google or the website for anything but the way there; taps do
-nothing once a ride has begun.
+Neither asks Google or the website for anything but the way there.
+
+**Mid-ride, too.** Nothing has to be paused or finished to choose
+somewhere to go: **Where to?** stays over the map while riding, under the
+numbers, and a place chosen there, or a tap on the map, is somewhere to go
+exactly as before a ride. The recording goes on underneath; the way is asked
+for from where the rider is and setting off the way they are going
+(`heading`, as a new way off the old one is), and as soon as it arrives the
+blue line is under the ridden one, the card says how much is left and the
+turns are shown and said. The website's first way is taken, with no choice
+of others, since the rider is moving. A tap chooses only while there is
+nowhere to go yet — a hand brushing the screen should not throw away a way
+being followed — so a destination already chosen is changed through Where
+to?, or let go with its cross, which leaves the ride going with nowhere to
+go. On the save card and after it, taps do nothing.
 
 A tap leaves the map where it was: the pin lands under the finger, and a
 dotted straight line runs to it from the rider while the website is asked
