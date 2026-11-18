@@ -38,7 +38,8 @@ import Foundation
 /// a car is not a bike route at any speed.
 ///
 /// With no coprocessor, or the question refused under Settings, there is
-/// nothing to ask and every point is kept, as before this file was written.
+/// nothing to ask and no walk is set aside. A train and a stop are found
+/// without it, from the points alone — `Timeline`.
 enum Motion {
     /// Not ridden for less than this, and it was ridden.
     static let shortest: TimeInterval = 60

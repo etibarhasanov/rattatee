@@ -569,6 +569,36 @@
     "et": "Ava seaded",
     "ru": "Открыть настройки"
   },
+  "partRide": {
+    "az": "Sürüş",
+    "en": "Riding",
+    "et": "Sõit",
+    "ru": "Езда"
+  },
+  "partStop": {
+    "az": "Dayanma",
+    "en": "Stopped",
+    "et": "Peatus",
+    "ru": "Остановка"
+  },
+  "partVehicle": {
+    "az": "Qatar və ya maşınla",
+    "en": "By train or car",
+    "et": "Rongi või autoga",
+    "ru": "На поезде или машине"
+  },
+  "partWait": {
+    "az": "Gözləmə",
+    "en": "Waiting",
+    "et": "Ootamine",
+    "ru": "Ожидание"
+  },
+  "partWalk": {
+    "az": "Piyada",
+    "en": "On foot",
+    "et": "Jalgsi",
+    "ru": "Пешком"
+  },
   "pinName": {
     "az": "Qoyulmuş nişan",
     "en": "Dropped pin",
@@ -646,6 +676,12 @@
     "en": "Rides are collected in and around Tallinn, and this one was somewhere else.",
     "et": "Sõite kogutakse Tallinnas ja selle ümbruses, aga see sõit oli mujal.",
     "ru": "Поездки собираются в Таллине и окрестностях, а эта была в другом месте."
+  },
+  "rideParts": {
+    "az": "Hissə-hissə",
+    "en": "Part by part",
+    "et": "Osade kaupa",
+    "ru": "По частям"
   },
   "ridePause": {
     "az": "Dayandır",

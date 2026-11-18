@@ -45,6 +45,7 @@ struct RideView: View {
 
     private func page(_ ride: Ride) -> some View {
         let insight = Insight(ride)
+        let parts = Timeline.parts(of: ride)
         return ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 6) {
@@ -58,7 +59,7 @@ struct RideView: View {
                     }
                 }
 
-                map(ride)
+                map(ride, stops: parts.compactMap { $0.kind == .stop ? $0.at : nil })
                 if let note = mapNote(ride) {
                     Note(text: note).padding(.top, -4)
                 }
@@ -78,6 +79,18 @@ struct RideView: View {
                 }
                 .padding(.horizontal, 16)
                 .ridePanel()
+
+                // The session, part by part. A ride that was only riding is
+                // one part, and a list of one says nothing the numbers
+                // above have not.
+                if parts.count > 1 {
+                    VStack(alignment: .leading, spacing: 0) {
+                        heading(L.t("rideParts")).padding(.bottom, 8)
+                        timeline(parts)
+                    }
+                    .padding(16)
+                    .ridePanel()
+                }
 
                 if let insight, insight.speed.count > 1 {
                     VStack(alignment: .leading, spacing: 8) {
@@ -130,15 +143,24 @@ struct RideView: View {
 
     // MARK: The map
 
-    private func map(_ ride: Ride) -> some View {
+    /// A walk is dotted and a train dashed, both in the muted colour; a stop
+    /// is a small muted dot where the rider stood.
+    private func map(_ ride: Ride, stops: [CLLocationCoordinate2D]) -> some View {
         let aside = ride.aside ?? []
         let runs = Geo.runs(ride.points, around: aside)
         let line = kept?.line.compactMap { $0.count >= 2 ? CLLocationCoordinate2D(latitude: $0[0], longitude: $0[1]) : nil } ?? []
         return Map(initialPosition: .rect(Self.frame(ride.points + aside.flatMap { $0 })), interactionModes: [.zoom]) {
-            ForEach(Array(aside.enumerated()), id: \.offset) { _, stretch in
+            ForEach(Array(aside.enumerated()), id: \.offset) { k, stretch in
                 if stretch.count > 1 {
                     MapPolyline(coordinates: stretch.map(\.coordinate))
-                        .stroke(Theme.muted, style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: [1, 8]))
+                        .stroke(Theme.muted, style: StrokeStyle(lineWidth: 4, lineCap: .round,
+                                                                dash: ride.asideKind(k) == .vehicle ? [10, 8] : [1, 8]))
+                }
+            }
+            ForEach(Array(stops.enumerated()), id: \.offset) { _, at in
+                Annotation("", coordinate: at) {
+                    Circle().fill(Theme.muted).frame(width: 10, height: 10)
+                        .overlay(Circle().stroke(.white, lineWidth: 2))
                 }
             }
             // The phone's line, faint once the website's is over it.
@@ -183,6 +205,67 @@ struct RideView: View {
         }
         let pad = max(rect.width, rect.height) * 0.15 + 200
         return rect.insetBy(dx: -pad, dy: -pad)
+    }
+
+    // MARK: Part by part
+
+    /// What happened, in order: a sign and a word for what it was, when it
+    /// began, and how far and how long — with the speed for the parts that
+    /// moved. Riding is in the app's colour and everything else muted, so
+    /// the eye finds the riding first; the word says which, never the
+    /// colour alone.
+    private func timeline(_ parts: [Part]) -> some View {
+        VStack(spacing: 0) {
+            ForEach(Array(parts.enumerated()), id: \.offset) { k, part in
+                HStack(spacing: 10) {
+                    Image(systemName: Self.sign(part.kind))
+                        .font(.subheadline)
+                        .foregroundStyle(part.kind == .ride ? Theme.here : Theme.muted)
+                        .frame(width: 26, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(Self.word(part.kind)).font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink)
+                        Text(L.time(Date(timeIntervalSince1970: part.from)))
+                            .font(.caption.monospacedDigit()).foregroundStyle(Theme.muted)
+                    }
+                    Spacer(minLength: 8)
+                    Text(Self.figures(part))
+                        .font(.subheadline.monospacedDigit()).foregroundStyle(Theme.muted)
+                        .multilineTextAlignment(.trailing)
+                }
+                .padding(.vertical, 8)
+                .accessibilityElement(children: .combine)
+                if k != parts.count - 1 { Divider().overlay(Theme.hairline) }
+            }
+        }
+    }
+
+    private static func sign(_ kind: Part.Kind) -> String {
+        switch kind {
+        case .ride: return "bicycle"
+        case .walk: return "figure.walk"
+        case .vehicle: return "tram.fill"
+        case .wait: return "hourglass"
+        case .stop: return "mappin.and.ellipse"
+        }
+    }
+
+    private static func word(_ kind: Part.Kind) -> String {
+        switch kind {
+        case .ride: return L.t("partRide")
+        case .walk: return L.t("partWalk")
+        case .vehicle: return L.t("partVehicle")
+        case .wait: return L.t("partWait")
+        case .stop: return L.t("partStop")
+        }
+    }
+
+    /// "1.9 km · 9:31 · 12.0 km/h" for a part that moved, "13:02" for one
+    /// that stood.
+    private static func figures(_ part: Part) -> String {
+        let time = L.clock(Int(part.seconds.rounded()))
+        guard part.metres > 0, part.seconds > 0 else { return time }
+        let kmh = part.metres / part.seconds * 3.6
+        return "\(L.distance(part.metres)) · \(time) · \(String(format: "%.1f", kmh)) km/h"
     }
 
     // MARK: The speed and the kilometres
