@@ -198,11 +198,10 @@ second it takes, and with the screen locked. The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
 recorded: eleven phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
-Azerbaijani is recorded, all fifteen phrases; English has its first eight;
+Azerbaijani and English are recorded, all fifteen phrases of each;
 Estonian and Russian are not yet.
-Until a phrase is recorded the phone's own voice reads it, in English and
-Russian;
-iOS has no Estonian or Azerbaijani voice. A roundabout is in the row and
+Until a phrase is recorded the phone's own voice reads it, in Russian;
+iOS has no Estonian voice. A roundabout is in the row and
 is not said: a bike is mostly on the path beside one. A tunnel is said
 at its entrance, "Enter the tunnel", and with the turn before it where it
 starts just past one, as the Veerenni path under the railway does. A ride
