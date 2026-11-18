@@ -190,6 +190,30 @@ iOS has no Estonian or Azerbaijani voice. A roundabout is in the row and
 is not said: a bike is mostly on the path beside one. A ride with nowhere
 to go has no row and no voice (`Core/Guide.swift`).
 
+**A radio, under the voice.** At the foot of the riding screen, over Pause
+and Finish, a row says **📻 Play radio**. A tap plays a station: Raadio
+Tallinn in Estonian, Radio Paradise in English, Наше Радио in Russian and
+Baku Retro FM in Azerbaijani, until the rider chooses another. Playing, the
+row is the station's name between two buttons, the next station and the one
+before, as a car's seek buttons go; a tap on the name stops it, and a longer
+press opens every station — twenty, `Seed/stations.json` — to choose from.
+The phone remembers the station, and whether the radio was on: a ride
+starts with it if the last one ended with it, after the greeting, so the
+first time is always a press. It never starts over something the rider is
+already listening to, and it stops at Finish.
+
+When a turn is said the radio goes under it and comes back after, which
+iOS does for other apps' sound and an app has to do for its own. The lock
+screen has the station's name, play and pause, and next and previous for
+the station, as a pair of headphones' buttons do.
+
+The sound comes straight from each broadcaster, the address a media player
+would take, and never through the website: it costs the site nothing and
+the rider about sixty megabytes of mobile data an hour. A stream that drops
+is joined again, and after three tries the row says **No signal** and keeps
+trying every half minute; a tap tries at once (`Core/Radio.swift`,
+`Views/RadioRow.swift`).
+
 **Off the way, a new one.** It says first, and only then recalculates, at
 the owner's word. More than sixty metres from the way for two points in a
 row, the row says "You're off the way · 80 m from it" in place of the next
@@ -357,6 +381,13 @@ nothing asks for.
   rides do not follow an account to a new phone yet.
 - **Everybody's rides on the map.** `GET /api/rides?bbox=` answers them; the
   record map does not draw them yet.
+- **The radio's stations.** They are compiled in, so a station that moves
+  its address is silent until a new build. The website already keeps a
+  station a language in its `data/radio.json`; a list there that the app
+  asks for when it opens, with this file as what it falls back on, would
+  mend one without a release — and would be a promise, a station's `id`,
+  `name` and `url` at the least, written into the website's **What the app
+  reads**.
 
 ---
 
@@ -374,6 +405,7 @@ Rattatee/
             Store.swift         every ride on the phone, and sending them
             Search.swift        places, streets, Google, and the way there and its turns
             Guide.swift         the voice that says the turns
+            Radio.swift         the radio on a ride, and going under that voice
             Venues.swift        the places kept on the phone, a name and a pin each
             Recents.swift       where the rider has gone before, newest first
             Lists.swift         the rider's lists, and adds waiting for signal
@@ -384,6 +416,7 @@ Rattatee/
   Views/    RecordTab.swift     the map and its taps, Ready, Recording, Paused
             SearchSheet.swift   Where to?
             ListPicker.swift    Add to a list
+            RadioRow.swift      the radio's row while riding, and the list of stations
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
             StatsCard.swift     how far today, this week, this month, in all
@@ -392,6 +425,7 @@ Rattatee/
             SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et, ru and az
+            stations.json       the radio's stations
   Voice/    <lang>-<clip>.m4a   the turns, recorded: Azerbaijani and English so far
   *.lproj/  InfoPlist.strings   the location and motion questions, in each language
   PrivacyInfo.xcprivacy         the privacy manifest

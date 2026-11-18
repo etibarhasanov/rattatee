@@ -35,6 +35,14 @@ import Observation
 /// Starting to play with the screen locked is what the `audio` background
 /// mode in Config/Info.plist is for.
 ///
+/// OVER THE APP'S OWN RADIO
+///
+/// That turning down is something iOS does to other apps, not to this one.
+/// While the app's radio is on (`Radio`) the session is the radio's and is
+/// left alone: the phrase plays inside it, and the radio is asked to go
+/// under it and come back — by `say` and `hush`, and for the phone's own
+/// voice by `Finished`, which hears it end.
+///
 /// Nothing here knows about a ride. The Store hands it each point it keeps
 /// while there is a way, so paused is silent, and so is a ride with nowhere
 /// to go — but for the one line when a ride starts, "Good morning, let's
@@ -73,12 +81,28 @@ final class Guide {
     @ObservationIgnored private var player: AVQueuePlayer?
     @ObservationIgnored private var ending: NSObjectProtocol?
     @ObservationIgnored private let talker = AVSpeechSynthesizer()
+    @ObservationIgnored private let finished = Finished()
+    /// The app's radio, which goes under a phrase and owns the session
+    /// while it is on.
+    @ObservationIgnored weak var radio: Radio?
+
+    /// A phrase is being said: the radio does not give the session away
+    /// under it.
+    var talking: Bool { player != nil || talker.isSpeaking }
 
     init() {
         voice = UserDefaults.standard.object(forKey: "voice") as? Bool ?? true
         // The stand-in looks after its own audio: the system turns other
         // sound down for it and back up, with nothing to tidy here.
         talker.usesApplicationAudioSession = false
+        talker.delegate = finished
+        finished.done = { [weak self] in
+            Task { @MainActor in
+                // Cut off by the next phrase is not finished.
+                guard let self, !self.talking else { return }
+                self.radio?.duck(false)
+            }
+        }
     }
 
     /// A new way, or none: nothing has been said on it.
@@ -161,10 +185,14 @@ final class Guide {
         let files = clips.compactMap { Bundle.main.url(forResource: "\(L.lang)-\($0.rawValue)", withExtension: "m4a") }
         guard files.count == clips.count else { return speak(words) }
         hush()
-        let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(.playback, mode: .voicePrompt,
-                                 options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
-        try? session.setActive(true)
+        if let radio, radio.on {
+            radio.duck(true)
+        } else {
+            let session = AVAudioSession.sharedInstance()
+            try? session.setCategory(.playback, mode: .voicePrompt,
+                                     options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
+            try? session.setActive(true)
+        }
         let items = files.map { AVPlayerItem(url: $0) }
         let player = AVQueuePlayer(items: items)
         // When the last of them ends, the session is given back, which is
@@ -184,6 +212,11 @@ final class Guide {
         let line = AVSpeechUtterance(string: words)
         line.voice = reader
         talker.stopSpeaking(at: .immediate)
+        // Beside the radio it speaks in the radio's session and the radio
+        // goes under it; alone, the system looks after it as before.
+        let beside = radio?.on == true
+        talker.usesApplicationAudioSession = beside
+        if beside { radio?.duck(true) }
         talker.speak(line)
     }
 
@@ -195,6 +228,26 @@ final class Guide {
         guard player != nil else { return }
         player?.pause()
         player = nil
+        // Back up, whether or not it is still on: a radio switched off
+        // under a phrase must not come back quiet. And where it is on, the
+        // session is the radio's to give back.
+        radio?.duck(false)
+        if radio?.on == true { return }
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    }
+}
+
+/// Hears the phone's own voice finish a line, or be cut off, which a
+/// synthesizer says only to a delegate, and a delegate has to be an object
+/// of Objective-C's.
+private final class Finished: NSObject, AVSpeechSynthesizerDelegate {
+    var done: (() -> Void)?
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        done?()
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        done?()
     }
 }

@@ -62,6 +62,8 @@ final class Store {
     let recorder = Recorder()
     /// The voice that says the turns of the way to `goal`.
     let guide = Guide()
+    /// The radio on a ride, which goes under that voice.
+    let radio = Radio()
 
     /// Screenshots for CI: nothing is written to disk or sent.
     @ObservationIgnored var demo = false
@@ -109,6 +111,8 @@ final class Store {
         }
 
         recorder.onPoint = { [weak self] point in self?.add(point) }
+        guide.radio = radio
+        radio.guide = guide
 
         network.pathUpdateHandler = { [weak self] path in
             guard path.status == .satisfied else { return }
@@ -142,6 +146,10 @@ final class Store {
         rides.insert(ride, at: 0)
         shown = nil
         write(ride)
+        // The radio first, if it was on last ride, so the greeting finds it
+        // on and is said over it: a stream takes a second or two to come,
+        // which is the greeting's, and then the music comes up under it.
+        radio.begin()
         // A new ride only: `resume()` does not greet.
         guide.greet()
         recorder.start()
@@ -175,6 +183,8 @@ final class Store {
         rides[i].status = .recording
         write(rides[i])
         recorder.start()
+        // Keep riding, after a Finish that stopped it.
+        radio.begin()
     }
 
     /// Pause, ask the phone which stretches were walked or driven, leave
@@ -184,6 +194,7 @@ final class Store {
     /// riding time.
     func finish() {
         pause()
+        radio.halt()
         guard let i = currentIndex, rides[i].status == .paused, !finishing else { return }
         finishing = true
         let id = rides[i].id, started = rides[i].started
@@ -201,6 +212,7 @@ final class Store {
     func throwAway() {
         guard let i = currentIndex else { return }
         recorder.stop()
+        radio.halt()
         let id = rides[i].id
         rides.remove(at: i)
         goal = nil
@@ -530,6 +542,7 @@ final class Store {
     /// For LaunchScript only: rides drawn on screen, never written.
     func pretend(_ rides: [Ride], shown: String? = nil) {
         demo = true
+        radio.demo = true
         self.rides = rides
         self.shown = shown
     }

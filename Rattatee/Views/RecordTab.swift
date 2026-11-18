@@ -609,13 +609,15 @@ struct LostRow: View {
     }
 }
 
-/// The foot of the screen while riding: Pause or Resume, and Finish.
+/// The foot of the screen while riding: the radio, and under it Pause or
+/// Resume, and Finish.
 struct RecordingCard: View {
     @Environment(Store.self) private var store
     let ride: Ride
 
     var body: some View {
         SheetCard {
+            RadioRow().padding(.bottom, 10)
             HStack(spacing: 10) {
                 if ride.status == .recording {
                     Button(L.t("ridePause")) { store.pause() }.buttonStyle(.bigQuiet)
