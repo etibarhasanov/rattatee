@@ -287,6 +287,36 @@
     "et": "{min} min · {dist}",
     "ru": "{min} мин · {dist}"
   },
+  "goalWayFastest": {
+    "az": "Ən sürətli · {min} dəq · {dist}",
+    "en": "Fastest · {min} min · {dist}",
+    "et": "Kiireim · {min} min · {dist}",
+    "ru": "Самый быстрый · {min} мин · {dist}"
+  },
+  "goalWayQuietest": {
+    "az": "Ən sakit · {min} dəq · {dist}",
+    "en": "Quietest · {min} min · {dist}",
+    "et": "Vaikseim · {min} min · {dist}",
+    "ru": "Самый тихий · {min} мин · {dist}"
+  },
+  "goalWayRidden": {
+    "az": "Sürülmüş yol · {min} dəq · {dist}",
+    "en": "Ridden · {min} min · {dist}",
+    "et": "Sõidetud · {min} min · {dist}",
+    "ru": "Проверено · {min} мин · {dist}"
+  },
+  "goalWaySafest": {
+    "az": "Ən təhlükəsiz · {min} dəq · {dist}",
+    "en": "Safest · {min} min · {dist}",
+    "et": "Turvalisim · {min} min · {dist}",
+    "ru": "Самый безопасный · {min} мин · {dist}"
+  },
+  "goalWayShortest": {
+    "az": "Ən qısa · {min} dəq · {dist}",
+    "en": "Shortest · {min} min · {dist}",
+    "et": "Lühim · {min} min · {dist}",
+    "ru": "Самый короткий · {min} мин · {dist}"
+  },
   "greetAfternoon": {
     "az": "Günortan xeyir, gedək",
     "en": "Good afternoon, let's go",

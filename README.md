@@ -158,13 +158,20 @@ for the way. When the way arrives the map moves once, to the whole of it,
 from where the rider is to the pin. A place chosen in the search that is
 off the screen is framed straight away instead, rider and place.
 
-Where the website finds more than one way — up to three — the card has a
+Where the website finds more than one way — up to five — the card has a
 small button for each, *9 min · 2.1 km*, as the website's own route bar
 does. The one chosen is the solid line and the others are faint under it;
 pressing another changes which is solid, and the map stays where it is.
 **Go** starts with the one chosen, and how much is left while riding is
 measured along it. The buttons say how long and how far and nothing about
 which is nicer, because the router does not say.
+
+From 2026-11-19 a way can say what kind it is, and there can be five:
+*Ridden*, *Fastest*, *Safest*, *Quietest*, *Shortest* — `style` in the
+website's answer, where its second router answered. The button then starts
+with the name, *Safest · 14 min · 4.0 km*. Where the website sends no
+names the buttons are as they were. The row of buttons still slides
+sideways here; on the website it wraps.
 
 Choosing a place puts it on the map with a suggested way by bike, in blue,
 how far it is and about how long, and **Go**, which is Start. While riding,
@@ -450,7 +457,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
 | `GET /api/v1/route?from=&to=&mode=bike` | asked first: everything `/api/route` answers below, with `version: 1`, and `trains` — each `seconds`, `meters`, `leave`, and `legs`, a ride (`kind: "bike"`, `meters`, `seconds`, `line`, `steps`) or the train (`kind: "train"`, `name`, `from`, `to`, `at`, `until`, `meters`, `line`). An answer without `version`, or none, and `/api/route` is asked instead |
-| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields; and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout`, `arrive` and `tunnel`, where the way goes into one; one the app does not know is left out |
+| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields — up to four from 2026-11-19, where the ways have names: `style` on the way and on each of the others, `ridden`, `fastest`, `safest`, `quietest` or `shortest`, which the card prints on the button, and a way without one, or with a word this build does not know, is a button with no name; and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout`, `arrive` and `tunnel`, where the way goes into one; one the app does not know is left out |
 | `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
 | `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |

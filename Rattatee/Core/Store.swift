@@ -429,7 +429,7 @@ final class Store {
     /// turns and all, and the voice starts over on it; with no answer, the
     /// old one stays and it is asked again later.
     ///
-    /// Where the website answers more than one — up to three — the first
+    /// Where the website answers more than one — up to five — the first
     /// is the way and the others are drawn faint beside it with a button
     /// each, and whichever the rider rides on becomes the way (`pick`).
     /// Ways by train are left out: a station is not something to turn

@@ -245,11 +245,20 @@ struct WayChips: View {
     }
 
     /// A way's button: how long and how far, or for a way by train how
-    /// long and when the train goes, since that is what it hangs on.
+    /// long and when the train goes, since that is what it hangs on. Where
+    /// the website says what kind of way it is, that comes first.
     private func chip(_ way: Way) -> String {
         let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
         if let train = way.train { return L.t("goalTrainChip", ["min": min, "at": train.at]) }
-        return L.t("goalWayChip", ["min": min, "dist": L.distance(way.metres)])
+        let gaps = ["min": min, "dist": L.distance(way.metres)]
+        switch way.style {
+        case .ridden: return L.t("goalWayRidden", gaps)
+        case .fastest: return L.t("goalWayFastest", gaps)
+        case .safest: return L.t("goalWaySafest", gaps)
+        case .quietest: return L.t("goalWayQuietest", gaps)
+        case .shortest: return L.t("goalWayShortest", gaps)
+        case nil: return L.t("goalWayChip", gaps)
+        }
     }
 }
 
