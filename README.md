@@ -143,6 +143,16 @@ on one of the ways drawn nothing to mean but a new pin on top of it, and
 asked the website for a way at every stray touch (`Views/RideMap.swift`, A
 HOLD IS A PIN, AND A TAP IS A CHOICE).
 
+**Somewhere chosen is harder to move.** With a pin on the map and its ways
+drawn, a tap chooses a way and nothing else: a named place is not chosen by
+a tap, and the hold that moves the pin is a whole second, not half of one.
+The ways run down the streets and the named places stand along them, so a
+finger wider than a line kept landing on the Prisma beside it, which moved
+the pin there and threw the ways away. Moving the pin is the one touch that
+loses something, so it is the one that has to be meant. To go somewhere
+else by name, let the first go with its cross and tap the place, or ask
+Where to? (SOMEWHERE CHOSEN IS HARDER TO MOVE, in the same file).
+
 **Mid-ride, too.** Nothing has to be paused or finished to choose somewhere
 to go: **Where to?** stays over the map while riding, under the numbers, and
 a place chosen there, or a touch on the map, is somewhere to go exactly as
@@ -169,8 +179,7 @@ does. The one chosen is the solid line and the others are faint under it;
 pressing another, or tapping its faint line on the map, changes which is
 solid, and the map stays where it is. A line is taken for tapped within a
 finger's half-width of it. Where the lines run together, as they do at both
-ends, the solid one is on top and a tap there changes nothing; and where a
-named place sits right on a faint line, the tap is the line's.
+ends, the solid one is on top and a tap there changes nothing.
 **Go** starts with the one chosen, and how much is left while riding is
 measured along it. The buttons say how long and how far and nothing about
 which is nicer, because the router does not say.
