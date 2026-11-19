@@ -232,13 +232,14 @@ final class Store {
         Task { await findWay() }
     }
 
-    /// A tap on the map before a ride, or during one: a place Apple's map
-    /// names, or anywhere at all. Nothing here asks Google or the website's search —
-    /// a named place is looked for in the phone's copy of the roll first
-    /// (`Venues.same`), so a café the website knows is that café under its
-    /// own id; anything else is Apple's name, or a pin whose street the
+    /// A touch on the map before a ride, or during one: a tap on a place
+    /// Apple's map names, which comes with its name, or a hold anywhere at
+    /// all, which comes with none. Nothing here asks Google or the website's
+    /// search — a named place is looked for in the phone's copy of the roll
+    /// first (`Venues.same`), so a café the website knows is that café under
+    /// its own id; anything else is Apple's name, or a pin whose street the
     /// phone itself works out. Then it is somewhere to go, like a search row.
-    func tapped(name: String?, at point: CLLocationCoordinate2D) {
+    func touched(name: String?, at point: CLLocationCoordinate2D) {
         // Before a ride, or while one is being ridden — never on the save
         // card, where somewhere to go would outlive the ride it was for.
         if let current, ![.recording, .paused].contains(current.status) { return }
@@ -279,7 +280,8 @@ final class Store {
 
     /// Go by another of the ways on offer: the card's row of them before a
     /// ride, or the same row under the numbers after a new way mid-ride,
-    /// where a press is the rider choosing and the choice is over.
+    /// where a press is the rider choosing and the choice is over. A tap on
+    /// a way's faint line on the map is the same press.
     func choose(way index: Int) {
         guard var goal, goal.ways.indices.contains(index) else { return }
         take(index, in: &goal)

@@ -2,8 +2,8 @@ import CoreLocation
 import Foundation
 
 /// Somewhere to ride to: a place off the website's search, a street off its
-/// geocoder, something Google Maps was asked for, or a point tapped on the
-/// map — a place Apple's map names, or anywhere at all.
+/// geocoder, something Google Maps was asked for, or a point on the map — a
+/// place Apple's map names, tapped, or anywhere at all, held.
 struct Spot: Identifiable, Equatable, Codable {
     /// Written to the phone by name (`Recents`): a case renamed is a place
     /// somebody chose that no longer reads back.
@@ -18,7 +18,7 @@ struct Spot: Identifiable, Equatable, Codable {
         case google
         /// A place Apple's map names, tapped, that the website does not know.
         case apple
-        /// Anywhere else tapped on the map.
+        /// Anywhere at all on the map, held: a dropped pin.
         case pin
     }
 
