@@ -44,7 +44,9 @@ struct RecordTab: View {
                     // touch chooses only where there is nowhere to go yet:
                     // a hand resting on the screen should not throw away a
                     // way the rider is following. Where to? and its cross
-                    // change it on purpose.
+                    // change it on purpose. Before a ride the map makes
+                    // somewhere chosen harder to move by itself: no tap
+                    // moves it, and the hold is a second (`RideMap`).
                     touch: canTouch ? { name, point in store.touched(name: name, at: point) } : nil,
                     // A tap on a faint line is a press on its button, and
                     // works where the buttons are: on the card before a

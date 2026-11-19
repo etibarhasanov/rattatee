@@ -4,7 +4,8 @@ import SwiftUI
 /// The map: where the phone is, and the line ridden so far. A touch on it
 /// is somewhere to go, before a ride or during one with nowhere to go yet:
 /// a tap on a place Apple's map names, or a hold anywhere. And where there
-/// are ways to choose from, a tap on one of the faint lines chooses it.
+/// are ways to choose from, a tap on one of the faint lines chooses it, and
+/// only a longer hold moves the pin.
 ///
 /// A HOLD IS A PIN, AND A TAP IS A CHOICE
 ///
@@ -16,13 +17,26 @@ import SwiftUI
 /// Google's, and a tap is a choice of something drawn: a named place, or a
 /// way. A tap on bare map does nothing at all.
 ///
-/// A named place and a faint line can be under the same finger, and Apple's
-/// map says which place a moment after the tap, not with it. So a tap on
-/// the line itself (`onLine`) is the line's and the place is left alone; a
-/// tap only near one (`reach`) chooses it too, and is the place's after all
-/// if the map then says there was one. And where the lines run together,
-/// which they do at both ends, the solid one is on top and is the one
-/// tapped: nothing changes (`wayNear`).
+/// A line is tapped within a finger's half-width of it (`reach`). Where the
+/// lines run together, which they do at both ends, the solid one is on top
+/// and is the one tapped: nothing changes (`wayNear`).
+///
+/// SOMEWHERE CHOSEN IS HARDER TO MOVE
+///
+/// For an evening a tap on a named place went there whether or not there
+/// was somewhere to go already, and where a place and a faint line were
+/// under one finger the place had the tap unless it was right on the line.
+/// The owner tried it the same night: choosing a line worked, and a finger
+/// wider than the line kept landing on the Prisma or the Stockmann beside
+/// it, which moved the pin there and threw the ways away. The lines run
+/// down the streets, and the named places are what stands along them.
+///
+/// So with somewhere to go, a tap chooses a way and nothing else: the named
+/// places are not the map's to select (`selectableMapFeatures`), and the
+/// hold that moves the pin is a whole second (`holdToMove`) where the one
+/// that first drops it is iOS's half (`holdToDrop`) — the owner's number.
+/// Moving it loses the ways found, so it is the one touch that has to be
+/// meant. Somewhere else by name is the cross and then a tap, or Where to?.
 ///
 /// It asks for less as well. Somewhere to go is a question to the website
 /// for the ways there, which it asks of a router that volunteers pay for,
@@ -349,13 +363,16 @@ private struct MapCanvas: UIViewRepresentable {
         context.coordinator.locate = locate
 
         // Beside the map's own gestures rather than instead of them:
-        // dragging and pinching go on as before. The hold is iOS's own
-        // half second with the finger still. The tap waits for the hold to
-        // fail, which it does the moment a finger lifts sooner than that,
-        // so a tap is no slower for it and a hold let go is not a tap too.
+        // dragging and pinching go on as before. How long the hold is,
+        // `agree` says, since it depends on whether there is a pin to
+        // move. The tap waits for the hold to fail, which it does the
+        // moment a finger lifts sooner than that, so a tap is no slower
+        // for it and a hold let go is not a tap too.
         let hold = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.held(_:)))
         hold.delegate = context.coordinator
+        hold.minimumPressDuration = Coordinator.holdToDrop
         map.addGestureRecognizer(hold)
+        context.coordinator.hold = hold
         let finger = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.tapped(_:)))
         finger.delegate = context.coordinator
         finger.require(toFail: hold)
@@ -372,6 +389,7 @@ private struct MapCanvas: UIViewRepresentable {
     final class Coordinator: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate {
         var canvas: MapCanvas
         weak var locate: MKUserTrackingButton?
+        weak var hold: UILongPressGestureRecognizer?
 
         /// What is on the map now: the lines by their marks, bottom first,
         /// the bike paths, and the pin.
@@ -386,23 +404,26 @@ private struct MapCanvas: UIViewRepresentable {
         private var goalID: String?
         private var looking = false
 
-        /// When a touch was last answered here for good — a line chosen by
-        /// a tap on it, a pin dropped by a hold — so a place the map drew
-        /// under the same finger is not chosen as well.
-        private var answeredAt = Date.distantPast
+        /// When a hold last dropped a pin, or was let go, so a place the
+        /// map drew under the same finger is not chosen as well.
+        private var heldAt = Date.distantPast
 
+        /// How long a finger is held still for a pin, in seconds: iOS's
+        /// own half second where there is nowhere to go yet, and a whole
+        /// one to move a pin that is there — SOMEWHERE CHOSEN IS HARDER TO
+        /// MOVE, above.
+        static let holdToDrop: TimeInterval = 0.5
+        static let holdToMove: TimeInterval = 1
         /// How near a faint line a tap has to be to be for it, in points:
         /// half of the forty-four a finger needs, which is what makes a
-        /// line four points wide something a thumb can hit. And how near to
-        /// be on the line itself, where it outranks a named place under it.
+        /// line four points wide something a thumb can hit.
         static let reach: CGFloat = 22
-        static let onLine: CGFloat = 10
         /// How much nearer the finger a faint line has to be than the solid
         /// one, in points, to be the one meant.
         static let nearer: CGFloat = 4
-        /// How long after a touch the map may still say it was on a place
-        /// it drew, in seconds: it says so a moment after the finger lifts,
-        /// once it is sure the tap was not the first of two.
+        /// How long after a hold the map may still say the finger was on a
+        /// place it drew, in seconds: it says so a moment after the finger
+        /// lifts, once it is sure a tap was not the first of two.
         static let sameTouch: TimeInterval = 0.6
 
         init(_ canvas: MapCanvas) { self.canvas = canvas }
@@ -465,9 +486,14 @@ private struct MapCanvas: UIViewRepresentable {
             }
 
             // A place Apple's map names can be chosen where a pin can be
-            // dropped.
-            let features: MKMapFeatureOptions = canvas.touch == nil ? [] : .pointsOfInterest
+            // dropped and there is nowhere to go yet. With somewhere to go
+            // a tap is for the lines alone, and the pin takes the longer
+            // hold to move.
+            let chosen = canvas.goal != nil
+            let features: MKMapFeatureOptions = (canvas.touch == nil || chosen) ? [] : .pointsOfInterest
             if map.selectableMapFeatures != features { map.selectableMapFeatures = features }
+            let still = chosen ? Self.holdToMove : Self.holdToDrop
+            if let hold, hold.minimumPressDuration != still { hold.minimumPressDuration = still }
 
             camera(map)
         }
@@ -604,48 +630,43 @@ private struct MapCanvas: UIViewRepresentable {
 
         // MARK: A hold and a tap
 
-        /// A hold: a pin under the finger, dropped as the hold is told for
-        /// one and not when the finger lifts, with a knock to say so, since
-        /// the finger is over the very spot the pin appears at.
+        /// A hold: a pin under the finger, dropped — or moved there, after
+        /// the longer hold — as the hold is told for one and not when the
+        /// finger lifts, with a knock to say so, since the finger is over
+        /// the very spot the pin appears at.
         @objc func held(_ finger: UILongPressGestureRecognizer) {
             switch finger.state {
             case .began:
                 guard let touch = canvas.touch, let map = finger.view as? MKMapView else { return }
-                answeredAt = Date()
+                heldAt = Date()
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 touch(nil, map.convert(finger.location(in: map), toCoordinateFrom: map))
             case .ended, .cancelled:
                 // Lifted over a place the map drew: the map may take the
                 // lift for a tap on it, and the pin is what was asked for.
-                answeredAt = Date()
+                heldAt = Date()
             default:
                 break
             }
         }
 
         /// A tap: a choice of way, where it was on or near one of the faint
-        /// lines. A tap on a named place is the map's own to tell, in
-        /// `didSelect` below, and a tap on anything else is nothing.
-        ///
-        /// The line is chosen at once either way, with nothing waited for.
-        /// On the line itself the tap is answered, and a place the map drew
-        /// under it is left alone. Only near it, a named place under the
-        /// finger still has the tap: the map says so a moment later, and
-        /// going there takes these lines away with it.
+        /// lines, at once. A tap on a named place is the map's own to tell,
+        /// in `didSelect` below, and only while there is nowhere to go —
+        /// so never under a tap for a line, since the lines are the ways to
+        /// somewhere. A tap on anything else is nothing.
         @objc func tapped(_ finger: UITapGestureRecognizer) {
             guard let choose = canvas.choose, let map = finger.view as? MKMapView,
-                  let near = wayNear(finger.location(in: map), in: map) else { return }
-            if near.away <= Self.onLine { answeredAt = Date() }
-            choose(near.way)
+                  let way = wayNear(finger.location(in: map), in: map) else { return }
+            choose(way)
         }
 
-        /// The faint line a tap is for — which of the ways it is — and how
-        /// far from it the tap was, in points: the nearest within `reach`.
-        /// None where the solid line is as near, give or take `nearer`: the
-        /// ways share their first and last streets, and there the solid one
-        /// is drawn on top, so it is the one under the finger and there is
-        /// nothing to change.
-        private func wayNear(_ at: CGPoint, in map: MKMapView) -> (way: Int, away: CGFloat)? {
+        /// The faint line a tap is for, as which of the ways it is: the
+        /// nearest within `reach`. None where the solid line is as near,
+        /// give or take `nearer`: the ways share their first and last
+        /// streets, and there the solid one is drawn on top, so it is the
+        /// one under the finger and there is nothing to change.
+        private func wayNear(_ at: CGPoint, in map: MKMapView) -> Int? {
             var nearest: (way: Int, away: CGFloat)?
             var chosen = CGFloat.infinity
             for (_, stroke) in drawn {
@@ -662,7 +683,7 @@ private struct MapCanvas: UIViewRepresentable {
                 }
             }
             guard let found = nearest, found.away <= Self.reach, found.away + Self.nearer <= chosen else { return nil }
-            return found
+            return found.way
         }
 
         /// How far a point on the screen is from a line on the map, in
@@ -702,9 +723,10 @@ private struct MapCanvas: UIViewRepresentable {
             let name: String? = annotation.title ?? nil
             let at = annotation.coordinate
             mapView.deselectAnnotation(annotation, animated: false)
-            // Under a tap that was on a line, or a hold that has dropped a
-            // pin: that was the answer.
-            guard Date().timeIntervalSince(answeredAt) > Self.sameTouch else { return }
+            // Under a hold that has dropped a pin: the pin was the answer.
+            // And with somewhere to go already, a place is not chosen by a
+            // tap — the map is told so in `agree`, a moment after the fact.
+            guard canvas.goal == nil, Date().timeIntervalSince(heldAt) > Self.sameTouch else { return }
             canvas.touch?(name, at)
         }
 
