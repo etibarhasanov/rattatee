@@ -285,6 +285,27 @@ by night, are the website's own styles to the value; the other four were
 drawn to sit beside them (`Palette` in `Views/Theme.swift`). The choice is
 kept on the phone, as the website keeps its style in the browser.
 
+### Bike paths on the map
+
+The bicycle button at the foot of the record map draws where the bike paths
+are, over Apple's map: OpenStreetMap's cycle tracks, lanes and shared paths
+as [CyclOSM](https://www.cyclosm.org) draws them — its `cyclosm-lite` layer,
+which is the paths and nothing else. It is off on a new install and
+remembered once switched on. The way the website suggests already prefers
+those paths; this is so the rider can see them.
+
+The pictures come from OpenStreetMap France's servers, not from the website,
+so they read nothing from its database. They are asked only while the
+button is on, only for what is on the screen, never from zoomed out further
+than a district, two at a time, and once: 64 MB of them are kept on the
+phone. A screen is about a dozen; riding with the map following, some two
+hundred an hour the first time along a street and none the second.
+`BikePaths` in `Views/RideMap.swift` says the rest. While they show, the map
+says whose they are: *© OpenStreetMap · CyclOSM · OSM France*.
+
+It is why the record map is an `MKMapView` and not SwiftUI's `Map`, which
+draws nothing of anybody else's.
+
 ## The rules of a recording
 
 The website's, from `assets/ride.js` there, so a ride recorded here is the
@@ -494,7 +515,8 @@ Rattatee/
             SocialSignIn.swift  Google and Apple, Kohuke's file unchanged
             Disk.swift          the ride files, and where the other copies live
             Strings.swift       the words, the language chosen, and how a distance is said
-  Views/    RecordTab.swift     the map and its taps, Ready, Recording, Paused
+  Views/    RecordTab.swift     Where to?, Ready, Recording, Paused
+            RideMap.swift       the map, its lines and its taps, and the bike paths
             SearchSheet.swift   Where to?
             ListPicker.swift    Add to a list
             RadioRow.swift      the radio's row while riding, and the list of stations
