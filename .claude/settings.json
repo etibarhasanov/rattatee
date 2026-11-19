@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__Cloudflare_Developer_Platform__d1_database_query",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/d1-gate.mjs",
+            "timeout": 10,
+            "statusMessage": "Checking what this D1 query writes and what it would read, with the site's gate"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__Cloudflare_Developer_Platform__d1_database_query",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/d1-gate.mjs --after",
+            "timeout": 10,
+            "statusMessage": "Adding what this D1 query read to the day's total"
+          }
+        ]
+      }
+    ]
+  }
+}
