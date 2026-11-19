@@ -563,6 +563,12 @@
     "et": "Teest {dist} eemal",
     "ru": "В {dist} от него"
   },
+  "mapBikePaths": {
+    "az": "Velosiped yolları",
+    "en": "Bike paths",
+    "et": "Rattateed",
+    "ru": "Велодорожки"
+  },
   "openSettings": {
     "az": "Ayarları aç",
     "en": "Open Settings",
