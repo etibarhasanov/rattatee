@@ -114,6 +114,13 @@ struct Way: Equatable {
     /// Where it is a way by train: what the card and the map say of it.
     /// Nil for a way that is all bike, which is nearly every one.
     var train: Train?
+    /// What kind of way it is, where the website says: `style` in
+    /// /api/route, from 2026-11-19. Nil for a way with no name — from a
+    /// website before the names, where its second router did not answer,
+    /// and for a kind this build does not know.
+    var style: Style?
+
+    enum Style: String { case ridden, fastest, safest, quietest, shortest }
 
     /// Further than this from the line is not on it: the turns stop, and
     /// `Store.follow` says the rider is off the way and, if they stay off,
@@ -224,7 +231,7 @@ struct Goal: Equatable {
     var spot: Spot
     /// The way the rider is going by: the one chosen of `ways`.
     var way: Finding = .looking
-    /// Every way the website answered, its first first: up to three, and
+    /// Every way the website answered, its first first: up to five, and
     /// mostly one. More than one is a choice on the card.
     var ways: [Way] = []
     /// Which of `ways` is chosen.
@@ -456,6 +463,7 @@ enum Search {
         // from before it sent any answers none, and the way is still a way.
         let steps = (object["steps"] as? [[String: Any]] ?? []).compactMap { way.step($0) }
         way.steps = steps.sorted { $0.along < $1.along }
+        way.style = (object["style"] as? String).flatMap(Way.Style.init(rawValue:))
         return way
     }
 }
