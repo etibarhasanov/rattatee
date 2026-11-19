@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|mcp__.*(d1|D1|[Cc]loudflare).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/d1-gate.mjs",
+            "timeout": 10,
+            "statusMessage": "Checking whether this reaches D1, and what it would write or read, with the site's gate"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|mcp__.*(d1|D1|[Cc]loudflare).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/d1-gate.mjs --after",
+            "timeout": 10,
+            "statusMessage": "Adding what this D1 query read to the day's total"
+          }
+        ]
+      }
+    ]
+  },
+  "autoMode": {
+    "hard_deny": [
+      "$defaults",
+      "Never restore, delete or import a Cloudflare D1 database: no wrangler d1 time-travel restore, no wrangler d1 delete, no D1 import or time_travel call through the API or any MCP tool. This app has no database of its own; the site's is the one every rider's rides are in, and a restore throws away everything written since the point it goes back to. Those are the owner's to run from their own terminal."
+    ]
+  }
+}
