@@ -19,8 +19,13 @@
  * wrangler.toml. Its answer is handed back as it is. Run with `--after`, it
  * runs the gate's meter the same way, which keeps the day's hand-run reads.
  *
- * Without the site beside it there is nothing to price with, so every query
- * asks, saying why. Fail closed: a wrong ask is one keystroke, a wrong allow
+ * It is wired to the same doors the site's is: Bash, for `wrangler d1` and
+ * curl to D1's API, and every MCP tool that names D1 or Cloudflare.
+ *
+ * Without the site beside it there is nothing to price with, so every call
+ * that looks like D1 asks, saying why, and a restore or a deleted database is
+ * refused here as it would be there. A shell command that does not mention
+ * D1 gets no word, as it would from the gate. Fail closed: a wrong ask is one keystroke, a wrong allow
  * is the account's reads for the day. Copying the gate in here instead would
  * be a second copy to fall behind the first, and its table sizes with it.
  */
@@ -40,12 +45,23 @@ process.stdin.on('data', (chunk) => { raw += chunk; });
 process.stdin.on('end', () => {
   if (!existsSync(gate)) {
     if (AFTER) return;
-    return ask('The site\'s D1 gate is not beside this checkout (../tallinntastebuds), so this query cannot be priced and is asking instead. Add etibarhasanov/tallinntastebuds to the session to have reads priced.');
+    let call = {};
+    try { call = JSON.parse(raw); } catch (e) { /* Unreadable: asked below. */ }
+    const text = call.tool_name === 'Bash'
+      ? String((call.tool_input && call.tool_input.command) || '')
+      : JSON.stringify(call);
+    if (!/\bd1\b|d1_|_d1|\/d1\/|api\.cloudflare\.com/i.test(text)) return;
+    if (/time[_-]?travel|\brestore\b|\bd1\s+delete\b|d1_database_delete/i.test(text)) {
+      return answer('deny', 'This would restore or delete a D1 database, which throws away everything written since. That is the owner\'s to run from their own terminal, never a session\'s.');
+    }
+    return ask('The site\'s D1 gate is not beside this checkout (../tallinntastebuds), so this cannot be priced and is asking instead. Add etibarhasanov/tallinntastebuds to the session to have it priced.');
   }
-  /* The gate reads its root from the call's cwd: point it at the site. */
+  /* The gate reads its root from the call's cwd: point it at the site, and
+     keep where the command really runs for a relative --file. */
   let input = raw;
   try {
     const call = JSON.parse(raw);
+    call.run_cwd = call.cwd || here;
     call.cwd = site;
     delete call.project_dir;
     input = JSON.stringify(call);
@@ -55,13 +71,18 @@ process.stdin.on('end', () => {
   const run = spawnSync(process.execPath, AFTER ? [gate, '--after'] : [gate], {
     cwd: site, input, encoding: 'utf8', timeout: 9000
   });
-  if (run.status === 0 && run.stdout) return process.stdout.write(run.stdout);
+  /* No output is the gate's "no word", and is passed on as that. */
+  if (run.status === 0) return process.stdout.write(run.stdout || '');
   if (AFTER) return;
   ask('The site\'s D1 gate did not answer (' + (run.error ? run.error.message : 'exit ' + run.status) + '), so this query is asking rather than running unpriced.');
 });
 
 function ask(reason) {
+  answer('ask', reason);
+}
+
+function answer(decision, reason) {
   process.stdout.write(JSON.stringify({
-    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'ask', permissionDecisionReason: reason }
+    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: decision, permissionDecisionReason: reason }
   }));
 }

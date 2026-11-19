@@ -42,10 +42,12 @@ designed with its frequency in mind before it is written:
 
 **A query run by hand is priced too.** The Cloudflare tool a session holds
 reaches the site's production database from here as well, so
-`.claude/hooks/d1-gate.mjs` runs the site's own gate on every
-`d1_database_query`: a write asks, a read past 2,000 rows asks. It needs the
-site checked out beside this one (`../tallinntastebuds`); without it, every
-query asks.
+`.claude/hooks/d1-gate.mjs` runs the site's own gate on every door into
+D1 a session has — `d1_database_query`, any MCP tool that names D1 or
+Cloudflare, and `wrangler d1` or curl to D1's API in the shell: a write
+asks, a read past 2,000 rows asks, and a restore or a deleted database is
+refused. It needs the site checked out beside this one
+(`../tallinntastebuds`); without it, every call that looks like D1 asks.
 
 The site's side of the same rule is **Every read has a price, set before it
 is written** in its `CLAUDE.md`; `/admin/stats` there shows the day's reads by
