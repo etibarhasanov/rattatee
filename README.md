@@ -132,27 +132,32 @@ with goes to the top of the list, and the website keeps it, so the next
 search — here, in the map app or on the site — finds it without asking
 Google.
 
-Or tap the map. A place Apple's map names is somewhere to go under that
-name — and if the phone's copy of the website's places has it within a
-street's width, it is the website's place, under the website's id. A tap
-anywhere else drops a pin, whose street the phone works out for itself.
-Neither asks Google or the website for anything but the way there.
+Or touch the map. A tap on a place Apple's map names is somewhere to go
+under that name — and if the phone's copy of the website's places has it
+within a street's width, it is the website's place, under the website's id.
+A hold anywhere, half a second with the finger still, drops a pin there,
+with a knock as it lands, whose street the phone works out for itself.
+Neither asks Google or the website for anything but the way there. A tap on
+bare map does nothing: until 2026-11-19 it dropped the pin, which left a tap
+on one of the ways drawn nothing to mean but a new pin on top of it, and
+asked the website for a way at every stray touch (`Views/RideMap.swift`, A
+HOLD IS A PIN, AND A TAP IS A CHOICE).
 
-**Mid-ride, too.** Nothing has to be paused or finished to choose
-somewhere to go: **Where to?** stays over the map while riding, under the
-numbers, and a place chosen there, or a tap on the map, is somewhere to go
-exactly as before a ride. The recording goes on underneath; the way is asked
-for from where the rider is and setting off the way they are going
-(`heading`, as a new way off the old one is), and as soon as it arrives the
-blue line is under the ridden one, the card says how much is left and the
-turns are shown and said. The website's first way is taken, with no choice
-of others, since the rider is moving. A tap chooses only while there is
-nowhere to go yet — a hand brushing the screen should not throw away a way
-being followed — so a destination already chosen is changed through Where
-to?, or let go with its cross, which leaves the ride going with nowhere to
-go. On the save card and after it, taps do nothing.
+**Mid-ride, too.** Nothing has to be paused or finished to choose somewhere
+to go: **Where to?** stays over the map while riding, under the numbers, and
+a place chosen there, or a touch on the map, is somewhere to go exactly as
+before a ride. The recording goes on underneath; the way is asked for from
+where the rider is and setting off the way they are going (`heading`, as a
+new way off the old one is), and as soon as it arrives the blue line is
+under the ridden one, the card says how much is left and the turns are shown
+and said. The website's first way is taken, with no choice of others, since
+the rider is moving. A touch chooses only while there is nowhere to go yet —
+a hand resting on the screen should not throw away a way being followed — so
+a destination already chosen is changed through Where to?, or let go with
+its cross, which leaves the ride going with nowhere to go. On the save card
+and after it, a touch does nothing.
 
-A tap leaves the map where it was: the pin lands under the finger, and a
+A pin leaves the map where it was: it lands under the finger, and a
 dotted straight line runs to it from the rider while the website is asked
 for the way. When the way arrives the map moves once, to the whole of it,
 from where the rider is to the pin. A place chosen in the search that is
@@ -161,7 +166,11 @@ off the screen is framed straight away instead, rider and place.
 Where the website finds more than one way — up to five — the card has a
 small button for each, *9 min · 2.1 km*, as the website's own route bar
 does. The one chosen is the solid line and the others are faint under it;
-pressing another changes which is solid, and the map stays where it is.
+pressing another, or tapping its faint line on the map, changes which is
+solid, and the map stays where it is. A line is taken for tapped within a
+finger's half-width of it. Where the lines run together, as they do at both
+ends, the solid one is on top and a tap there changes nothing; and where a
+named place sits right on a faint line, the tap is the line's.
 **Go** starts with the one chosen, and how much is left while riding is
 measured along it. The buttons say how long and how far and nothing about
 which is nicer, because the router does not say.
@@ -261,14 +270,14 @@ a way that must set off the way the rider is going leaves the router few —
 and all of them are offered, every time the rider leaves the way, and
 without a word. The first is the way, solid, its turns shown and said; the
 others are faint beside it, and the buttons of the card before a ride,
-*9 min · 2.4 km*, sit under the turn. A press chooses one. So does riding
-it: two points in a row on one of the ways and off the other two, and that
-one is the way, its turns said from there on, and the buttons and faint
-lines go. Riding one of the others is not "off the way" while it lasts.
-Still on the first after 800 m, or off all three, the choice is over and
-the way is followed as any way is. Ways by train are not offered here: a
-station is not something to turn towards mid-ride unasked (`Store.pick`,
-`Views/RecordTab.swift`'s `WayChips`).
+*9 min · 2.4 km*, sit under the turn. A press chooses one, as does a tap on
+its faint line. So does riding it: two points in a row on one of the ways and
+off the other two, and that one is the way, its turns said from there on,
+and the buttons and faint lines go. Riding one of the others is not "off the
+way" while it lasts. Still on the first after 800 m, or off all three, the
+choice is over and the way is followed as any way is. Ways by train are not
+offered here: a station is not something to turn towards mid-ride unasked
+(`Store.pick`, `Views/RecordTab.swift`'s `WayChips`).
 
 **Add to a list.** Signed in, the card of somewhere to go has **Add to a
 list** beside Go: the rider's lists on the website, a press each, and a new
@@ -523,7 +532,7 @@ Rattatee/
             Disk.swift          the ride files, and where the other copies live
             Strings.swift       the words, the language chosen, and how a distance is said
   Views/    RecordTab.swift     Where to?, Ready, Recording, Paused
-            RideMap.swift       the map, its lines and its taps, and the bike paths
+            RideMap.swift       the map, its lines, its taps and holds, and the bike paths
             SearchSheet.swift   Where to?
             ListPicker.swift    Add to a list
             RadioRow.swift      the radio's row while riding, and the list of stations

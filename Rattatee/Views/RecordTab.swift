@@ -40,12 +40,16 @@ struct RecordTab: View {
                     here: store.recorder.here,
                     follow: !store.demo && !planning && (ride == nil || ride?.status == .recording),
                     // Somewhere to go is chosen before a ride or during one,
-                    // with no need to pause or finish. While riding, a tap
-                    // chooses only where there is nowhere to go yet: a hand
-                    // on the handlebar brushing the screen should not throw
-                    // away a way the rider is following. Where to? and its
-                    // cross change it on purpose.
-                    tap: canTap ? { name, point in store.tapped(name: name, at: point) } : nil)
+                    // with no need to pause or finish. While riding, a
+                    // touch chooses only where there is nowhere to go yet:
+                    // a hand resting on the screen should not throw away a
+                    // way the rider is following. Where to? and its cross
+                    // change it on purpose.
+                    touch: canTouch ? { name, point in store.touched(name: name, at: point) } : nil,
+                    // A tap on a faint line is a press on its button, and
+                    // works where the buttons are: on the card before a
+                    // ride, and under the numbers during one.
+                    choose: (ride == nil || riding != nil) ? { index in store.choose(way: index) } : nil)
                 .overlay(alignment: .top) {
                     if ride == nil || riding != nil { searchBar }
                 }
@@ -58,15 +62,15 @@ struct RecordTab: View {
         // say a moment after the place was chosen.
         .onChange(of: store.recorder.here == nil) { Task { await store.findWay() } }
         // And asked for before anything is chosen, where iOS already lets
-        // the app know: a tap then has somewhere to draw its way from, and
+        // the app know: a pin then has somewhere to draw its way from, and
         // does not wait on the phone's first fix as well as on the website.
         .onAppear { if store.recorder.allowed { store.recorder.locate() } }
     }
 
-    /// Whether a tap on the map is somewhere to go: before a ride, and
-    /// while riding or paused with nowhere to go yet — never on the save
-    /// card or after it.
-    private var canTap: Bool {
+    /// Whether a touch on the map is somewhere to go — a tap on a place it
+    /// names, a hold anywhere: before a ride, and while riding or paused
+    /// with nowhere to go yet — never on the save card or after it.
+    private var canTouch: Bool {
         guard let current = store.current else { return store.ride(store.shown) == nil }
         return [.recording, .paused].contains(current.status) && store.goal == nil
     }
@@ -213,7 +217,8 @@ struct GoalCard: View {
 
 /// The ways on offer, a small button each — how long and how far, as on the
 /// website's route bar, and nothing about which is nicer, since the router
-/// does not say. The one chosen is filled, and is the solid line on the map.
+/// does not say. The one chosen is filled, and is the solid line on the map;
+/// a tap on one of the faint lines there is a press on its button here.
 /// On the card before a ride, where Go starts with the one chosen; and under
 /// the numbers just after a new way mid-ride, where riding one chooses it
 /// just as well as a press does.
