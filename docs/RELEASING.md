@@ -4,7 +4,7 @@ Two workflows, two jobs:
 
 | Workflow | Runs | Makes |
 | --- | --- | --- |
-| `build` (`.github/workflows/ios.yml`) | every push to `main` or `claude/**`, every pull request | a simulator build and the screenshots — proof it compiles, nothing installable |
+| `build` (`.github/workflows/ios.yml`) | only when asked | a simulator build and the screenshots — proof it compiles, nothing installable |
 | `package` (`.github/workflows/release.yml`) | only when asked | a signed `.ipa`, sent to TestFlight unless told not to |
 
 A push never makes a package. There are two ways to ask for one.
@@ -25,6 +25,35 @@ git tag v1.2
 ```bash
 git push origin v1.2
 ```
+
+**A release is a merge of `develop` into `main`, tagged.** Work happens on
+`develop`; `main` only ever moves when a version is ready and its number has
+been chosen. For version 0.6.9, say:
+
+```bash
+git checkout develop
+```
+
+Set `MARKETING_VERSION = 0.6.9;` in `Rattatee.xcodeproj/project.pbxproj`
+(both Debug and Release), commit it on `develop`, then:
+
+```bash
+git checkout main
+```
+
+```bash
+git merge --no-ff develop -m "Release 0.6.9"
+```
+
+```bash
+git tag v0.6.9
+```
+
+```bash
+git push origin main develop v0.6.9
+```
+
+The tag is what packages it and sends it to TestFlight.
 
 The build number is `BUILD_NUMBER_BASE` (100, at the top of the workflow)
 plus the run number, so it only goes up. Without a tag, the version is the
