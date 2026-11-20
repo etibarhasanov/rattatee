@@ -85,10 +85,15 @@ enum API {
     /// A JSON POST, the way the website's own pages send one. Answers the
     /// bytes that came back, or throws a `Refusal` carrying the route's own
     /// word for what went wrong.
+    ///
+    /// `signed: false` sends it with no cookie, so the website sees nobody
+    /// signed in whoever is, and keeps none the answer sets. One caller: a
+    /// ride saved with nobody signed in — `Store.send`.
     @discardableResult
-    static func post(_ path: String, _ body: [String: Any]) async throws -> Data {
+    static func post(_ path: String, _ body: [String: Any], signed: Bool = true) async throws -> Data {
         var request = URLRequest(url: url(path))
         request.httpMethod = "POST"
+        request.httpShouldHandleCookies = signed
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)

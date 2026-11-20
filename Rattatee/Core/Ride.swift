@@ -68,7 +68,10 @@ struct Ride: Codable, Identifiable, Equatable {
         /// Save was pressed and the server has not confirmed it yet. Sent
         /// again and again until it does — see `RideBook.send`.
         case waiting
-        /// The server stored it; `serverId` is its id there.
+        /// The server answered. Signed in, it stored the ride and
+        /// `serverId` is its id there. With nobody signed in it counted
+        /// the streets the ride went down and kept nothing — `phoneOnly`
+        /// — so there is no id, and the ride is this file and no more.
         case saved
         /// The server refused it for a reason sending again cannot change
         /// (`short`, `fast`, `malformed`). Kept on the phone so it is not
@@ -139,7 +142,15 @@ struct Ride: Codable, Identifiable, Equatable {
         (aside ?? []).reduce(0) { $0 + Geo.length($1) }
     }
 
-    /// What the server answered.
+    /// Save was pressed with nobody signed in, so what the save card
+    /// said holds whatever happens next: the ride stays on this phone and
+    /// the website counts it without keeping it. It is sent with no
+    /// session even if somebody signs in before it has gone. Nil for a
+    /// ride saved before this was written, which is sent as it always was.
+    var phoneOnly: Bool?
+
+    /// What the server answered, for a ride it kept: nothing, for one it
+    /// only counted.
     var serverId: String?
     var serverMeters: Int?
     /// The server's word for the last refusal: "often", "short", "fast",
