@@ -333,11 +333,25 @@ enum Geo {
 
     static func round5(_ x: Double) -> Double { (x * 100_000).rounded() / 100_000 }
 
-    /// The box the server accepts points in — `nearTallinn()` in the
-    /// website's `functions/api/_lib.js`. A ride with one point outside it is
-    /// refused whole, so points outside are left out before sending.
-    static func inTallinn(_ p: Point) -> Bool {
-        abs(p.lat - 59.437) <= 0.55 && abs(p.lng - 24.7536) <= 1.1
+    /// The boxes the server counts a ride in — `CITIES` in the website's
+    /// `functions/api/_lib.js`, restated here: Tallinn, Tartu, Pärnu and
+    /// Narva, fourteen kilometres each way from the middle, Narva's cut in
+    /// the east at the river. Until 2026-11-20 it was one box, some sixty
+    /// kilometres round Tallinn. Change one there, change it here.
+    ///
+    /// Only a ride is held to them. A way and an address are asked for
+    /// anywhere in Estonia, and the server is what says no to those.
+    static let cities: [(south: Double, north: Double, west: Double, east: Double)] = [
+        (59.311, 59.563, 24.5066, 25.0006),
+        (58.252, 58.504, 26.489, 26.969),
+        (58.26, 58.512, 24.257, 24.737),
+        (59.251, 59.503, 27.943, 28.21)
+    ]
+
+    /// A ride with one point outside the boxes is refused whole, so points
+    /// outside are left out before sending.
+    static func inCity(_ p: Point) -> Bool {
+        cities.contains { p.lat >= $0.south && p.lat <= $0.north && p.lng >= $0.west && p.lng <= $0.east }
     }
 
     /// The most points one ride may carry — `MAX_POINTS` on the server.
@@ -345,7 +359,7 @@ enum Geo {
 
     /// The line as the server takes it: `[lat, lng, t, acc]` — five decimals,
     /// whole seconds since the first point, whole metres — and `alt` after
-    /// them in whole metres where the fix had a height, inside the box, and
+    /// them in whole metres where the fix had a height, inside the boxes, and
     /// no more than `maxPoints` of it. The server keeps the last two only if
     /// every point has them and they are sane (a `t` from 0 to a day, an
     /// accuracy up to a kilometre), which these always are short of a ride
@@ -354,7 +368,7 @@ enum Geo {
     /// about forty kilometres, so this only happens on very long days, and a
     /// point every 24 m instead of every 12 still follows the streets.
     static func line(_ points: [Point]) -> [[Double]] {
-        let inside = points.filter(inTallinn)
+        let inside = points.filter(inCity)
         var kept = inside
         if inside.count > maxPoints {
             let step = Double(inside.count - 1) / Double(maxPoints - 1)
