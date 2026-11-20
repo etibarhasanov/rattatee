@@ -7,9 +7,11 @@
 	     lists. Nothing tracks: no ads, no analytics, no third party.
 
 	     Precise location: the points of a saved ride, sent to
-	     tallinntastebuds.ee. Stored there under the account (so "linked"),
-	     never shown with a name, and the first and last 200 m are cut off
-	     before it is stored.
+	     tallinntastebuds.ee. Signed in, it is stored there under the account
+	     (so "linked"), never shown with a name, and the first and last 200 m
+	     are cut off before it is stored. With nobody signed in it is not
+	     stored at all: the website counts the streets it went down and lets
+	     it go, which is why the save card says the ride stays on the phone.
 	     User ID: the account's username, which the site's session carries.
 	     UserDefaults: whether the first screen has been seen (CA92.1, the
 	     app's own settings). -->

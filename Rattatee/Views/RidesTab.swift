@@ -86,7 +86,7 @@ struct RidesTab: View {
                     Text(month.title)
                 } footer: {
                     if month.title == months.last?.title {
-                        Text(L.t("ridesFoot")).padding(.top, 6)
+                        Text(store.user == nil ? L.t("ridesFootPhone") : L.t("ridesFoot")).padding(.top, 6)
                     }
                 }
                 .listRowBackground(Theme.card)
