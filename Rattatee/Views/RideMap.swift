@@ -148,13 +148,17 @@ struct RideMap: View {
                 // onto one (`Store.pick`).
                 if points.isEmpty || goal.picking != nil {
                     for (k, other) in goal.ways.enumerated() where k != goal.chosen {
-                        all.append(MapLine(coordinates: other.line, kind: .other, way: k))
+                        all.append(MapLine(coordinates: other.line, kind: .other, way: k, train: other.train != nil))
                     }
                 }
                 if let train = way.train {
                     // A way by train: the rides solid, as any way, and the
-                    // rail dashed, so it is not read as a road.
-                    for leg in train.legs { all.append(MapLine(coordinates: leg.line, kind: leg.bike ? .way : .rail)) }
+                    // rail dashed, so it is not read as a road — and the
+                    // whole of it orange, which says train before a word of
+                    // the card is read.
+                    for leg in train.legs {
+                        all.append(MapLine(coordinates: leg.line, kind: leg.bike ? .way : .rail, train: true))
+                    }
                 } else {
                     all.append(MapLine(coordinates: way.line, kind: .way))
                 }
@@ -188,6 +192,10 @@ struct MapLine {
     /// For a way on offer and not chosen, which of the goal's ways it is:
     /// what a tap on it chooses.
     var way: Int?
+    /// Part of a way by train, on offer or chosen, rides and rail alike:
+    /// drawn in the trains' orange (`Theme.train`) and not in the colour
+    /// chosen under Account.
+    var train = false
 
     /// The same number for the same line drawn the same way, so a line
     /// that has not changed is left on the map and not drawn again.
@@ -196,6 +204,7 @@ struct MapLine {
         hasher.combine(look)
         hasher.combine(kind)
         hasher.combine(way)
+        hasher.combine(train)
         hasher.combine(coordinates.count)
         for point in coordinates {
             hasher.combine(point.latitude)
@@ -286,11 +295,12 @@ final class BikePaths: MKTileOverlay {
     }
 }
 
-/// A line on the `MKMapView`, which remembers what kind it is and, for a
-/// way on offer, which one.
+/// A line on the `MKMapView`, which remembers what kind it is, for a way
+/// on offer which one, and whether it is part of a way by train.
 private final class Stroke: MKPolyline {
     var kind = MapLine.Kind.way
     var way: Int?
+    var train = false
 }
 
 /// An `MKMapView` that says when it first has a size, which is the first
@@ -454,6 +464,7 @@ private struct MapCanvas: UIViewRepresentable {
                     let stroke = Stroke(coordinates: line.coordinates, count: line.coordinates.count)
                     stroke.kind = line.kind
                     stroke.way = line.way
+                    stroke.train = line.train
                     map.addOverlay(stroke, level: .aboveRoads)
                     drawn.append((mark, stroke))
                 }
@@ -508,20 +519,26 @@ private struct MapCanvas: UIViewRepresentable {
             let line = MKPolylineRenderer(polyline: stroke)
             line.lineCap = .round
             line.lineJoin = .round
-            let accent = colour(Theme.accent, in: mapView)
+            // A way by train is orange whatever the colour chosen, on offer
+            // and chosen, its rides and its rail. Only the three kinds a
+            // way is drawn as are ever a train's.
+            let tint = colour(stroke.train ? Theme.train : Theme.accent, in: mapView)
             switch stroke.kind {
             case .other:
-                line.strokeColor = accent.withAlphaComponent(0.3)
+                // Orange at three in ten is a peach that Apple's map, which
+                // is a warm white itself, all but swallows; the accents are
+                // all darker than their ground and hold at that.
+                line.strokeColor = tint.withAlphaComponent(stroke.train ? 0.45 : 0.3)
                 line.lineWidth = 4
             case .way:
-                line.strokeColor = accent.withAlphaComponent(0.75)
+                line.strokeColor = tint.withAlphaComponent(0.75)
                 line.lineWidth = 5
             case .rail:
-                line.strokeColor = accent.withAlphaComponent(0.75)
+                line.strokeColor = tint.withAlphaComponent(0.75)
                 line.lineWidth = 5
                 line.lineDashPattern = [8, 8]
             case .crow:
-                line.strokeColor = accent.withAlphaComponent(0.6)
+                line.strokeColor = tint.withAlphaComponent(0.6)
                 line.lineWidth = 4
                 line.lineDashPattern = [1, 9]
             case .aside:

@@ -211,7 +211,10 @@ the website finds one that is — `trains` in `GET /api/v1/route`, counted
 from setting off and leaving within the hour — it is one more button after
 the bike ways, *15 min · train 09:31*, and the card says *Leave at 09:25:
 ride to Ülemiste, the RE34 at 09:31 to Kitseküla, ride on*. The rides are
-the solid line and the rail dashed. While riding, the station is a corner
+the solid line and the rail dashed, and the whole of it is orange, as
+Elron's trains are, whatever the colour chosen under Account: faint orange
+among the faint lines while it is on offer, and its button filled orange
+when it is the one chosen (`Theme.train` in `Views/Theme.swift`). While riding, the station is a corner
 like any other, with a train in the row in place of an arrow — *Train RE34
 at 09:31 to Kitseküla* — read once by the phone's own voice on the platform,
 since no recording says which train. On the train nothing is recorded: a
@@ -314,7 +317,11 @@ in Settings.
 Every colour has a day and a night. Red and Blue by day, and Green and Plum
 by night, are the website's own styles to the value; the other four were
 drawn to sit beside them (`Palette` in `Views/Theme.swift`). The choice is
-kept on the phone, as the website keeps its style in the browser.
+kept on the phone, as the website keeps its style in the browser. Three
+things read the same whatever the colour: saved, waiting and not kept, and a
+way by train, which is orange. In Green and Plum the line ridden is a burnt
+orange too, so on the rides of a way by train what is ridden and what is
+left are two oranges, a darker over a lighter.
 
 ### Bike paths on the map
 
