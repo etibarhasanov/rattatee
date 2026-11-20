@@ -461,11 +461,13 @@ rewritten every five points, about sixty metres, and at every pause.
   cap) waits for the next UTC midnight. Anything else is tried again.
 
 - **The answer is lost on the way back**: from the phone that is the same as
-  a save that never arrived, and the ride is sent again. Every save carries
-  `request`, the id the ride has had on the phone since Start, and the
-  website does a ride it has seen in the last week once, however often it
-  comes. Until 2026-11-20 it had no such field, and the second try was a
-  second ride.
+  a save that never arrived, and the ride is sent again — and the website
+  does it again, counted a second time signed out and kept as a second ride
+  signed in. That is the one known gap, and it is accepted: for an hour on
+  2026-11-20 every save carried `request`, the ride's own id, for the
+  website to know a repeat by, and the owner took it out the same day
+  rather than have the website remember an id for every ride it says it
+  keeps nothing of.
 
 A ride saved with nobody signed in is marked so on the phone
 (`Ride.phoneOnly`) and is sent with no session even if somebody signs in
@@ -481,7 +483,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 
 | | |
 |---|---|
-| `POST /api/rides` | `{ action: "save", anon: true, request, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }` signed in, where the ride is kept, and `{ counted: true }` with no `ride` signed out, where it is counted and not kept. `request` is the ride's own id on the phone, a UUID, the same on every try, so a ride sent twice is done once. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }` signed in, where the ride is kept, and `{ counted: true }` with no `ride` signed out, where it is counted and not kept. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
 | `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
 | `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |

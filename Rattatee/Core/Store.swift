@@ -35,12 +35,14 @@ import Observation
 /// again whenever there is a reason to think it might go now: the app coming
 /// to the front, the network coming back, Try now.
 ///
-/// A ride whose answer was lost on the way back looks, from here, exactly
-/// like one that never arrived, and is sent again. So every save carries
-/// `request`, the ride's own id, which it has had since Start: the website
-/// remembers it for a week and does a ride it has seen once, however often
-/// it comes. Until 2026-11-20 it had no such field, and the second try was
-/// a second ride.
+/// One known gap. A ride whose answer was lost on the way back looks, from
+/// here, exactly like one that never arrived, and is sent again — and the
+/// website does it again: counted a second time with nobody signed in,
+/// kept as a second ride with somebody. For an hour on 2026-11-20 every
+/// save carried `request`, the ride's own id, for the website to know a
+/// repeat by. The owner took it out the same day: a small chance and a
+/// small harm, and not worth the website remembering an id for every ride
+/// it says it keeps nothing of.
 @MainActor
 @Observable
 final class Store {
@@ -609,9 +611,6 @@ final class Store {
                     // and not kept; with one, the session wins and the
                     // ride is on the account.
                     "anon": true,
-                    // The same id on every try, so the website does the
-                    // ride once.
-                    "request": ride.id,
                     "name": ride.name,
                     // The active time: what the server shares out between
                     // the pieces and judges the speed over.
@@ -636,7 +635,7 @@ final class Store {
                 case "often":
                     outcome.notBefore = Self.nextUTCMidnight()
                 default:
-                    // 503 not-ready, no-salt, anything new: try again later.
+                    // 503 not-ready, anything new: try again later.
                     // That includes `signed-out` from a server that does not
                     // take `anon` yet. Later, not at once — see sendWaiting().
                     outcome.tries = (outcome.tries ?? 0) + 1
