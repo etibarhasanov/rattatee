@@ -8,6 +8,20 @@ field and error word it depends on. A route this app starts reading is added
 there the same week, and an error word it has no sentence for is decided
 there first.
 
+## Branches: develop is where the work goes, main is what was released
+
+- **`develop` is where all ordinary work lands.** Branch from it, open pull
+  requests into it, rebase onto it. A session's own branch is cut from
+  `develop`, never from `main`.
+- **`main` is the default branch and holds only releases.** Nothing is
+  committed to it directly and no feature branch is merged into it. When the
+  owner says a version is ready and names its number, `develop` is merged
+  into `main`, `MARKETING_VERSION` in `Rattatee.xcodeproj/project.pbxproj`
+  is that number, and the merge is tagged `v<number>` — which packages it and
+  sends it to TestFlight (`docs/RELEASING.md`). The version number is the
+  owner's to choose; a session does not pick one.
+- **0.6.9** was the first release made this way, on 2026-11-20.
+
 ## Every request has a price
 
 The site runs on Cloudflare's free plan. Its database bills every row a
