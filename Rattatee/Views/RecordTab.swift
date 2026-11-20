@@ -221,7 +221,7 @@ struct GoalCard: View {
 /// website's route bar, and nothing about which is nicer, since the router
 /// does not say. The one chosen is filled, and is the solid line on the map;
 /// a tap on one of the faint lines there is a press on its button here.
-/// A way by train is filled in the trains' orange, as its line is drawn.
+/// A way by train is filled in the trains' orange, as its rail is drawn.
 /// On the card before a ride, where Go starts with the one chosen; and under
 /// the numbers just after a new way mid-ride, where riding one chooses it
 /// just as well as a press does.
@@ -234,8 +234,9 @@ struct WayChips: View {
             HStack(spacing: 6) {
                 ForEach(Array(goal.ways.enumerated()), id: \.offset) { index, way in
                     let on = index == goal.chosen
-                    // The button chosen is the colour of its line on the
-                    // map, and a way by train's line is orange.
+                    // A way by train's button is the orange its rail is
+                    // on the map: the stretch that makes it another kind of
+                    // way, and its button, are the one colour.
                     let fill = way.train == nil ? Theme.accent : Theme.train
                     let onFill = way.train == nil ? Theme.onAccent : Theme.onTrain
                     Button {

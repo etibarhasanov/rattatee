@@ -213,7 +213,7 @@ struct Train: Equatable {
     let to: String
     let at: String
     let leave: String
-    /// The legs in order, to draw: a ride solid, the rail dashed.
+    /// The legs in order, to draw: a ride as any way, the rail orange.
     let legs: [(bike: Bool, line: [CLLocationCoordinate2D])]
     /// Where along the way's line the rail runs. A point kept there would
     /// be the train's, not the bike's, and `Store.add` keeps none.
