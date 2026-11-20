@@ -134,15 +134,19 @@ enum Theme {
     static let bad = pair(0xB3261E, 0xF08A7E)
     static let badWash = pair(0xF6DADA, 0x3E2222)
 
-    /// A way by train, whatever the colour chosen: orange, as Elron's trains
-    /// are, at the owner's word — the way's line on the map and its button
-    /// on the card. A little lighter by night, to hold on a dark map.
+    /// The train of a way by train, whatever the colour chosen: orange, as
+    /// Elron's trains are, at the owner's word — its rail on the map, and
+    /// the way's button on the card. A little lighter by night, for the
+    /// faint rail of a way on offer to hold on a dark map.
     ///
-    /// These two numbers are an orange picked to read as Elron's, not one
-    /// read out of Elron's own files: the session that wrote them on
-    /// 2026-11-20 could reach neither elron.ee nor its logo. Elron's exact
-    /// orange, once somebody has it, goes here and nowhere else.
-    static let train = pair(0xF26A1B, 0xFF8433)
+    /// The day's is the orange Google's map draws Elron's line in, read off
+    /// a screenshot the owner sent on 2026-11-20, so it is good to the few
+    /// parts in 255 a compressed picture is. It was not read out of Elron's
+    /// own files, which that session could not reach. Elron's exact orange,
+    /// once somebody has it, goes here and nowhere else.
+    static let train = pair(0xF06816, 0xFF8433)
+    /// The darker edge the rail is drawn inside, off the same screenshot.
+    static let trainEdge = pair(0x9C4818, 0x7A3610)
     /// What is written on that orange: near black by day and by night,
     /// since the orange is light in both and white on it is hard to read.
     static let onTrain = Color(UIColor(hex: 0x24130A))
