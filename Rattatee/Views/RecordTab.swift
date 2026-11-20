@@ -221,6 +221,7 @@ struct GoalCard: View {
 /// website's route bar, and nothing about which is nicer, since the router
 /// does not say. The one chosen is filled, and is the solid line on the map;
 /// a tap on one of the faint lines there is a press on its button here.
+/// A way by train is filled in the trains' orange, as its line is drawn.
 /// On the card before a ride, where Go starts with the one chosen; and under
 /// the numbers just after a new way mid-ride, where riding one chooses it
 /// just as well as a press does.
@@ -233,6 +234,10 @@ struct WayChips: View {
             HStack(spacing: 6) {
                 ForEach(Array(goal.ways.enumerated()), id: \.offset) { index, way in
                     let on = index == goal.chosen
+                    // The button chosen is the colour of its line on the
+                    // map, and a way by train's line is orange.
+                    let fill = way.train == nil ? Theme.accent : Theme.train
+                    let onFill = way.train == nil ? Theme.onAccent : Theme.onTrain
                     Button {
                         store.choose(way: index)
                     } label: {
@@ -241,8 +246,8 @@ struct WayChips: View {
                             .monospacedDigit()
                             .padding(.horizontal, 12)
                             .frame(minHeight: 36)
-                            .foregroundStyle(on ? Theme.onAccent : Theme.ink)
-                            .background(on ? Theme.accent : Theme.wash, in: Capsule())
+                            .foregroundStyle(on ? onFill : Theme.ink)
+                            .background(on ? fill : Theme.wash, in: Capsule())
                     }
                     .accessibilityAddTraits(on ? .isSelected : [])
                 }
