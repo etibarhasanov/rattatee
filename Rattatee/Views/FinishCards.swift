@@ -120,8 +120,11 @@ struct SaveCard: View {
             .background(Theme.paper, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.hairline))
 
-            // The two things somebody wants to know before pressing Save.
-            Note(text: L.t("rideSaveWhyApp")).padding(.top, 8).padding(.bottom, 12)
+            // What somebody wants to know before pressing Save, which is
+            // not the same thing signed in and signed out: kept on the
+            // website, or counted there and kept on this phone alone.
+            Note(text: store.user == nil ? L.t("rideSaveWhyPhone") : L.t("rideSaveWhyApp"))
+                .padding(.top, 8).padding(.bottom, 12)
 
             Button(L.t("rideSave")) {
                 typing = false
@@ -188,7 +191,8 @@ struct OutcomeCard: View {
                 Text(ride.name.isEmpty ? when(ride) : ride.name + " · " + when(ride))
                     .font(.subheadline).foregroundStyle(Theme.muted)
                 RideNumbers(ride: ride)
-                Note(text: L.t("rideSavedWhyApp")).padding(.bottom, 14)
+                Note(text: ride.phoneOnly == true ? L.t("rideSavedWhyPhone") : L.t("rideSavedWhyApp"))
+                    .padding(.bottom, 14)
                 done
             case .refused:
                 head(L.t("badgeNotKept", ["why": why(ride.problem)]))

@@ -1,9 +1,9 @@
 # Rattatee
 
 Record a bike ride in Tallinn with the phone in your pocket. The iPhone app
-that saves rides to [Tallinn Tastebuds](https://tallinntastebuds.ee), where
-they are collected to become a map of confirmed bike routes, per street and
-per direction.
+that sends rides to [Tallinn Tastebuds](https://tallinntastebuds.ee), where
+they are counted into what the site knows of how each street rides, per
+street and per direction — and kept there too, for whoever is signed in.
 
 *Rattatee* is Estonian for a bike path.
 
@@ -26,10 +26,16 @@ the same as Kohuke (`etibarhasanov/kohuke`) and the map app
 the website's recorder does, `POST /api/rides`. Its project structure,
 sign-in and networking are copied from Kohuke.
 
-**Nobody has to sign in.** What the rides are for is their points. People
-ride, press Save, and that is it: the ride is kept with no account on it.
-Signing in is there for whoever wants it, on the **Account** tab, and buys one
-thing — the ride is also listed on their account page on the website.
+**Nobody has to sign in, and then the ride is theirs alone.** People ride,
+press Save, and that is it: the ride stays on the phone, and the website
+counts the streets it went down and keeps nothing of it — since
+2026-11-20, when the owner drew that line; for three days before it such a
+ride was kept there with no account on it. The save card says so before
+Save is pressed, and that saving rides wants an account. Signing in is
+there for whoever wants that, on the **Account** tab: a ride saved signed in
+is kept on the website under the account, listed on the account page there
+and drawn on its page here. Nothing tells the two kinds apart on the phone
+beyond that, and nothing offers to move a ride to an account afterwards.
 
 ## What it does
 
@@ -77,7 +83,7 @@ Three tabs.
   and waiting rides count; a ride Not kept does not. It is added up on the
   phone from the rides already there, so it asks the website for nothing
   and works with no signal — the server could not say it better anyway,
-  since a ride saved with no account is nobody's there from the next day.
+  since a ride saved with no account is not there at all.
 
   **A ride, opened.** A row opens its ride on a page of its own
   (`Views/RideView.swift`): the map framed to it, the riding solid, a walk
@@ -97,9 +103,9 @@ Three tabs.
   asked for by its id, `GET /api/rides/<id>`, and the line the website keeps
   is drawn solid over the phone's, which goes faint: what is left of the
   phone's at each end is the 200 m that was never kept. A ride saved with no
-  account cannot be asked for — the website answers a ride only to the
-  account it is under — so its page says how much was kept, from the
-  answer to its save. Waiting and Not kept are in the pill under the title.
+  account was never kept, so there is nothing to ask for and its page says
+  nothing of the website: the line is the phone's own. Waiting and Not
+  kept are in the pill under the title.
   **Remove from this phone** is at the foot, as the swipe is, and never for
   a ride still waiting.
 - **Account.** **Create account** or **Sign in** with a username and a
@@ -454,10 +460,17 @@ rewritten every five points, about sixty metres, and at every pause.
   the ride is listed as *Not kept*, still on the phone. `often` (the day's
   cap) waits for the next UTC midnight. Anything else is tried again.
 
-One known gap, accepted for the first version: `/api/rides` has no request
-id, so if the server stores a ride and its answer is lost on the way back,
-the next try stores it a second time. The fix is an optional field on the
-route that the server uses to recognise a repeat.
+- **The answer is lost on the way back**: from the phone that is the same as
+  a save that never arrived, and the ride is sent again. Every save carries
+  `request`, the id the ride has had on the phone since Start, and the
+  website does a ride it has seen in the last week once, however often it
+  comes. Until 2026-11-20 it had no such field, and the second try was a
+  second ride.
+
+A ride saved with nobody signed in is marked so on the phone
+(`Ride.phoneOnly`) and is sent with no session even if somebody signs in
+before it has gone, so what its save card said — it stays on this phone —
+is what happens.
 
 ## What it asks the website for
 
@@ -468,7 +481,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 
 | | |
 |---|---|
-| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `POST /api/rides` | `{ action: "save", anon: true, request, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }` signed in, where the ride is kept, and `{ counted: true }` with no `ride` signed out, where it is counted and not kept. `request` is the ride's own id on the phone, a UUID, the same on every try, so a ride sent twice is done once. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
 | `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
 | `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
@@ -500,8 +513,6 @@ nothing asks for.
 
 ### What the website does not have yet
 
-- **A request id on a save**, so a retry after a lost answer is not a second
-  ride. See above.
 - **The server's list in My rides.** `GET /api/rides?mine=1` answers a
   signed-in account's rides; the app lists only what is on the phone, so
   rides do not follow an account to a new phone yet.
@@ -614,8 +625,11 @@ launched in each state and photographed. The pictures are the run's
   to a place the user chose, while a ride is being recorded; nothing plays
   otherwise.*
 - **App Privacy**, matching `PrivacyInfo.xcprivacy`:
-  - *Precise Location* — collected, for App Functionality, not used for
-    tracking. Linked to the user only when they are signed in.
+  - *Precise Location* — collected, for App Functionality, linked, not
+    used for tracking. That is the ride of somebody signed in, which the
+    website keeps under their account. A ride saved with nobody signed in
+    is sent, counted and let go, which is not collecting it; the answer
+    stays *collected* because the app does both.
   - *User ID* — collected only when signed in, for App Functionality,
     linked, not used for tracking.
   - Nothing else: no analytics, no advertising, no third-party code. What
@@ -623,7 +637,7 @@ launched in each state and photographed. The pictures are the run's
     for, go to the website to be answered and are not kept with anything
     that says who asked.
 - **Privacy policy URL**: `https://tallinntastebuds.ee/privacy`, which says
-  what is kept of a ride.
+  what is kept of a ride, and that one saved with no account is not kept.
 - **Account deletion** is in the app, under Account, as review requires of
   an app that can make an account.
 - **Sign-in is optional**, so review needs no demo account.
@@ -640,7 +654,9 @@ Connect refuses an icon that has one, even a fully opaque one.
 ## Done when
 
 - A ride recorded on a real iPhone with the screen locked for the whole
-  ride saves and comes back from `GET /api/rides?bbox=`.
+  ride saves — and, saved signed in, comes back from `GET
+  /api/rides?bbox=`; saved signed out it is answered `counted` and comes
+  back from nowhere.
 - Killing the app mid-ride, or losing signal at Save, does not lose the
   ride.
 - The project archives for TestFlight with the permission texts and the

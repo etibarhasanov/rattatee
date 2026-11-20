@@ -821,6 +821,12 @@
     "et": "Sellest saab kinnitatud rattatee. Sinu nime selle juures kunagi ei näidata ning esimesed ja viimased 200 m jäetakse ära.",
     "ru": "Она станет подтверждённым велосипедным маршрутом. Ваше имя рядом с ней никогда не показывается, а первые и последние 200 м отрезаются."
   },
+  "rideSaveWhyPhone": {
+    "az": "O, bu telefonda qalır. Sayt yalnız keçdiyin küçələri sayır, ilk və son 200 m olmadan, gedişin özünü isə saxlamır. Gedişlərini hesabda saxlamaq üçün hesab yarat.",
+    "en": "It stays on this phone. The website only counts the streets you rode, without the first and last 200 m, and keeps no ride. To save your rides to an account, create one.",
+    "et": "See jääb sellesse telefoni. Sait loeb ainult kokku tänavad, mida mööda sõitsid, ilma esimese ja viimase 200 meetrita, ega hoia sõitu alles. Kui tahad sõite oma kontole salvestada, loo konto.",
+    "ru": "Она останется на этом телефоне. Сайт только учитывает улицы, по которым вы проехали, без первых и последних 200 м, и саму поездку не хранит. Чтобы сохранять поездки в аккаунте, создайте его."
+  },
   "rideSaved": {
     "az": "Saxlanıldı",
     "en": "Saved",
@@ -832,6 +838,12 @@
     "en": "It is a confirmed bike route now. Thank you.",
     "et": "See on nüüd kinnitatud rattatee. Aitäh!",
     "ru": "Теперь это подтверждённый велосипедный маршрут. Спасибо!"
+  },
+  "rideSavedWhyPhone": {
+    "az": "O, bu telefondadır və keçdiyin küçələr sayılıb. Təşəkkür edirik.",
+    "en": "It is on this phone, and the streets you rode are counted. Thank you.",
+    "et": "See on selles telefonis ja tänavad, mida mööda sõitsid, on kokku loetud. Aitäh!",
+    "ru": "Она на этом телефоне, а улицы, по которым вы проехали, учтены. Спасибо!"
   },
   "rideSaving": {
     "az": "Saxlanılır…",
@@ -900,10 +912,16 @@
     "ru": "Здесь появятся поездки, записанные на этом телефоне."
   },
   "ridesFoot": {
-    "az": "Gedişlər yalnız bu telefondan göstərilir. Saxlanmış gedişlər serverdə sənin adın olmadan durur.",
-    "en": "Rides are listed from this phone only. Saved rides are on the server without your name.",
-    "et": "Siin on ainult selle telefoni sõidud. Salvestatud sõidud on serveris ilma sinu nimeta.",
-    "ru": "Здесь только поездки с этого телефона. Сохранённые поездки хранятся на сервере без вашего имени."
+    "az": "Gedişlər yalnız bu telefondan göstərilir. Hesaba daxil olarkən saxlanmış gedişlər serverdə də sənin adın olmadan durur.",
+    "en": "Rides are listed from this phone only. Rides saved while signed in are on the server too, without your name.",
+    "et": "Siin on ainult selle telefoni sõidud. Sisselogituna salvestatud sõidud on ka serveris, ilma sinu nimeta.",
+    "ru": "Здесь только поездки с этого телефона. Поездки, сохранённые после входа в аккаунт, хранятся и на сервере, без вашего имени."
+  },
+  "ridesFootPhone": {
+    "az": "Gedişlər yalnız bu telefondadır. Onları hesabda saxlamaq üçün hesab yarat.",
+    "en": "Rides are kept on this phone only. To save them to an account, create one.",
+    "et": "Sõidud on ainult selles telefonis. Kui tahad neid kontole salvestada, loo konto.",
+    "ru": "Поездки хранятся только на этом телефоне. Чтобы сохранять их в аккаунте, создайте его."
   },
   "ridesWaitingMany": {
     "az": "{n} gediş göndərilməyi gözləyir. Bağlantı olanda özləri gedəcək.",
