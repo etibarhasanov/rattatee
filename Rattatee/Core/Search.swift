@@ -287,7 +287,7 @@ struct Lost: Equatable {
 ///
 /// Nothing here is Rattatee's. The places are `GET /api/places?q=`, the one
 /// search of the city the website's find bar and the map app use; the streets
-/// are `GET /api/geocode?q=`; the way and its turns are `GET /api/v1/route` with `mode=bike`,
+/// are `GET /api/geocode?q=` with `near`; the way and its turns are `GET /api/v1/route` with `mode=bike`,
 /// or `GET /api/route` where that does not answer;
 /// and what none of them knows is `POST /api/lookup`, the website's **Look
 /// for it on Google Maps**, offered from five letters as it is there. A place
@@ -331,9 +331,18 @@ enum Search {
         return list.compactMap { spot($0) }
     }
 
-    /// Streets, addresses and districts for these letters.
-    static func streets(_ q: String) async throws -> [Spot] {
-        guard let object = try await rows("api/geocode", ["q": q]) as? [String: Any],
+    /// Streets, addresses and districts for these letters — anywhere in
+    /// Estonia, nearest first, where the phone knows where the rider is, and
+    /// Tallinn's where it does not. `near` goes to one decimal, about ten
+    /// kilometres, which is all the website uses of it: finer would tell it
+    /// where somebody is standing for nothing, and would make every rider's
+    /// request a different address, so none was answered from its cache.
+    static func streets(_ q: String, near: CLLocationCoordinate2D?) async throws -> [Spot] {
+        var query = ["q": q]
+        if let near {
+            query["near"] = "\((near.latitude * 10).rounded() / 10),\((near.longitude * 10).rounded() / 10)"
+        }
+        guard let object = try await rows("api/geocode", query) as? [String: Any],
               let list = object["results"] as? [[String: Any]] else { throw Failed() }
         return list.enumerated().compactMap { i, row in
             guard let lat = row["lat"] as? Double, let lng = row["lng"] as? Double,

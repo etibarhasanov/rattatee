@@ -499,8 +499,8 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `POST /api/apple` | Apple's token and its nonce, answered as a sign-in |
 
 A line longer than 3,500 points, about forty kilometres, is thinned evenly
-before it is sent, and points outside the box the server accepts are left
-out (`Geo.line` in `Core/Ride.swift`).
+before it is sent, and points outside the four boxes the server counts rides in — Tallinn, Tartu,
+Pärnu and Narva, fourteen kilometres round each — are left out (`Geo.line` in `Core/Ride.swift`).
 
 **Sign in with Apple needs the website to know this app.** Apple signs its
 token for a bundle id, and `functions/api/_apple.js` there lists the ids it

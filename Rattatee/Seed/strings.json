@@ -768,10 +768,10 @@
     "ru": "Сегодня уже двадцать поездок — больше один аккаунт за день сохранить не может. Поездка останется на телефоне до завтра."
   },
   "rideOutside": {
-    "az": "Gedişlər Tallində və ətrafında toplanır, bu isə başqa yerdə idi.",
-    "en": "Rides are collected in and around Tallinn, and this one was somewhere else.",
-    "et": "Sõite kogutakse Tallinnas ja selle ümbruses, aga see sõit oli mujal.",
-    "ru": "Поездки собираются в Таллине и окрестностях, а эта была в другом месте."
+    "az": "Gedişlər Tallin, Tartu, Pärnu və Narvada və onların ətrafında toplanır, bu isə başqa yerdə idi.",
+    "en": "Rides are collected in and around Tallinn, Tartu, Pärnu and Narva, and this one was somewhere else.",
+    "et": "Sõite kogutakse Tallinnas, Tartus, Pärnus ja Narvas ning nende ümbruses, aga see sõit oli mujal.",
+    "ru": "Поездки собираются в Таллине, Тарту, Пярну и Нарве и их окрестностях, а эта была в другом месте."
   },
   "rideParts": {
     "az": "Hissə-hissə",
@@ -1290,10 +1290,10 @@
     "ru": "не читается"
   },
   "whyOutside": {
-    "az": "Tallindən kənarda",
-    "en": "outside Tallinn",
-    "et": "väljaspool Tallinna",
-    "ru": "не в Таллине"
+    "az": "şəhərlərdən kənarda",
+    "en": "outside the cities",
+    "et": "linnadest väljas",
+    "ru": "за пределами городов"
   },
   "whyShort": {
     "az": "çox qısa",
