@@ -5,13 +5,23 @@ import Observation
 
 /// Every ride on this phone, and who is signed in, if anybody is.
 ///
-/// NOBODY HAS TO SIGN IN
+/// NOBODY HAS TO SIGN IN, AND THEN THE RIDE IS THEIRS ALONE
 ///
-/// What the rides are collected for is their points, so the app asks for no
-/// account: people ride, press Save, and that is it. A ride is sent with
-/// `anon: true`, which is what lets `/api/rides` take it with no session.
-/// Somebody who does sign in (Account, on My rides) gets one thing for it:
-/// their rides are also listed on their account page on the website.
+/// The app asks for no account: people ride, press Save, and that is it. A
+/// ride is sent with `anon: true`, which is what lets `/api/rides` take it
+/// with no session, and since 2026-11-20 the website does not keep such a
+/// ride: it counts the streets the ride went down, into what it knows of
+/// how each street rides, and lets the ride go. The ride is the file on
+/// this phone and nothing else, and the save card says so before Save is
+/// pressed. So a ride saved with nobody signed in is marked `phoneOnly` and
+/// sent with no session even if somebody signs in before it has gone:
+/// what the card said is what happens. Nothing afterwards offers to move
+/// such a ride to an account, and nothing on the phone tells it from a
+/// kept one. The owner's line was that neither is needed.
+///
+/// Somebody who does sign in (Account, on My rides) has their rides kept on
+/// the website under the account, listed on their account page there and
+/// drawn on the ride's page here.
 ///
 /// THE RIDE IS KEPT ON THE PHONE UNTIL THE SERVER SAYS IT HAS IT
 ///
@@ -25,11 +35,12 @@ import Observation
 /// again whenever there is a reason to think it might go now: the app coming
 /// to the front, the network coming back, Try now.
 ///
-/// One known gap: `/api/rides` has no request id. If the server stores a ride
-/// and its answer is then lost, the phone cannot tell that from never having
-/// reached it, and the next try stores it a second time. The owner chose to
-/// accept that for v1; the fix is an optional field on the route, which
-/// README.md describes.
+/// A ride whose answer was lost on the way back looks, from here, exactly
+/// like one that never arrived, and is sent again. So every save carries
+/// `request`, the ride's own id, which it has had since Start: the website
+/// remembers it for a week and does a ride it has seen once, however often
+/// it comes. Until 2026-11-20 it had no such field, and the second try was
+/// a second ride.
 @MainActor
 @Observable
 final class Store {
@@ -460,6 +471,7 @@ final class Store {
     func save(name: String) async {
         guard let i = currentIndex, rides[i].status == .finished else { return }
         rides[i].name = String(name.trimmingCharacters(in: .whitespacesAndNewlines).prefix(Self.longestName))
+        rides[i].phoneOnly = user == nil
         rides[i].status = .waiting
         goal = nil
         guide.forget()
@@ -593,16 +605,22 @@ final class Store {
             do {
                 let data = try await API.post("api/rides", [
                     "action": "save",
-                    // Lets a save with no session through; with one, the
-                    // session wins and the ride is on the account.
+                    // Lets a save with no session through, to be counted
+                    // and not kept; with one, the session wins and the
+                    // ride is on the account.
                     "anon": true,
+                    // The same id on every try, so the website does the
+                    // ride once.
+                    "request": ride.id,
                     "name": ride.name,
                     // The active time: what the server shares out between
                     // the pieces and judges the speed over.
                     "seconds": max(1, ride.ridden()),
                     "line": line
-                ])
+                ], signed: ride.phoneOnly != true)
                 let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+                // `ride` where the website kept it; `counted` and no
+                // `ride` where it did not, which leaves the two below nil.
                 let saved = object?["ride"] as? [String: Any]
                 outcome.status = .saved
                 outcome.serverId = saved?["id"] as? String
