@@ -651,6 +651,12 @@ launched in each state and photographed. The pictures are the run's
     is typed into the search, and where the phone is when a way is asked
     for, go to the website to be answered and are not kept with anything
     that says who asked.
+- **Required-reason APIs**, also in `PrivacyInfo.xcprivacy`: UserDefaults
+  for the app's own settings (`CA92.1`), and a file's modification date
+  (`C617.1`), which `Core/Venues.swift` reads to tell when its copy of the
+  places is a week old. Code that starts reading a file's date, the disk's
+  free space, the time since boot or the keyboards needs its line there
+  too, or App Store Connect refuses the build.
 - **Privacy policy URL**: `https://tallinntastebuds.ee/privacy`, which says
   what is kept of a ride, and that one saved with no account is not kept.
 - **Account deletion** is in the app, under Account, as review requires of
