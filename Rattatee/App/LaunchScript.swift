@@ -27,6 +27,10 @@ enum LaunchScript {
     /// `-kOpen YES` on the My rides tab opens its newest ride.
     static var open: Bool { UserDefaults.standard.bool(forKey: "kOpen") }
 
+    /// `-kMap YES`, with `-kOpen YES`, opens that ride's map over the whole
+    /// screen.
+    static var map: Bool { UserDefaults.standard.bool(forKey: "kMap") }
+
     /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides,
     /// and goal and going, which have somewhere to ride to.
     @MainActor

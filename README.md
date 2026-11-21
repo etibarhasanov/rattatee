@@ -91,7 +91,12 @@ Three tabs.
   the rider stopped, a ring where it began and a dot where it ended; the
   save card's numbers; the ride **part by part** (below); the fastest kilometre and how long was
   spent standing; the speed along the way as a line; and each kilometre's
-  time, with a bar for its speed and the fastest one in full colour. All of
+  time, with a bar for its speed and the fastest one in full colour. The
+  map on the page stays still, so a thumb on it scrolls the page; a tap
+  opens it over the whole screen, where it moves and zooms like any map,
+  anywhere along the ride, and **Whole ride** frames it again. Until
+  2026-11-21 the page's map could only zoom, and a map that cannot move
+  zooms only on its middle. All of
   it is the phone's own ride, so it opens with no signal and for a ride saved
   with no account. The sums are the website's — `rideInsight()` in its
   `functions/api/_rides.js`, ported step for step to `Core/Insight.swift` —
