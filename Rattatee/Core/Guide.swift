@@ -10,13 +10,25 @@ import Observation
 /// two hundred metres before a corner — "In 200 metres", then the turn — and
 /// once at it.
 ///
+/// A SHARP CORNER IS SAID FIFTY METRES BEFORE IT
+///
+/// At the corner is too late for a left or a right sharper than a street
+/// corner, which a bike has to slow right down for, and two hundred metres
+/// is too far to keep it in mind. The owner's word, on 2026-11-21: such a
+/// turn is said fifty metres before it, "In 50 metres, turn left", and that
+/// stands for the call at the corner, which would come a second or two
+/// later and cut it off. Sharp is `sharp` degrees or more on the way's own
+/// line (`Way.sharpness`). Where "In 50 metres" has no recording in the
+/// language and the phone has no voice for it either, the corner is said at
+/// the corner as before, rather than not at all.
+///
 /// WHOSE VOICE
 ///
 /// The owner's, recorded: one short file a phrase, in each of the app's four
 /// languages, under `Rattatee/Voice/` as `<lang>-<clip>.m4a` — `et-left.m4a`,
 /// `ru-keep-right.m4a`. `docs/voice.md` is the list of them and what each
 /// says. That is why the phrases are few and carry no street name and no
-/// distance but the one: a recording can only say what was recorded. The
+/// distance but the two: a recording can only say what was recorded. The
 /// street is in the row.
 ///
 /// Where a recording is missing — Russian is the one language not recorded
@@ -65,10 +77,19 @@ final class Guide {
     static let soon: ClosedRange<Double> = 120...220
     /// And how near is "now".
     static let now: Double = 40
+    /// Where a sharp corner is said instead, "In 50 metres". Thirty metres
+    /// deep, so the points kept a dozen metres apart land in it at least
+    /// twice; nearer than `now` is the corner's own call, which comes first.
+    static let near: ClosedRange<Double> = 40...70
+    /// How many degrees a left or a right turns, or more, to be sharp:
+    /// clearly more than a street corner's ninety, so a square corner is
+    /// said as it always was. One number, to change if it is said too often
+    /// or not often enough.
+    static let sharp: Double = 100
 
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
-        case soon, left, right, straight, around, arrive, tunnel, off
+        case soon, near, left, right, straight, around, arrive, tunnel, off
         case morning, afternoon, evening, late
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
@@ -137,6 +158,12 @@ final class Guide {
                 return say([turn, .tunnel], next.step.words + ", " + after.words)
             }
             say([turn], next.step.words)
+        } else if Self.near.contains(next.metres), turnsSharp(next.step, on: way), heard([.near, turn]) {
+            // Said here, and not again at the corner: A SHARP CORNER IS SAID
+            // FIFTY METRES BEFORE IT.
+            guard said.insert(corner + "-near").inserted else { return }
+            said.insert(corner + "-now")
+            say([.near, turn], L.t("turnNear") + ", " + next.step.words)
         } else if next.step.turn != .arrive, Self.soon.contains(next.metres) {
             if said.insert(corner + "-soon").inserted {
                 say([.soon, turn], L.t("turnSoon") + ", " + next.step.words)
@@ -190,10 +217,33 @@ final class Guide {
         }
     }
 
+    /// Whether a corner is a sharp left or right, on the way's own line.
+    private func turnsSharp(_ step: Step, on way: Way) -> Bool {
+        (step.turn == .left || step.turn == .right) && way.sharpness(at: step.along) >= Self.sharp
+    }
+
+    /// Whether a sentence would be heard at all: every recording of it is in
+    /// the bundle, or the phone has a voice of its own for the language.
+    private func heard(_ clips: [Clip]) -> Bool {
+        clips.allSatisfy { file($0) != nil } || reader != nil
+    }
+
+    /// The recording of a phrase in the app's language, if it was made.
+    private func file(_ clip: Clip) -> URL? {
+        Bundle.main.url(forResource: "\(L.lang)-\(clip.rawValue)", withExtension: "m4a")
+    }
+
+    /// The phone's own voice for the app's language: English and Russian.
+    /// iOS has none for Estonian or Azerbaijani.
+    private var reader: AVSpeechSynthesisVoice? {
+        guard let code = ["en": "en-GB", "ru": "ru-RU"][L.lang] else { return nil }
+        return AVSpeechSynthesisVoice(language: code)
+    }
+
     /// The recordings one after another, or, where one of them is not in the
     /// bundle, the words in the phone's voice.
     private func say(_ clips: [Clip], _ words: String) {
-        let files = clips.compactMap { Bundle.main.url(forResource: "\(L.lang)-\($0.rawValue)", withExtension: "m4a") }
+        let files = clips.compactMap { file($0) }
         guard files.count == clips.count else { return speak(words) }
         hush()
         if let radio, radio.on {
@@ -218,8 +268,7 @@ final class Guide {
     }
 
     private func speak(_ words: String) {
-        let code = ["en": "en-GB", "ru": "ru-RU"][L.lang] ?? ""
-        guard let reader = AVSpeechSynthesisVoice(language: code) else { return }
+        guard let reader else { return }
         let line = AVSpeechUtterance(string: words)
         line.voice = reader
         talker.stopSpeaking(at: .immediate)

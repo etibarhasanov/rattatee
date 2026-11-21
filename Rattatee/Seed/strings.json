@@ -1235,6 +1235,12 @@
     "et": "Pööra vasakule",
     "ru": "Поверните налево"
   },
+  "turnNear": {
+    "az": "50 metrdən sonra",
+    "en": "In 50 metres",
+    "et": "50 meetri pärast",
+    "ru": "Через 50 метров"
+  },
   "turnRight": {
     "az": "Sağa dön",
     "en": "Turn right",

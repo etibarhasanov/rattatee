@@ -164,6 +164,45 @@ struct Way: Equatable {
         return (step, step.along - spot.along)
     }
 
+    /// How sharply the way turns at a spot along it, in degrees either way:
+    /// nought straight on, ninety a street corner, 180 back the way it came.
+    /// Read `corner` metres before and after the spot rather than from one
+    /// vertex to the next, so a kink of a few metres where a path crosses a
+    /// road is not a hairpin — the way the website reads a ridden line,
+    /// `sharpness()` and `CORNER` in its functions/api/route.js. The website
+    /// knows a sharp turn from its router too, and answers it as a plain
+    /// `left` or `right`; reading it off the line here needs nothing new of
+    /// it. Nought where the line runs out on either side.
+    func sharpness(at along: Double, corner: Double = 20) -> Double {
+        guard let before = coordinate(along: along - corner), let joint = coordinate(along: along),
+              let after = coordinate(along: along + corner) else { return 0 }
+        func heading(_ a: CLLocationCoordinate2D, _ b: CLLocationCoordinate2D) -> Double {
+            atan2((b.longitude - a.longitude) * cos(a.latitude * .pi / 180), b.latitude - a.latitude) * 180 / .pi
+        }
+        let turn = (heading(joint, after) - heading(before, joint) + 540).truncatingRemainder(dividingBy: 360) - 180
+        return abs(turn)
+    }
+
+    /// The spot so many metres down the line, or nothing off either end of
+    /// it. Measured as `place(of:)` measures, in flat metres a segment.
+    func coordinate(along: Double) -> CLLocationCoordinate2D? {
+        guard along >= 0, line.count > 1 else { return nil }
+        var run = 0.0
+        for i in 1..<line.count {
+            let a = line[i - 1], b = line[i]
+            let east = 111_320.0 * cos(a.latitude * .pi / 180)
+            let dx = (b.longitude - a.longitude) * east, dy = (b.latitude - a.latitude) * 111_320.0
+            let length = (dx * dx + dy * dy).squareRoot()
+            if run + length >= along {
+                let t = length > 0 ? (along - run) / length : 0
+                return CLLocationCoordinate2D(latitude: a.latitude + t * (b.latitude - a.latitude),
+                                              longitude: a.longitude + t * (b.longitude - a.longitude))
+            }
+            run += length
+        }
+        return nil
+    }
+
     /// One of the website's steps, placed on this way's line.
     func step(_ raw: [String: Any]) -> Step? {
         guard let word = raw["turn"] as? String, let turn = Turn(rawValue: word),

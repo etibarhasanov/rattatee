@@ -1,12 +1,15 @@
 # The voice: what to record
 
 The turns of a way are said aloud in recordings of the owner's voice — see
-`Rattatee/Core/Guide.swift`. This is the dictionary: fifteen phrases, each in
-English, Estonian, Russian and Azerbaijani, sixty recordings in all.
+`Rattatee/Core/Guide.swift`. This is the dictionary: sixteen phrases, each in
+English, Estonian, Russian and Azerbaijani, sixty-four recordings in all.
 
 The app joins them. Before a corner it plays **In 200 metres** and then the
-turn; at the corner it plays the turn alone. So each phrase is recorded on
-its own, as a whole sentence, with no "and then".
+turn; at the corner it plays the turn alone. A left or a right sharper than
+a street corner — a hundred degrees or more — is said fifty metres before
+it instead, **In 50 metres** and then the turn, and not again at the
+corner, which is too late to slow down for it. So each phrase is recorded
+on its own, as a whole sentence, with no "and then".
 
 A tunnel is said like a turn, at its entrance. Where it starts just past
 a corner — the Veerenni path under the railway turns left into it — the
@@ -16,6 +19,7 @@ tunnel**, so the second does not cut the first off.
 | File | English (`en-`) | Estonian (`et-`) | Russian (`ru-`) | Azerbaijani (`az-`) |
 |---|---|---|---|---|
 | `soon` | In two hundred metres | Kahesaja meetri pärast | Через двести метров | İki yüz metrdən sonra |
+| `near` | In fifty metres | Viiekümne meetri pärast | Через пятьдесят метров | Əlli metrdən sonra |
 | `left` | Turn left | Pööra vasakule | Поверните налево | Sola dön |
 | `right` | Turn right | Pööra paremale | Поверните направо | Sağa dön |
 | `keep-left` | Keep left | Hoia vasakule | Держитесь левее | Solda qal |
@@ -55,6 +59,36 @@ it is right. Only the meaning has to match the file.
 each**, on 2026-11-18, each language in one take. Russian is still to do,
 and until it is the phone's voice reads it.
 
+**In 50 metres** came on 2026-11-21 and is recorded in no language yet.
+Until it is, a sharp corner is read whole by the phone's voice in English
+and Russian, and in Estonian and Azerbaijani, which the phone has no voice
+for, it is said at the corner as before rather than not at all.
+
+### Estonian, to record again
+
+Nine of the Estonian phrases have a pause inside them, cut down to a fifth or
+a third of a second when the take was cut apart: "Pööra … paremale". The
+English and Azerbaijani turns are one breath of 0.6 to 0.9 seconds; these
+are 1.0 to 2.1, and "Pööra" is the same word for left, right and turning
+round, so on a bike the word that matters comes late. Measured on
+2026-11-21, not listened to:
+
+| File | Says | Long | Pause inside |
+|---|---|---|---|
+| `et-left` | Pööra vasakule | 1.56 s | 0.22 s |
+| `et-right` | Pööra paremale | 1.65 s | 0.24 s |
+| `et-keep-left` | Hoia vasakule | 1.64 s | 0.30 s |
+| `et-keep-right` | Hoia paremale | 1.58 s | 0.26 s |
+| `et-straight` | Sõida otse | 1.48 s | 0.24 s |
+| `et-around` | Pööra ümber | 1.41 s | 0.29 s |
+| `et-arrive` | Oled kohal | 1.03 s | 0.15 s |
+| `et-tunnel` | Sõida tunnelisse | 1.84 s | 0.20 s |
+| `et-off` | Oled teelt maas | 2.12 s | 0.22 s and 0.21 s |
+
+`et-soon`, `et-wrong-way` and the four greetings, whose only pause is at
+the comma, are fine as they are. Record the nine again in the same take as
+`et-near`.
+
 ## Recording
 
 - Voice Memos on an iPhone, in a quiet room, the phone a hand's width from
@@ -62,8 +96,10 @@ and until it is the phone's voice reads it.
 - The easy way is **one recording a language**: read the phrases down
   the column, in the order of the table, with a clear pause of two seconds
   between them. They are cut apart afterwards.
-- Say each a little slower and louder than talking. It will be heard from a
-  pocket, over traffic.
+- Say each a little louder than talking — it will be heard from a pocket,
+  over traffic — and **each in one breath, with no pause inside it**, as
+  if it were one word. Slower is fine; a gap is not, since it is where the
+  rider stops listening.
 - Twice each is fine; the better one is kept.
 
 ## Where they go

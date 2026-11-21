@@ -236,12 +236,18 @@ under the numbers a row shows the next corner: an arrow, how far, what to
 do and the street it is onto. A voice says the same, since the phone is in
 a pocket — "In 200 metres, turn right" about two hundred metres before, and
 "Turn right" at the corner — over music, which is turned down for the
-second it takes, and with the screen locked. The speaker in the row
+second it takes, and with the screen locked. A left or a right sharper
+than a street corner, a hundred degrees or more on the way's line, is said
+fifty metres before it instead of at it — "In 50 metres, turn right" —
+since a bike has to slow for it and the corner is too late to start (A
+SHARP CORNER IS SAID FIFTY METRES BEFORE IT in `Core/Guide.swift`). The speaker in the row
 switches it off and on, and the phone remembers. The voice is the owner's,
-recorded: eleven phrases in each language, listed in `docs/voice.md`,
-which is why it says no street names and no distance but the one.
-Azerbaijani, English and Estonian are recorded, all fifteen phrases of
-each; Russian is not yet, and until it is the phone's own voice reads it. A roundabout is in the row and
+recorded: sixteen phrases in each language, listed in `docs/voice.md`,
+which is why it says no street names and no distance but the two.
+Azerbaijani, English and Estonian are recorded, the first fifteen phrases
+of each; Russian is not yet, and until it is the phone's own voice reads
+it. "In 50 metres" is recorded in none yet, and Estonian has nine to
+record again, which `docs/voice.md` lists. A roundabout is in the row and
 is not said: a bike is mostly on the path beside one. A tunnel is said
 at its entrance, "Enter the tunnel", and with the turn before it where it
 starts just past one, as the Veerenni path under the railway does. A ride
@@ -580,7 +586,7 @@ Rattatee/
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et, ru and az
             stations.json       the radio's stations
-  Voice/    <lang>-<clip>.m4a   the turns, recorded: Azerbaijani and English so far
+  Voice/    <lang>-<clip>.m4a   the turns, recorded: Azerbaijani, English and Estonian so far
   *.lproj/  InfoPlist.strings   the location and motion questions, in each language
   PrivacyInfo.xcprivacy         the privacy manifest
 Config/     Info.plist          the two background modes and the languages
