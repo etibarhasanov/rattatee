@@ -151,6 +151,7 @@ jobs:
           shot 07-kept -kDemo kept
           shot 08-rides -kDemo rides -kTab 1
           shot 24-ride -kDemo rides -kTab 1 -kOpen YES
+          shot 29-ride-map -kDemo rides -kTab 1 -kOpen YES -kMap YES
           # Search and go. The search asks the live site, as the app does.
           shot 16-goal -kDemo goal
           shot 17-going -kDemo going

@@ -749,6 +749,18 @@
     "et": "{dist} jalgsi või autoga — kaardil punktiiriga, jääb sellesse telefoni, rattasõiduna ei saadeta.",
     "ru": "{dist} пешком или на машине — пунктиром на карте, остаётся на этом телефоне и не отправляется как езда на велосипеде."
   },
+  "rideMapOpen": {
+    "az": "Xəritəni aç",
+    "en": "Open the map",
+    "et": "Ava kaart",
+    "ru": "Открыть карту"
+  },
+  "rideMapWhole": {
+    "az": "Bütün gediş",
+    "en": "Whole ride",
+    "et": "Kogu sõit",
+    "ru": "Вся поездка"
+  },
   "rideName": {
     "az": "Ad (istəyə görə)",
     "en": "Name (optional)",
