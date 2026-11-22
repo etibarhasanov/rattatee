@@ -611,6 +611,12 @@
     "et": "Sõit",
     "ru": "Езда"
   },
+  "partShow": {
+    "az": "Bu hissəni xəritədə göstərir",
+    "en": "Shows this part on a map",
+    "et": "Näitab seda osa kaardil",
+    "ru": "Показывает эту часть на карте"
+  },
   "partStop": {
     "az": "Dayanma",
     "en": "Stopped",
