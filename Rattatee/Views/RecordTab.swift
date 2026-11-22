@@ -386,16 +386,16 @@ struct RideDash: View {
 }
 
 /// The next turn, under the numbers: an arrow, how far, what to do and the
-/// street it is onto, and the switch for the voice that says the same. The
-/// street is beside the words rather than in them — "onto Narva maantee" is
-/// a case ending in Estonian that nothing here can decline.
+/// street it is onto. The street is beside the words rather than in them —
+/// "onto Narva maantee" is a case ending in Estonian that nothing here can
+/// decline. The switch for the voice that says the same was a speaker at
+/// the end of this row until 2026-11-22; it is at the foot now, beside the
+/// radio (`VoiceButton`).
 struct TurnRow: View {
-    @Environment(Store.self) private var store
     let step: Step
     let metres: Double
 
     var body: some View {
-        let voice = store.guide.voice
         HStack(spacing: 12) {
             Image(systemName: step.turn.symbol)
                 .font(.title2.weight(.bold))
@@ -409,28 +409,19 @@ struct TurnRow: View {
                     .font(.subheadline).foregroundStyle(Theme.muted).lineLimit(1)
             }
             Spacer(minLength: 0)
-            Button { store.guide.voice.toggle() } label: {
-                Image(systemName: voice ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                    .foregroundStyle(voice ? Theme.accent : Theme.muted)
-                    .frame(width: 44, height: 44)
-                    .background(Theme.wash, in: Circle())
-            }
-            .accessibilityLabel(voice ? L.t("voiceOn") : L.t("voiceOff"))
         }
     }
 }
 
 /// In the turn row's place while the rider is off the way or riding it
 /// backwards: what has happened, and then that a new way is being looked
-/// for — which happens by itself, so there is nothing to press but the
-/// speaker. The icon is on the quiet ground rather than the accent: it is
-/// news, not an instruction.
+/// for — which happens by itself, so there is nothing here to press. The
+/// icon is on the quiet ground rather than the accent: it is news, not an
+/// instruction.
 struct LostRow: View {
-    @Environment(Store.self) private var store
     let lost: Lost
 
     var body: some View {
-        let voice = store.guide.voice
         HStack(spacing: 12) {
             Image(systemName: symbol)
                 .font(.title2.weight(.bold))
@@ -443,13 +434,6 @@ struct LostRow: View {
                 Text(words.1).font(.subheadline).foregroundStyle(Theme.muted).lineLimit(1)
             }
             Spacer(minLength: 0)
-            Button { store.guide.voice.toggle() } label: {
-                Image(systemName: voice ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                    .foregroundStyle(voice ? Theme.accent : Theme.muted)
-                    .frame(width: 44, height: 44)
-                    .background(Theme.wash, in: Circle())
-            }
-            .accessibilityLabel(voice ? L.t("voiceOn") : L.t("voiceOff"))
         }
     }
 
@@ -468,7 +452,8 @@ struct LostRow: View {
     }
 }
 
-/// The foot of the screen while riding: the radio, and under it Pause or
+/// The foot of the screen while riding: the radio, with the voice's button
+/// at its end where there is somewhere to go, and under them Pause or
 /// Resume, and Finish.
 struct RecordingCard: View {
     @Environment(Store.self) private var store
@@ -476,7 +461,11 @@ struct RecordingCard: View {
 
     var body: some View {
         SheetCard {
-            RadioRow().padding(.bottom, 10)
+            HStack(spacing: 10) {
+                RadioRow()
+                if store.goal != nil { VoiceButton() }
+            }
+            .padding(.bottom, 10)
             HStack(spacing: 10) {
                 if ride.status == .recording {
                     Button(L.t("ridePause")) { store.pause() }.buttonStyle(.bigQuiet)
@@ -486,5 +475,46 @@ struct RecordingCard: View {
                 Button(L.t("rideFinish")) { store.finish() }.buttonStyle(.big)
             }
         }
+    }
+}
+
+/// The switch for the voice that says the turns, at the end of the radio's
+/// row: a square with a speaker and one word, the size of the row it ends.
+///
+/// At the owner's word on 2026-11-22, two buttons at the foot, one for the
+/// music and one for the voice. Until then the voice's switch was a small
+/// speaker at the end of the turn row, up among the numbers, where it was
+/// easy to miss. It is shown only while there is somewhere to go — from
+/// the moment one is chosen, so it does not come and go while a way is
+/// being looked for. With nowhere to go the voice says nothing but the
+/// greeting at Start, and a button that switched nothing would only take
+/// the radio's room. The radio keeps its row and its next and previous: it
+/// is narrower by this square and no more.
+///
+/// On, the speaker is in the accent and the word is "Voice"; off, both are
+/// muted and the word is "Off". The ground is the quiet one either way: the
+/// voice is on unless somebody turned it off, and the accent ground is for
+/// the radio while it plays.
+struct VoiceButton: View {
+    @Environment(Store.self) private var store
+
+    var body: some View {
+        let voice = store.guide.voice
+        Button { store.guide.voice.toggle() } label: {
+            VStack(spacing: 2) {
+                Image(systemName: voice ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                    .font(.title3)
+                    .foregroundStyle(voice ? Theme.accent : Theme.muted)
+                Text(voice ? L.t("voiceShort") : L.t("voiceShortOff"))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(voice ? Theme.ink : Theme.muted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(width: 64, height: 56)
+            .background(Theme.wash, in: RoundedRectangle(cornerRadius: Theme.radius))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(voice ? L.t("voiceOn") : L.t("voiceOff"))
     }
 }

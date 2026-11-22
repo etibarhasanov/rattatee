@@ -246,8 +246,13 @@ under the numbers a row shows the next corner: an arrow, how far, what to
 do and the street it is onto. A voice says the same, since the phone is in
 a pocket — "In 200 metres, turn right" about two hundred metres before, and
 "Turn right" at the corner — over music, which is turned down for the
-second it takes, and with the screen locked. The speaker in the row
-switches it off and on, and the phone remembers. The voice is the owner's,
+second it takes, and with the screen locked. A button at the foot of the
+riding screen, at the end of the radio's row, switches it off and on, and
+the phone remembers: a speaker and *Voice*, or a struck-through speaker and
+*Off*. It is there from the moment somewhere to go is chosen and not
+before, since a ride with nowhere to go hears nothing from it but the
+greeting at Start; until 2026-11-22 it was a small speaker at the end of the
+turn row, where it was easy to miss. The voice is the owner's,
 recorded: eleven phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
 Azerbaijani, English and Estonian are recorded, all fifteen phrases of
@@ -258,7 +263,10 @@ starts just past one, as the Veerenni path under the railway does. A ride
 with nowhere to go has no row and no voice (`Core/Guide.swift`).
 
 **A radio, under the voice.** At the foot of the riding screen, over Pause
-and Finish, a row says **📻 Play radio**. A tap plays a station: Raadio
+and Finish, a row says **📻 Play radio** — the whole width with nowhere to
+go, and beside the voice's button where there is somewhere, so the music and
+the voice are two buttons side by side and either can be had without the
+other. A tap plays a station: Raadio
 Tallinn in Estonian, Radio Paradise in English, Наше Радио in Russian and
 Baku Retro FM in Azerbaijani, until the rider chooses another. Playing, the
 row is the station's name between two buttons, the next station and the one
