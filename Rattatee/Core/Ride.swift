@@ -280,8 +280,8 @@ struct Ride: Codable, Identifiable, Equatable {
     }
 
     /// The ride in a few numbers, sent as `summary` beside the line on every
-    /// save, which a signed-in rider's account adds up and the Account tab
-    /// shows (`AccountTotals`). The website ignores it with no session, so
+    /// save, which a signed-in rider's account adds up and My rides shows
+    /// (`AccountTotals`). The website ignores it with no session, so
     /// it goes on every save rather than the phone deciding when: one
     /// payload, and the server is what knows whether there is an account.
     ///

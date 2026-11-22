@@ -6,7 +6,7 @@ import Foundation
 /// records a ride on the phone and hands it to `/api/rides`, the Function the
 /// website's own recorder saves through, asks `/api/account`,
 /// `/api/google` and `/api/apple` who is riding, and asks `/api/rides`
-/// again, on the Account tab, what that account's rides add up to.
+/// again, on My rides, what that account's rides add up to.
 ///
 /// Requests go through one `URLSession` whose cookie store is the system's.
 /// The website's session is an HttpOnly cookie (`ttb_s`), and a native

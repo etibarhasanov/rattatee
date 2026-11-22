@@ -1,32 +1,35 @@
 import Foundation
 import Observation
 
-/// What the website has added up of the signed-in rider's rides, for the
-/// Account tab's On your account.
+/// What the website has added up of the signed-in rider's rides, for On
+/// your account on My rides (`AccountTotalsSection` in
+/// `Views/RidesTab.swift`).
 ///
 /// Since 2026-11-22 every ride a signed-in rider saves carries its summary
 /// (`Ride.summary`): how far, how long, how long stopped, its top speed and
 /// fastest kilometre. The website keeps one row an account, which each save
 /// adds to — the ride outside the four cities too, which it keeps no line
 /// of — and `GET /api/rides?totals=1` answers that row. So these are every
-/// ride saved to the account from any phone, which is not what My rides
-/// adds up (`StatsCard`): that is this phone's rides, signed in or not,
-/// waiting ones included. The two differ, and are meant to.
+/// ride saved to the account from any phone, which is not what the card
+/// above it adds up (`StatsCard`): that is this phone's rides, signed in or
+/// not, waiting ones included. The two differ, and are meant to.
 ///
 /// HOW OFTEN IT ASKS
 ///
-/// When the Account tab appears with somebody signed in, and when who is
-/// signed in changes — and not again for the same account within `every`,
-/// a minute, however often the tab is opened. Never in the background,
-/// never on a timer, and never signed out. A rider opens Account a few
-/// times a day at most, so a thousand riders are a few thousand requests a
-/// day, each reading the one row. The last-asked time is kept in memory
-/// only, so a relaunch may ask once more, which is one request.
+/// When My rides appears with somebody signed in, and when who is signed in
+/// changes — and not again for the same account within `every`, a minute,
+/// however often the tab is opened. Never in the background, never on a
+/// timer, and never signed out. My rides is opened more often than Account,
+/// and the minute is what holds it: a rider going back and forth between
+/// tabs asks once, so a thousand riders who each look a few times a day
+/// are a few thousand requests a day, each reading the one row. The
+/// last-asked time is kept in memory only, so a relaunch may ask once
+/// more, which is one request.
 ///
 /// KEPT ON THE PHONE, FOR THE ACCOUNT IT WAS
 ///
 /// The last answer is kept in `totals.json` beside the lists, with whose
-/// it was and when it came, so the tab opens on numbers rather than a
+/// it was and when it came, so My rides opens on numbers rather than a
 /// spinner, and with no signal says how old they are. It is shown only to
 /// the account it was asked for, and goes on sign-out and on deleting the
 /// account (`Store.leave`), as the lists do.

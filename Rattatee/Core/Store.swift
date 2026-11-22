@@ -24,7 +24,7 @@ import Observation
 /// drawn on the ride's page here. Since 2026-11-22 every save carries the
 /// ride in a few numbers as well (`Ride.summary`), which the account adds
 /// up — a ride outside the four cities included, sent for those alone
-/// (`send`) — and the Account tab shows (`AccountTotals`). With nobody
+/// (`send`) — and My rides shows (`AccountTotals`). With nobody
 /// signed in the website ignores them and nothing more is kept.
 ///
 /// THE RIDE IS KEPT ON THE PHONE UNTIL THE SERVER SAYS IT HAS IT

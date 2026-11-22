@@ -1229,11 +1229,29 @@
     "et": "Kiireim km",
     "ru": "Самый быстрый км"
   },
+  "totalsHours": {
+    "az": "{h} saat {m} dəq",
+    "en": "{h} h {m} min",
+    "et": "{h} h {m} min",
+    "ru": "{h} ч {m} мин"
+  },
   "totalsLongest": {
     "az": "Ən uzun gediş",
     "en": "Longest ride",
     "et": "Pikim sõit",
     "ru": "Самая длинная поездка"
+  },
+  "totalsMinSec": {
+    "az": "{m} dəq {s} san",
+    "en": "{m} min {s} s",
+    "et": "{m} min {s} s",
+    "ru": "{m} мин {s} с"
+  },
+  "totalsMinutes": {
+    "az": "{m} dəq",
+    "en": "{m} min",
+    "et": "{m} min",
+    "ru": "{m} мин"
   },
   "totalsNone": {
     "az": "Gedişlərin növbəti saxladığından başlayaraq burada toplanacaq.",

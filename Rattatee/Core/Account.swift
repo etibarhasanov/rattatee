@@ -15,7 +15,7 @@ import Foundation
 /// A ride is filed under whoever is signed in at the moment it is sent, or
 /// under nobody. The lists, and any place still waiting to go on one, were
 /// the account's, and go with it (`ListBook.forget`), and so do the
-/// account's totals kept from the Account tab (`AccountTotals.forget`).
+/// account's totals kept for My rides (`AccountTotals.forget`).
 extension Store {
     /// Ask the site who this cookie belongs to, and which doors it offers.
     func whoAmI() async {
