@@ -96,7 +96,8 @@ Three tabs.
   opens it over the whole screen, where it moves and zooms like any map,
   anywhere along the ride, and **Whole ride** frames it again. Until
   2026-11-21 the page's map could only zoom, and a map that cannot move
-  zooms only on its middle. All of
+  zooms only on its middle. A part of the ride opens a map of its own
+  (below). All of
   it is the phone's own ride, so it opens with no signal and for a ride saved
   with no account. The sums are the website's — `rideInsight()` in its
   `functions/api/_rides.js`, ported step for step to `Core/Insight.swift` —
@@ -448,6 +449,16 @@ long, and the speed where it moved.
   thirteen of them made a 12 km/h ride read 5.8. The active time is the
   riding time less the stretches set aside and the stops, counted once
   where they overlap and less whatever fell in a pause.
+- **A part shows where it was.** A tap on a part opens a still map under
+  its row, framed to it: riding bold over the rest of the ride drawn
+  faint, a walk or a train bold in its dots or dashes, a wait or a stop a
+  ringed dot where the rider stood, with the streets round it. One part is
+  open at a time; a tap on its row again puts it away, and a tap on its
+  map opens it over the whole screen on the same part, where **Whole
+  ride** frames the rest. The page's own map could not do it: by the time
+  the list is on the screen, that map has scrolled away above it. The
+  part's points are picked out by its times (`Timeline.points(of:in:)`),
+  so nothing more is stored and nothing is asked of the website.
 - **None of it is sent but the riding.** Fewer points and a shorter time,
   never a label, never a point of a walk, a train or a stop. The website
   keeps bike routes; the session is the rider's and stays on the phone.

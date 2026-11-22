@@ -31,6 +31,16 @@ import Charts
 /// Letting it move on the page would have had a thumb on it move the map
 /// and not the page, so it opens instead, and over the whole screen it moves
 /// and zooms as any map does.
+///
+/// A PART OPENS ITS OWN MAP
+///
+/// The owner asked on 2026-11-22 for Part by part to show where each part
+/// was. The page's map cannot: by the time the list is on the screen it has
+/// scrolled away above it. So a tap on a part opens a still map under its
+/// row, framed to that part — riding bold over the rest of the ride drawn
+/// faint, a wait or a stop a ringed dot where the rider stood — and a tap
+/// on that map opens it over the whole screen, framed the same. One part is
+/// open at a time, and a tap on its row again puts it away.
 struct RideView: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -45,6 +55,18 @@ struct RideView: View {
         if LaunchScript.map { return true }
         #endif
         return false
+    }()
+    /// The part open under its row in Part by part, by its place in the
+    /// list; nil for none.
+    @State private var opened: Int?
+    /// The part the map over the whole screen opened on, by its place in the
+    /// list; nil for the whole ride. CI's `-kPart <n>` with `-kMap YES` opens
+    /// it on that part.
+    @State private var mapPart: Int? = {
+        #if DEBUG
+        if let n = LaunchScript.part { return n }
+        #endif
+        return nil
     }()
 
     /// Read from the store each time, so a ride that goes from Waiting to
@@ -81,7 +103,7 @@ struct RideView: View {
                     }
                 }
 
-                map(ride, line: line, stops: stops, whole: whole)
+                map(ride, line: line, stops: stops, part: nil, frame: whole, height: 260)
                 if let note = mapNote(ride) {
                     Note(text: note).padding(.top, -4)
                 }
@@ -108,7 +130,7 @@ struct RideView: View {
                 if parts.count > 1 {
                     VStack(alignment: .leading, spacing: 0) {
                         heading(L.t("rideParts")).padding(.bottom, 8)
-                        timeline(parts)
+                        timeline(parts, ride: ride, line: line, stops: stops)
                     }
                     .padding(16)
                     .ridePanel()
@@ -150,7 +172,8 @@ struct RideView: View {
         }
         // What the page has, line and all: opening it asks for nothing.
         .fullScreenCover(isPresented: $mapping) {
-            RideMapCover(ride: ride, line: line, stops: stops, whole: whole)
+            RideMapCover(ride: ride, line: line, stops: stops, whole: whole,
+                         part: mapPart.flatMap { parts.indices.contains($0) ? parts[$0] : nil })
         }
     }
 
@@ -175,16 +198,18 @@ struct RideView: View {
         kept?.line.compactMap { $0.count >= 2 ? CLLocationCoordinate2D(latitude: $0[0], longitude: $0[1]) : nil } ?? []
     }
 
-    /// The map on the page: the whole ride, still, so a thumb on it scrolls
-    /// the page — and a tap anywhere on it opens it over the whole screen,
-    /// which the sign in its corner says.
+    /// A map on the page, still, so a thumb on it scrolls the page — and a
+    /// tap anywhere on it opens it over the whole screen, which the sign in
+    /// its corner says. The whole ride at the top of the page, with `part`
+    /// nil; under an open row of Part by part, that part, by its place in
+    /// the list, and the map over the whole screen opens on it too.
     private func map(_ ride: Ride, line: [CLLocationCoordinate2D], stops: [CLLocationCoordinate2D],
-                     whole: MKMapRect) -> some View {
-        Map(initialPosition: .rect(whole), interactionModes: []) {
-            Self.marks(ride, line: line, stops: stops)
+                     part: (Int, Part)?, frame: MKMapRect, height: CGFloat) -> some View {
+        Map(initialPosition: .rect(frame), interactionModes: []) {
+            Self.marks(ride, line: line, stops: stops, part: part?.1)
         }
         .mapStyle(.standard(pointsOfInterest: .excludingAll))
-        .frame(height: 260)
+        .frame(height: height)
         .clipShape(RoundedRectangle(cornerRadius: Theme.radius))
         .overlay(RoundedRectangle(cornerRadius: Theme.radius).stroke(Theme.hairline))
         .overlay(alignment: .topTrailing) {
@@ -197,11 +222,18 @@ struct RideView: View {
                 .padding(8)
         }
         .contentShape(RoundedRectangle(cornerRadius: Theme.radius))
-        .onTapGesture { mapping = true }
+        .onTapGesture { cover(part?.0) }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(L.t("rideMapOpen"))
         .accessibilityAddTraits(.isButton)
-        .accessibilityAction { mapping = true }
+        .accessibilityAction { cover(part?.0) }
+    }
+
+    /// Opens the map over the whole screen, on the part at `index` or on
+    /// the whole ride.
+    private func cover(_ index: Int?) {
+        mapPart = index
+        mapping = true
     }
 
     /// What a ride's map draws, on the page and over the whole screen alike.
@@ -209,51 +241,90 @@ struct RideView: View {
     /// is a small muted dot where the rider stood; the phone's line goes
     /// faint under the website's where there is one; a ring where the ride
     /// began and a dot where it ended.
+    ///
+    /// With a `part`, all of that is faint and the part is drawn over it:
+    /// riding bold in the ride's colour, a walk or a train bold in the ink
+    /// with its own dots or dashes, and a wait or a stop a larger dot in a
+    /// ring where the rider stood.
     @MapContentBuilder
     fileprivate static func marks(_ ride: Ride, line: [CLLocationCoordinate2D],
-                                  stops: [CLLocationCoordinate2D]) -> some MapContent {
+                                  stops: [CLLocationCoordinate2D], part: Part? = nil) -> some MapContent {
         let aside = ride.aside ?? []
+        let rest = part == nil ? 1.0 : 0.3
         ForEach(Array(aside.enumerated()), id: \.offset) { k, stretch in
             if stretch.count > 1 {
                 MapPolyline(coordinates: stretch.map(\.coordinate))
-                    .stroke(Theme.muted, style: StrokeStyle(lineWidth: 4, lineCap: .round,
-                                                            dash: ride.asideKind(k) == .vehicle ? [10, 8] : [1, 8]))
+                    .stroke(Theme.muted.opacity(rest),
+                            style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: Self.dash(ride.asideKind(k))))
             }
         }
         ForEach(Array(stops.enumerated()), id: \.offset) { _, at in
             Annotation("", coordinate: at) {
                 Circle().fill(Theme.muted).frame(width: 10, height: 10)
                     .overlay(Circle().stroke(.white, lineWidth: 2))
+                    .opacity(rest)
             }
         }
         // The phone's line, faint once the website's is over it.
         ForEach(Array(Geo.runs(ride.points, around: aside).enumerated()), id: \.offset) { _, run in
             if run.count > 1 {
                 MapPolyline(coordinates: run.map(\.coordinate))
-                    .stroke(Theme.here.opacity(line.isEmpty ? 1 : 0.35),
+                    .stroke(Theme.here.opacity((line.isEmpty ? 1 : 0.35) * rest),
                             style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
             }
         }
         if line.count > 1 {
             MapPolyline(coordinates: line)
-                .stroke(Theme.here, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                .stroke(Theme.here.opacity(rest), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
         }
         if let first = ride.points.first {
             Annotation("", coordinate: first.coordinate) {
                 Circle().fill(.white).frame(width: 12, height: 12)
                     .overlay(Circle().stroke(Theme.here, lineWidth: 3))
+                    .opacity(part == nil ? 1 : 0.5)
             }
         }
         if let last = ride.points.last {
             Annotation("", coordinate: last.coordinate) {
                 Circle().fill(Theme.here).frame(width: 12, height: 12)
                     .overlay(Circle().stroke(.white, lineWidth: 2))
+                    .opacity(part == nil ? 1 : 0.5)
+            }
+        }
+        if let part {
+            let shown = Timeline.points(of: part, in: ride).map(\.coordinate)
+            let stood = part.kind == .wait || part.kind == .stop
+            if !stood && shown.count > 1 {
+                MapPolyline(coordinates: shown)
+                    .stroke(Theme.paper.opacity(0.6), style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
+                MapPolyline(coordinates: shown)
+                    .stroke(part.kind == .ride ? Theme.here : Theme.ink,
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round, dash: Self.dash(part.kind)))
+            }
+            if stood, let at = shown.first {
+                Annotation("", coordinate: at) {
+                    Circle().fill(Theme.here.opacity(0.18)).frame(width: 44, height: 44)
+                        .overlay(Circle().stroke(Theme.here.opacity(0.5), lineWidth: 1.5))
+                        .overlay(Circle().fill(Theme.muted).frame(width: 16, height: 16)
+                            .overlay(Circle().stroke(.white, lineWidth: 2.5)))
+                }
             }
         }
     }
 
-    /// The box round the ride, with a margin so its ends are not on the edge.
-    private static func frame(_ points: [Point]) -> MKMapRect {
+    /// A walk is dotted, a train or a drive dashed, and riding solid.
+    private static func dash(_ kind: Part.Kind) -> [CGFloat] {
+        switch kind {
+        case .walk: return [1, 8]
+        case .vehicle: return [10, 8]
+        default: return []
+        }
+    }
+
+    /// The box round the ride, or round a part of it, with a margin so its
+    /// ends are not on the edge; a part that stood still, a box about 400 m
+    /// across round where it stood.
+    fileprivate static func frame(_ points: [Point]) -> MKMapRect {
         let rect = points.reduce(MKMapRect.null) { box, p in
             box.union(MKMapRect(origin: MKMapPoint(p.coordinate), size: MKMapSize(width: 1, height: 1)))
         }
@@ -261,7 +332,11 @@ struct RideView: View {
             let middle = MKMapPoint(CLLocationCoordinate2D(latitude: 59.437, longitude: 24.7536))
             return MKMapRect(x: middle.x - 5000, y: middle.y - 5000, width: 10000, height: 10000)
         }
-        let pad = max(rect.width, rect.height) * 0.15 + 200
+        // Never closer than 400 m across — the box is in map points, some
+        // thirteen to the metre here — so a part that stood still is framed
+        // with the streets round it rather than the dot alone.
+        let least = 400 * MKMapPointsPerMeterAtLatitude(points[0].lat)
+        let pad = max(rect.width, rect.height) * 0.15 + 200 + max(0, least - max(rect.width, rect.height)) / 2
         return rect.insetBy(dx: -pad, dy: -pad)
     }
 
@@ -272,26 +347,52 @@ struct RideView: View {
     /// moved. Riding is in the app's colour and everything else muted, so
     /// the eye finds the riding first; the word says which, never the
     /// colour alone.
-    private func timeline(_ parts: [Part]) -> some View {
+    ///
+    /// Each row is a button: a tap opens the part's own map under it and
+    /// puts away the one open before, and a tap again puts it away. The
+    /// chevron turns down on the open one and its word takes the ride's
+    /// colour.
+    private func timeline(_ parts: [Part], ride: Ride, line: [CLLocationCoordinate2D],
+                          stops: [CLLocationCoordinate2D]) -> some View {
         VStack(spacing: 0) {
             ForEach(Array(parts.enumerated()), id: \.offset) { k, part in
-                HStack(spacing: 10) {
-                    Image(systemName: Self.sign(part.kind))
-                        .font(.subheadline)
-                        .foregroundStyle(part.kind == .ride ? Theme.here : Theme.muted)
-                        .frame(width: 26, alignment: .leading)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(Self.word(part.kind)).font(.subheadline.weight(.medium)).foregroundStyle(Theme.ink)
-                        Text(L.time(Date(timeIntervalSince1970: part.from)))
-                            .font(.caption.monospacedDigit()).foregroundStyle(Theme.muted)
+                let isOpen = opened == k
+                Button {
+                    withAnimation(.snappy) { opened = isOpen ? nil : k }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: Self.sign(part.kind))
+                            .font(.subheadline)
+                            .foregroundStyle(part.kind == .ride ? Theme.here : Theme.muted)
+                            .frame(width: 26, alignment: .leading)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(Self.word(part.kind)).font(.subheadline.weight(.medium))
+                                .foregroundStyle(isOpen ? Theme.here : Theme.ink)
+                            Text(L.time(Date(timeIntervalSince1970: part.from)))
+                                .font(.caption.monospacedDigit()).foregroundStyle(Theme.muted)
+                        }
+                        Spacer(minLength: 8)
+                        Text(Self.figures(part))
+                            .font(.subheadline.monospacedDigit()).foregroundStyle(Theme.muted)
+                            .multilineTextAlignment(.trailing)
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Theme.muted)
+                            .rotationEffect(.degrees(isOpen ? 90 : 0))
                     }
-                    Spacer(minLength: 8)
-                    Text(Self.figures(part))
-                        .font(.subheadline.monospacedDigit()).foregroundStyle(Theme.muted)
-                        .multilineTextAlignment(.trailing)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
                 }
-                .padding(.vertical, 8)
+                .buttonStyle(.plain)
                 .accessibilityElement(children: .combine)
+                .accessibilityHint(L.t("partShow"))
+                .accessibilityAddTraits(isOpen ? .isSelected : [])
+                if isOpen {
+                    map(ride, line: line, stops: stops, part: (k, part),
+                        frame: Self.frame(Timeline.points(of: part, in: ride)), height: 180)
+                        .padding(.bottom, 10)
+                        .transition(.opacity)
+                }
                 if k != parts.count - 1 { Divider().overlay(Theme.hairline) }
             }
         }
@@ -395,6 +496,10 @@ struct RideView: View {
 /// moved and zoomed as any map is, anywhere along it. **Whole ride** frames
 /// it again once it has been moved, and is greyed until then.
 ///
+/// Opened from a part's own map, it is framed to that part and draws it as
+/// that map does, bold over the rest; **Whole ride** frames the whole ride
+/// with the part still bold, and is not greyed until it has.
+///
 /// Everything on it is what the page already had, the website's line too,
 /// so opening it asks the website for nothing; the map is Apple's.
 private struct RideMapCover: View {
@@ -403,22 +508,29 @@ private struct RideMapCover: View {
     let stops: [CLLocationCoordinate2D]
     /// The box round the ride, as the page's map is framed.
     let whole: MKMapRect
+    /// The part it opened on, or nil for the whole ride.
+    let part: Part?
 
     @Environment(\.dismiss) private var dismiss
     @State private var position: MapCameraPosition
+    /// Still framed to the part it opened on, which **Whole ride** undoes.
+    @State private var onPart: Bool
 
-    init(ride: Ride, line: [CLLocationCoordinate2D], stops: [CLLocationCoordinate2D], whole: MKMapRect) {
+    init(ride: Ride, line: [CLLocationCoordinate2D], stops: [CLLocationCoordinate2D], whole: MKMapRect,
+         part: Part?) {
         self.ride = ride
         self.line = line
         self.stops = stops
         self.whole = whole
-        _position = State(initialValue: .rect(whole))
+        self.part = part
+        _position = State(initialValue: .rect(part.map { RideView.frame(Timeline.points(of: $0, in: ride)) } ?? whole))
+        _onPart = State(initialValue: part != nil)
     }
 
     var body: some View {
         NavigationStack {
             Map(position: $position) {
-                RideView.marks(ride, line: line, stops: stops)
+                RideView.marks(ride, line: line, stops: stops, part: part)
             }
             .mapStyle(.standard(pointsOfInterest: .excludingAll))
             .mapControls {
@@ -431,8 +543,11 @@ private struct RideMapCover: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(L.t("rideMapWhole")) { withAnimation { position = .rect(whole) } }
-                        .disabled(!position.positionedByUser)
+                    Button(L.t("rideMapWhole")) {
+                        onPart = false
+                        withAnimation { position = .rect(whole) }
+                    }
+                    .disabled(!onPart && !position.positionedByUser)
                 }
                 ToolbarItem(placement: .topBarTrailing) { Button(L.t("close")) { dismiss() } }
             }
