@@ -34,8 +34,9 @@ ride was kept there with no account on it. The save card says so before
 Save is pressed, and that saving rides wants an account. Signing in is
 there for whoever wants that, on the **Account** tab: a ride saved signed in
 is kept on the website under the account, listed on the account page there
-and drawn on its page here. Nothing tells the two kinds apart on the phone
-beyond that, and nothing offers to move a ride to an account afterwards.
+and drawn on its page here, and added up with the account's others on the
+Account tab. Nothing tells the two kinds apart on the phone beyond that,
+and nothing offers to move a ride to an account afterwards.
 
 ## What it does
 
@@ -83,7 +84,9 @@ Three tabs.
   and waiting rides count; a ride Not kept does not. It is added up on the
   phone from the rides already there, so it asks the website for nothing
   and works with no signal — the server could not say it better anyway,
-  since a ride saved with no account is not there at all.
+  since a ride saved with no account is not there at all. The website's
+  own sum, of an account's rides from any phone, is on the Account tab,
+  and the two are not meant to agree.
 
   **A ride, opened.** A row opens its ride on a page of its own
   (`Views/RideView.swift`): the map framed to it, the riding solid, a walk
@@ -118,11 +121,14 @@ Three tabs.
   password, as in Kohuke, or continue with Apple or Google where the
   website offers them — the same accounts as the site and Kohuke, made on
   the spot the first time — or, signed in, sign out and delete the
-  account. **Language**: the phone's, or English, Eesti or Русский for this
-  app alone, switched at once. Under **Look**,
-  the colour, one of the website's four (Red, Green, Blue, Plum), and the
-  background: **Like the phone**, which is where a new install starts,
-  **Light** or **Dark**. Then Privacy.
+  account. Signed in, **On your account** under those adds up every ride
+  saved to the account from any phone: distance, rides, riding time, time
+  stopped, the average, the top speed, the fastest kilometre and the
+  longest ride, and since when (below). **Language**: the phone's, or
+  English, Eesti or Русский for this app alone, switched at once. Under
+  **Look**, the colour, one of the website's four (Red, Green, Blue, Plum),
+  and the background: **Like the phone**, which is where a new install
+  starts, **Light** or **Dark**. Then Privacy.
 
 ### Search and go
 
@@ -355,6 +361,37 @@ says whose they are: *© OpenStreetMap · CyclOSM · OSM France*.
 It is why the record map is an `MKMapView` and not SwiftUI's `Map`, which
 draws nothing of anybody else's.
 
+### On your account
+
+Since 2026-11-22 a signed-in rider's rides add up on the website, and the
+Account tab shows the sum under the signed-in rows. Every save carries the
+ride in a few numbers the phone has already worked out (`Ride.summary` in
+`Core/Ride.swift`): the distance ridden, the active time and the time
+Start to Finish, the time stopped, the top speed and the fastest
+kilometre, and where the kept line would begin and end — the first point
+200 m in from each end, so no door is in it. They are the whole ride, not
+the line that is sent: a ride that went out past the four cities adds every
+kilometre of it, and one that never came near them is sent with no line at
+all, for its numbers alone — *Saved*, with *It was outside the cities, so
+it is not a bike route, but it is added up on your account* where a ride
+kept as a route says it is one. The website keeps them with the account
+and adds them to its totals; with nobody signed in it ignores them, and a
+rider with no account gets nothing new and has nothing more kept.
+
+The section reads `GET /api/rides?totals=1` (`Core/AccountTotals.swift`):
+distance, rides, riding time, stopped, the average, the top speed and the
+fastest kilometre where there are any, and the longest ride, with *Every
+ride saved to this account, from any phone, since 14 Nov 2026.* under them.
+It asks when the tab appears signed in, and when who is signed in changes,
+and not again for the same account within a minute — never in the
+background and never on a timer, one row read on the website each time.
+The last answer is kept on the phone for the account it was, so the tab
+opens on numbers; with no signal they stay, under *As of Sun 22 Nov 17:08
+— the site could not be reached.* Before the first answer a muted Distance
+row waits with a spinner, and an account with nothing added up yet says
+*Your rides add up here from the next one you save.* Signing out or
+deleting the account forgets the numbers on the phone.
+
 ## The rules of a recording
 
 The website's, from `assets/ride.js` there, so a ride recorded here is the
@@ -487,6 +524,12 @@ rewritten every five points, about sixty metres, and at every pause.
 - **The server refuses it**: `short`, `fast` and `malformed` are final and
   the ride is listed as *Not kept*, still on the phone. `often` (the day's
   cap) waits for the next UTC midnight. Anything else is tried again.
+- **Nothing of it is in the four cities**: saved with nobody signed in, it
+  is *Not kept · outside the cities* and never sent, as ever. Saved signed
+  in, it is sent with an empty line for its numbers alone, which the
+  account adds up (**On your account**, above), and is *Saved*; a session
+  the website no longer honours answers `signed-out`, and it is Not kept
+  after all.
 
 - **The answer is lost on the way back**: from the phone that is the same as
   a save that never arrived, and the ride is sent again — and the website
@@ -511,7 +554,8 @@ repository's `CLAUDE.md` under **What the app reads**.
 
 | | |
 |---|---|
-| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }` signed in, where the ride is kept, and `{ counted: true }` with no `ride` signed out, where it is counted and not kept. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }` signed in, where the ride is kept, and `{ counted: true }` with no `ride` signed out, where it is counted and not kept. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account. Since 2026-11-22 every save carries `summary`, the whole ride in numbers, which a signed-in account adds up and the website otherwise ignores: `meters`, `seconds` (the active time), `total`, `stopped`, and where there are any `top` (km/h to one decimal), `fastest` (seconds) and `start` and `end` (`[lat, lng]`, 200 m in from each end). A ride with nothing inside the four cities, saved signed in, goes with `line: []` and no `anon`, answered `{ counted: true }`, or `signed-out` with no session, which marks it Not kept |
+| `GET /api/rides?totals=1` | what the signed-in account's rides add up to, for **On your account**: `{ ready, user, totals }`, `totals` null before any ride is added up, or `rides`, `meters`, `seconds`, `stopped`, `top` (km/h, or null), `fastest` (seconds, or null), `longest` (metres) and `since` (milliseconds since 1970). Asked when the Account tab appears signed in and when who is signed in changes, once a minute at most |
 | `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
 | `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
@@ -529,6 +573,8 @@ repository's `CLAUDE.md` under **What the app reads**.
 A line longer than 3,500 points, about forty kilometres, is thinned evenly
 before it is sent, and points outside the four boxes the server counts rides in — Tallinn, Tartu,
 Pärnu and Narva, fourteen kilometres round each — are left out (`Geo.line` in `Core/Ride.swift`).
+The `summary` beside it is worked out over every point, so the account's
+totals are the whole ride whatever the line leaves out.
 
 **Sign in with Apple needs the website to know this app.** Apple signs its
 token for a bundle id, and `functions/api/_apple.js` there lists the ids it
@@ -568,9 +614,10 @@ Rattatee/
             Recorder.swift      Core Location, in the background too
             Motion.swift        which stretches were walked or driven, asked once at Finish
             Timeline.swift      the ride part by part: a train carried, a stop settled, what is listed
-            Ride.swift          a ride, a point, and the sums
+            Ride.swift          a ride, a point, the sums, and the summary sent with it
             Insight.swift       a ride's kilometres and speeds, and what the website kept of it
             Store.swift         every ride on the phone, and sending them
+            AccountTotals.swift what the account's rides add up to, from the website
             Search.swift        places, streets, Google, and the way there and its turns
             Guide.swift         the voice that says the turns
             Radio.swift         the radio on a ride, and going under that voice
@@ -590,7 +637,7 @@ Rattatee/
             RidesTab.swift      My rides
             StatsCard.swift     how far today, this week, this month, in all
             RideView.swift      one ride, opened
-            AccountView.swift   the Account tab, the colours, deleting an account
+            AccountView.swift   the Account tab, its totals, the colours, deleting an account
             SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et, ru and az
@@ -657,7 +704,9 @@ launched in each state and photographed. The pictures are the run's
 - **App Privacy**, matching `PrivacyInfo.xcprivacy`:
   - *Precise Location* — collected, for App Functionality, linked, not
     used for tracking. That is the ride of somebody signed in, which the
-    website keeps under their account. A ride saved with nobody signed in
+    website keeps under their account, its numbers added up there with
+    the account's others (**On your account**) — derived from the same
+    points, so no new kind of data. A ride saved with nobody signed in
     is sent, counted and let go, which is not collecting it; the answer
     stays *collected* because the app does both.
   - *User ID* — collected only when signed in, for App Functionality,

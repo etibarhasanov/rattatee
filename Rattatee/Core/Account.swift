@@ -14,7 +14,8 @@ import Foundation
 /// Signing out keeps the rides on the phone: they are the phone's record.
 /// A ride is filed under whoever is signed in at the moment it is sent, or
 /// under nobody. The lists, and any place still waiting to go on one, were
-/// the account's, and go with it (`ListBook.forget`).
+/// the account's, and go with it (`ListBook.forget`), and so do the
+/// account's totals kept from the Account tab (`AccountTotals.forget`).
 extension Store {
     /// Ask the site who this cookie belongs to, and which doors it offers.
     func whoAmI() async {
@@ -88,6 +89,7 @@ extension Store {
     private func leave() {
         user = nil
         ListBook.shared.forget()
+        AccountTotals.shared.forget()
         if let cookies = HTTPCookieStorage.shared.cookies(for: API.base) {
             for cookie in cookies where cookie.name == "ttb_s" { HTTPCookieStorage.shared.deleteCookie(cookie) }
         }

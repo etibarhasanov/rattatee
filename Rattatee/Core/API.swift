@@ -4,8 +4,9 @@ import Foundation
 ///
 /// Rattatee has no server of its own, the same as Kohuke and the map app. It
 /// records a ride on the phone and hands it to `/api/rides`, the Function the
-/// website's own recorder saves through, and asks `/api/account`,
-/// `/api/google` and `/api/apple` who is riding.
+/// website's own recorder saves through, asks `/api/account`,
+/// `/api/google` and `/api/apple` who is riding, and asks `/api/rides`
+/// again, on the Account tab, what that account's rides add up to.
 ///
 /// Requests go through one `URLSession` whose cookie store is the system's.
 /// The website's session is an HttpOnly cookie (`ttb_s`), and a native
@@ -80,6 +81,15 @@ enum API {
     struct Refusal: Error {
         let code: String
         let status: Int
+    }
+
+    /// Whether the phone holds the site's session cookie, `ttb_s`. Not
+    /// whether the site still honours it — only the site can say that — but
+    /// without one no request can be signed in, so there is nothing to ask.
+    /// Unlike `Store.user`, it is known at launch and with no signal. One
+    /// caller: a ride outside the four cities — `Store.send`.
+    static var holdsSession: Bool {
+        HTTPCookieStorage.shared.cookies(for: base)?.contains { $0.name == "ttb_s" } ?? false
     }
 
     /// A JSON POST, the way the website's own pages send one. Answers the

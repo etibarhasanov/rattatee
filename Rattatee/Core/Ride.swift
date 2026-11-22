@@ -72,10 +72,15 @@ struct Ride: Codable, Identifiable, Equatable {
         /// `serverId` is its id there. With nobody signed in it counted
         /// the streets the ride went down and kept nothing — `phoneOnly`
         /// — so there is no id, and the ride is this file and no more.
+        /// Signed in with nothing of it inside the four cities (`outside`)
+        /// there is no id either: there was no line to keep, and only its
+        /// `summary` was added up on the account.
         case saved
         /// The server refused it for a reason sending again cannot change
-        /// (`short`, `fast`, `malformed`). Kept on the phone so it is not
-        /// lost silently, and listed as Not kept.
+        /// (`short`, `fast`, `malformed`), or it was never sent: nothing of
+        /// it was inside the four cities and no account was there to add up
+        /// its numbers (`outside`, the phone's own word). Kept on the phone
+        /// so it is not lost silently, and listed as Not kept.
         case refused
     }
 
@@ -154,7 +159,8 @@ struct Ride: Codable, Identifiable, Equatable {
     var serverId: String?
     var serverMeters: Int?
     /// The server's word for the last refusal: "often", "short", "fast",
-    /// "malformed", or "offline" for no answer at all.
+    /// "malformed", or "offline" for no answer at all — and "outside",
+    /// which is the phone's: see `Status.refused`.
     var problem: String?
     /// "often" means not again before the next UTC midnight; any other
     /// failure means not again before a wait that doubles with `tries`.
@@ -265,6 +271,60 @@ struct Ride: Codable, Identifiable, Equatable {
         return (Date(timeIntervalSince1970: first.t), Date(timeIntervalSince1970: last.t))
     }
 
+    /// Whether nothing of the ride is inside the four cities (`Geo.cities`):
+    /// fewer than two points there, so `Geo.line` has no line to send. With
+    /// nobody signed in such a ride is not sent at all; signed in it goes
+    /// with an empty line, for its `summary` alone — `Store.send`.
+    var outside: Bool {
+        points.lazy.filter(Geo.inCity).prefix(2).count < 2
+    }
+
+    /// The ride in a few numbers, sent as `summary` beside the line on every
+    /// save, which a signed-in rider's account adds up and the Account tab
+    /// shows (`AccountTotals`). The website ignores it with no session, so
+    /// it goes on every save rather than the phone deciding when: one
+    /// payload, and the server is what knows whether there is an account.
+    ///
+    /// It is the whole ride as ridden, where the line is not. The line is
+    /// only what is inside the four cities, thinned past `Geo.maxPoints`,
+    /// and the server takes 200 m off each end of it; these are worked out
+    /// over every point the rider kept, so a ride into the countryside adds
+    /// up to every kilometre of it on the account, and one that never came
+    /// near a city adds up too, with no line at all. Nothing set aside at
+    /// Finish is in them: `points` is the riding, as everywhere else.
+    ///
+    /// - `meters`: the distance ridden (`metres`, gaps not counted).
+    /// - `seconds`: the active time, the same number sent as the save's own
+    ///   `seconds`; `total`: Start to Finish with the pauses left out.
+    /// - `stopped`: seconds spent standing, as the ride's page says it
+    ///   (`Insight`), and `fastest`, its fastest whole kilometre in seconds,
+    ///   left out of a ride under one.
+    /// - `top`: the save card's top speed, the fastest half-minute in km/h
+    ///   to one decimal, left out where there is none.
+    /// - `start` and `end`: `[lat, lng]` where the line the website keeps
+    ///   would begin and end — the first point `Geo.ends` of riding in from
+    ///   each end — so the account can say where rides set off and arrive
+    ///   without anybody's door in it. Both left out of a ride under twice
+    ///   that, which has no middle to name.
+    var summary: [String: Any] {
+        let insight = Insight(self)
+        var sum: [String: Any] = [
+            "meters": Int(metres.rounded()),
+            "seconds": ridden(),
+            "total": seconds(),
+            "stopped": Int((insight?.stopped ?? 0).rounded())
+        ]
+        if let top = topSpeed { sum["top"] = (top * 10).rounded() / 10 }
+        if let fastest = insight?.fastest { sum["fastest"] = Int(fastest.seconds.rounded()) }
+        if metres >= Geo.ends * 2,
+           let start = Geo.point(Geo.ends, into: points),
+           let end = Geo.point(Geo.ends, into: points.reversed()) {
+            sum["start"] = [Geo.round5(start.lat), Geo.round5(start.lng)]
+            sum["end"] = [Geo.round5(end.lat), Geo.round5(end.lng)]
+        }
+        return sum
+    }
+
     /// The name, or "Ride · Fri 14 Nov" when it was not given one.
     var title: String {
         name.isEmpty ? L.t("rideUntitled", ["date": L.date(started)]) : name
@@ -310,6 +370,33 @@ enum Geo {
             if d <= gap { m += d }
         }
         return m
+    }
+
+    /// How much of each end of a ride the website never keeps — `ENDS` on
+    /// the server, in `functions/api/rides.js`, where a ride's first and
+    /// last 200 m are cut off before it is stored or counted, which is
+    /// where a home or a workplace would be. The save card promises it in
+    /// so many words ("the first and last 200 m are left off"), and
+    /// `Store.shortest` is built on it. Change it there, change it here.
+    static let ends: Double = 200
+
+    /// The first point `distance` of riding into a line, counted as
+    /// `length` counts — a gap is not riding — or nil for a line not that
+    /// long. The server's `cut()` beside `ENDS`, over the whole ride rather
+    /// than the line it was sent; the end of a ride is the same asked of
+    /// the points reversed.
+    static func point<S: Sequence>(_ distance: Double, into points: S) -> Point? where S.Element == Point {
+        var run = 0.0
+        var last: Point?
+        for p in points {
+            if let last {
+                let d = metres(last, p)
+                if d <= gap { run += d }
+                if run >= distance { return p }
+            }
+            last = p
+        }
+        return nil
     }
 
     /// The ridden line in the pieces it is drawn in: cut where two points
