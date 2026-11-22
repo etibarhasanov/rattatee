@@ -9,9 +9,9 @@ import SwiftUI
 /// and the server does not know which of its rides are this rider's — one
 /// saved with no account is nobody's from the next day on — so its totals
 /// would be smaller than the phone's and need sending to say so. The
-/// website's own sum, of a signed-in account's rides from any phone, is on
-/// the Account tab instead (`AccountTotals`), and the two are not meant to
-/// agree.
+/// website's own sum, of a signed-in account's rides from any phone, is
+/// the section under this card instead (`AccountTotalsSection`), and the
+/// two are not meant to agree.
 ///
 /// Waiting rides count with saved ones, since they were ridden; a ride the
 /// server refused for good (too short, too fast) does not, the same way it
