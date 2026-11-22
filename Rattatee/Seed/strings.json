@@ -1188,10 +1188,10 @@
     "ru": "Аккаунт"
   },
   "tabRecord": {
-    "az": "Yaz",
-    "en": "Record",
-    "et": "Salvesta",
-    "ru": "Запись"
+    "az": "Get",
+    "en": "Go",
+    "et": "Sõida",
+    "ru": "Поехали"
   },
   "tabRides": {
     "az": "Gedişlərim",
