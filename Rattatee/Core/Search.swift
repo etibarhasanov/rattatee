@@ -114,10 +114,11 @@ struct Way: Equatable {
     /// Where it is a way by train: what the card and the map say of it.
     /// Nil for a way that is all bike, which is nearly every one.
     var train: Train?
-    /// What kind of way it is, where the website says: `style` in
-    /// /api/route, from 2026-11-19. Nil for a way with no name — from a
-    /// website before the names, where its second router did not answer,
-    /// and for a kind this build does not know.
+    /// What kind of way it is, where the website says. It says one thing
+    /// now: `ridden: true` on the way people have ridden and held their
+    /// pace on, which it puts first. The other four are `style`, a name the
+    /// website gave every way for a day from 2026-11-19 and then took back.
+    /// Nil for a way with no name, which is every way but a ridden one.
     var style: Style?
 
     enum Style: String { case ridden, fastest, safest, quietest, shortest }
@@ -472,7 +473,10 @@ enum Search {
         // from before it sent any answers none, and the way is still a way.
         let steps = (object["steps"] as? [[String: Any]] ?? []).compactMap { way.step($0) }
         way.steps = steps.sorted { $0.along < $1.along }
+        // Until this read `ridden`, the ridden way came first with a button
+        // like any other's: the website had stopped sending `style`.
         way.style = (object["style"] as? String).flatMap(Way.Style.init(rawValue:))
+            ?? (object["ridden"] as? Bool == true ? Way.Style.ridden : nil)
         return way
     }
 }
