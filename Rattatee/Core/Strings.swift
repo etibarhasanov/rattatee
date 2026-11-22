@@ -69,6 +69,12 @@ enum L {
         date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).locale(Locale(identifier: lang)))
     }
 
+    /// "14 Nov 2026": a day that may be in another year, with no weekday,
+    /// which says nothing that far back.
+    static func day(_ date: Date) -> String {
+        date.formatted(.dateTime.day().month(.abbreviated).year().locale(Locale(identifier: lang)))
+    }
+
     static func time(_ date: Date) -> String {
         date.formatted(.dateTime.hour().minute().locale(Locale(identifier: lang)))
     }

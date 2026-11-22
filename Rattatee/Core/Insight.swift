@@ -2,7 +2,9 @@ import Foundation
 
 /// What a ride's points say beyond its distance and time: each kilometre's
 /// time, the fastest one, the speed along the way, and how long was spent
-/// standing. The ride page draws it (`Views/RideView.swift`).
+/// standing. The ride page draws it (`Views/RideView.swift`), and its time
+/// standing and fastest kilometre go to the website in every save's
+/// `summary` (`Ride.summary`), for a signed-in account's totals.
 ///
 /// The website works out the same for a ride it keeps — `rideInsight()` in
 /// its `functions/api/_rides.js` — and this is that function, step for step

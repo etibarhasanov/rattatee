@@ -21,7 +21,11 @@ import Observation
 ///
 /// Somebody who does sign in (Account, on My rides) has their rides kept on
 /// the website under the account, listed on their account page there and
-/// drawn on the ride's page here.
+/// drawn on the ride's page here. Since 2026-11-22 every save carries the
+/// ride in a few numbers as well (`Ride.summary`), which the account adds
+/// up — a ride outside the four cities included, sent for those alone
+/// (`send`) — and the Account tab shows (`AccountTotals`). With nobody
+/// signed in the website ignores them and nothing more is kept.
 ///
 /// THE RIDE IS KEPT ON THE PHONE UNTIL THE SERVER SAYS IT HAS IT
 ///
@@ -594,29 +598,60 @@ final class Store {
         min(60 * pow(2, Double(max(0, tries - 1))), 6 * 3600)
     }
 
+    /// Send one ride, and file what the website said.
+    ///
+    /// A RIDE OUTSIDE THE CITIES STILL ADDS UP ON AN ACCOUNT
+    ///
+    /// The website takes a line only inside its four cities, and `Geo.line`
+    /// leaves the rest out. A ride with nothing inside them (`Ride.outside`)
+    /// has no line at all, and until 2026-11-22 it was marked Not kept ·
+    /// outside the cities on the phone and never sent. With nobody signed in
+    /// it still is: there is nothing to count and nobody to count it for.
+    /// Saved signed in, it now goes with an empty line and its `summary`,
+    /// and the website adds its numbers up on the account and answers
+    /// `counted`, keeping no line — so a rider's totals are every ride they
+    /// saved, the one in the countryside included.
+    ///
+    /// Whether it goes is decided here, at sending, from what was true at
+    /// Save and what is true now. Saved with nobody signed in
+    /// (`phoneOnly`), it is not sent, whoever has signed in since — the
+    /// rule that sends an in-city ride with no session. Saved signed in, it
+    /// is sent if the phone still holds the site's session cookie
+    /// (`API.holdsSession`), and not on `user`, which is only what `whoAmI`
+    /// last heard: nil from launch until the site answers, and for the
+    /// whole launch with no signal, which would have filed a signed-in
+    /// rider's ride Not kept for good. It goes without `anon`, since with
+    /// no account there is nothing to do with it, so a session the site no
+    /// longer honours is answered `signed-out`, and the ride is Not kept ·
+    /// outside, as it would have been signed out. One request, once, for a
+    /// kind of ride that is rare already.
     private func send(_ id: String) async {
         guard let ride = self.ride(id) else { return }
-        let line = Geo.line(ride.points)
+        let outside = ride.outside
         var outcome = ride
 
-        if line.count < 2 {
-            // Nothing of it is inside the box the server takes rides in.
+        if outside && (ride.phoneOnly == true || !API.holdsSession) {
             outcome.status = .refused
             outcome.problem = "outside"
         } else {
+            let line: [[Double]] = outside ? [] : Geo.line(ride.points)
+            var body: [String: Any] = [
+                "action": "save",
+                "name": ride.name,
+                // The active time: what the server shares out between the
+                // pieces and judges the speed over.
+                "seconds": max(1, ride.ridden()),
+                "line": line,
+                // The whole ride in numbers, for a signed-in rider's
+                // account to add up; ignored with no session.
+                "summary": ride.summary
+            ]
+            // Lets a save with no session through, to be counted and not
+            // kept; with one, the session wins and the ride is on the
+            // account. Not for a ride outside the cities: above.
+            if !outside { body["anon"] = true }
             do {
-                let data = try await API.post("api/rides", [
-                    "action": "save",
-                    // Lets a save with no session through, to be counted
-                    // and not kept; with one, the session wins and the
-                    // ride is on the account.
-                    "anon": true,
-                    "name": ride.name,
-                    // The active time: what the server shares out between
-                    // the pieces and judges the speed over.
-                    "seconds": max(1, ride.ridden()),
-                    "line": line
-                ], signed: ride.phoneOnly != true)
+                let data = try await API.post("api/rides", body, signed: ride.phoneOnly != true)
                 let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
                 // `ride` where the website kept it; `counted` and no
                 // `ride` where it did not, which leaves the two below nil.
@@ -632,6 +667,13 @@ final class Store {
                 switch refusal.code {
                 case "short", "fast", "malformed":
                     outcome.status = .refused
+                    // A ride outside the cities says why it really was
+                    // not kept — the empty line, to a server that does
+                    // not take one yet.
+                    if outside { outcome.problem = "outside" }
+                case "signed-out" where outside:
+                    outcome.status = .refused
+                    outcome.problem = "outside"
                 case "often":
                     outcome.notBefore = Self.nextUTCMidnight()
                 default:

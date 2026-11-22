@@ -191,8 +191,7 @@ struct OutcomeCard: View {
                 Text(ride.name.isEmpty ? when(ride) : ride.name + " · " + when(ride))
                     .font(.subheadline).foregroundStyle(Theme.muted)
                 RideNumbers(ride: ride)
-                Note(text: ride.phoneOnly == true ? L.t("rideSavedWhyPhone") : L.t("rideSavedWhyApp"))
-                    .padding(.bottom, 14)
+                Note(text: savedNote).padding(.bottom, 14)
                 done
             case .refused:
                 head(L.t("badgeNotKept", ["why": why(ride.problem)]))
@@ -215,6 +214,14 @@ struct OutcomeCard: View {
                 }
             }
         }
+    }
+
+    /// What became of a saved ride: on this phone and counted, with nobody
+    /// signed in; a bike route on the account; or, from outside the four
+    /// cities, no route at all but added up on the account (`Store.send`).
+    private var savedNote: String {
+        if ride.phoneOnly == true { return L.t("rideSavedWhyPhone") }
+        return ride.outside ? L.t("totalsSaved") : L.t("rideSavedWhyApp")
     }
 
     @ViewBuilder

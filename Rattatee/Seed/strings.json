@@ -1205,6 +1205,90 @@
     "et": "Täna",
     "ru": "Сегодня"
   },
+  "totalsAsOf": {
+    "az": "{when} vəziyyətinə — sayta qoşulmaq mümkün olmadı.",
+    "en": "As of {when} — the site could not be reached.",
+    "et": "Seisuga {when} — saidiga ei saanud ühendust.",
+    "ru": "По состоянию на {when} — сайт не ответил."
+  },
+  "totalsAverage": {
+    "az": "Orta sürət",
+    "en": "Average",
+    "et": "Keskmine",
+    "ru": "Средняя скорость"
+  },
+  "totalsDistance": {
+    "az": "Məsafə",
+    "en": "Distance",
+    "et": "Vahemaa",
+    "ru": "Расстояние"
+  },
+  "totalsFastest": {
+    "az": "Ən sürətli km",
+    "en": "Fastest km",
+    "et": "Kiireim km",
+    "ru": "Самый быстрый км"
+  },
+  "totalsLongest": {
+    "az": "Ən uzun gediş",
+    "en": "Longest ride",
+    "et": "Pikim sõit",
+    "ru": "Самая длинная поездка"
+  },
+  "totalsNone": {
+    "az": "Gedişlərin növbəti saxladığından başlayaraq burada toplanacaq.",
+    "en": "Your rides add up here from the next one you save.",
+    "et": "Sinu sõidud hakkavad siin kokku liituma järgmisest, mille salvestad.",
+    "ru": "Ваши поездки начнут складываться здесь со следующей, которую вы сохраните."
+  },
+  "totalsRides": {
+    "az": "Gedişlər",
+    "en": "Rides",
+    "et": "Sõidud",
+    "ru": "Поездки"
+  },
+  "totalsRiding": {
+    "az": "Sürmə vaxtı",
+    "en": "Riding time",
+    "et": "Sõiduaeg",
+    "ru": "Время в пути"
+  },
+  "totalsSaved": {
+    "az": "O, şəhərlərdən kənarda idi, ona görə velosiped marşrutu olmayacaq, amma hesabında nəzərə alındı. Təşəkkür edirik.",
+    "en": "It was outside the cities, so it is not a bike route, but it is added up on your account. Thank you.",
+    "et": "See oli linnadest väljas, nii et rattateeks see ei saa, aga sinu kontol on see kokku arvatud. Aitäh!",
+    "ru": "Она была за пределами городов, поэтому велосипедным маршрутом не станет, но в вашем аккаунте она учтена. Спасибо!"
+  },
+  "totalsStopped": {
+    "az": "Dayanma",
+    "en": "Stopped",
+    "et": "Seisatud",
+    "ru": "На месте"
+  },
+  "totalsTitle": {
+    "az": "Hesabında",
+    "en": "On your account",
+    "et": "Sinu kontol",
+    "ru": "В вашем аккаунте"
+  },
+  "totalsTop": {
+    "az": "Ən yüksək sürət",
+    "en": "Top speed",
+    "et": "Tippkiirus",
+    "ru": "Макс. скорость"
+  },
+  "totalsWhy": {
+    "az": "Bu hesaba istənilən telefondan saxlanmış bütün gedişlər, {date} tarixindən bəri.",
+    "en": "Every ride saved to this account, from any phone, since {date}.",
+    "et": "Kõik sellele kontole salvestatud sõidud, ükskõik millisest telefonist, alates {date}.",
+    "ru": "Все поездки, сохранённые в этом аккаунте с любого телефона, начиная с {date}."
+  },
+  "totalsWhyNoDate": {
+    "az": "Bu hesaba istənilən telefondan saxlanmış bütün gedişlər.",
+    "en": "Every ride saved to this account, from any phone.",
+    "et": "Kõik sellele kontole salvestatud sõidud, ükskõik millisest telefonist.",
+    "ru": "Все поездки, сохранённые в этом аккаунте с любого телефона."
+  },
   "tryNow": {
     "az": "İndi yoxla",
     "en": "Try now",
