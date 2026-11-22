@@ -8,7 +8,8 @@ import SwiftUI
 /// card than that. A tap turns it on and off; where there was no signal, a
 /// tap tries again.
 ///
-/// It is beside the speaker in the turn row and not in place of it: that
+/// Where there is somewhere to go, the voice's button is at its end
+/// (`VoiceButton`, in RecordTab.swift), and the row is narrower by it: that
 /// one is the voice, this one the music, and a rider can have either
 /// without the other.
 struct RadioRow: View {

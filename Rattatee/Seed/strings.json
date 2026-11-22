@@ -1397,6 +1397,18 @@
     "et": "Hääl on sees",
     "ru": "Голос включён"
   },
+  "voiceShort": {
+    "az": "Səs",
+    "en": "Voice",
+    "et": "Hääl",
+    "ru": "Голос"
+  },
+  "voiceShortOff": {
+    "az": "Sönülü",
+    "en": "Off",
+    "et": "Väljas",
+    "ru": "Выкл."
+  },
   "whyFast": {
     "az": "çox sürətli",
     "en": "too fast",
