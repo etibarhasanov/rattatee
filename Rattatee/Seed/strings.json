@@ -1121,6 +1121,12 @@
     "et": "Kõik",
     "ru": "Все"
   },
+  "statsAllAccount": {
+    "az": "Hesabındakı bütün telefonlardan, {date} tarixindən.",
+    "en": "From every phone on your account, since {date}.",
+    "et": "Kõigist sinu konto telefonidest, alates {date}.",
+    "ru": "Со всех телефонов вашего аккаунта, с {date}."
+  },
   "statsMonth": {
     "az": "Ay",
     "en": "Month",
@@ -1217,12 +1223,6 @@
     "et": "Keskmine",
     "ru": "Средняя скорость"
   },
-  "totalsDistance": {
-    "az": "Məsafə",
-    "en": "Distance",
-    "et": "Vahemaa",
-    "ru": "Расстояние"
-  },
   "totalsFastest": {
     "az": "Ən sürətli km",
     "en": "Fastest km",
@@ -1253,24 +1253,6 @@
     "et": "{m} min",
     "ru": "{m} мин"
   },
-  "totalsNone": {
-    "az": "Gedişlərin növbəti saxladığından başlayaraq burada toplanacaq.",
-    "en": "Your rides add up here from the next one you save.",
-    "et": "Sinu sõidud hakkavad siin kokku liituma järgmisest, mille salvestad.",
-    "ru": "Ваши поездки начнут складываться здесь со следующей, которую вы сохраните."
-  },
-  "totalsRides": {
-    "az": "Gedişlər",
-    "en": "Rides",
-    "et": "Sõidud",
-    "ru": "Поездки"
-  },
-  "totalsRiding": {
-    "az": "Sürmə vaxtı",
-    "en": "Riding time",
-    "et": "Sõiduaeg",
-    "ru": "Время в пути"
-  },
   "totalsSaved": {
     "az": "O, şəhərlərdən kənarda idi, ona görə velosiped marşrutu olmayacaq, amma hesabında nəzərə alındı. Təşəkkür edirik.",
     "en": "It was outside the cities, so it is not a bike route, but it is added up on your account. Thank you.",
@@ -1283,29 +1265,11 @@
     "et": "Seisatud",
     "ru": "На месте"
   },
-  "totalsTitle": {
-    "az": "Hesabında",
-    "en": "On your account",
-    "et": "Sinu kontol",
-    "ru": "В вашем аккаунте"
-  },
   "totalsTop": {
     "az": "Ən yüksək sürət",
     "en": "Top speed",
     "et": "Tippkiirus",
     "ru": "Макс. скорость"
-  },
-  "totalsWhy": {
-    "az": "Bu hesaba istənilən telefondan saxlanmış bütün gedişlər, {date} tarixindən bəri.",
-    "en": "Every ride saved to this account, from any phone, since {date}.",
-    "et": "Kõik sellele kontole salvestatud sõidud, ükskõik millisest telefonist, alates {date}.",
-    "ru": "Все поездки, сохранённые в этом аккаунте с любого телефона, начиная с {date}."
-  },
-  "totalsWhyNoDate": {
-    "az": "Bu hesaba istənilən telefondan saxlanmış bütün gedişlər.",
-    "en": "Every ride saved to this account, from any phone.",
-    "et": "Kõik sellele kontole salvestatud sõidud, ükskõik millisest telefonist.",
-    "ru": "Все поездки, сохранённые в этом аккаунте с любого телефона."
   },
   "tryNow": {
     "az": "İndi yoxla",

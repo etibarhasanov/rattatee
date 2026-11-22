@@ -81,14 +81,18 @@ Three tabs.
   the rides and the riding time for **Today**, **Week**, **Month** or
   **All**, with a bar a day for the week (`Views/StatsCard.swift`). A week
   starts on Monday and a month on its 1st, in the phone's time zone. Saved
-  and waiting rides count; a ride Not kept does not. It is added up on the
-  phone from the rides already there, so it asks the website for nothing
-  and works with no signal — the server could not say it better anyway,
-  since a ride saved with no account is not there at all. The website's
-  own sum, of an account's rides from any phone, is under it, signed in
-  (**On your account**, below), and the two are not meant to agree, so
-  each says under it what it counts. A phone with no ride on it shows only
-  that it has none, signed in or not.
+  and waiting rides count; a ride Not kept does not. Today, Week and Month
+  are added up on the phone from the rides already there, so they ask the
+  website for nothing and work with no signal — the server could not say
+  them better anyway, since a ride saved with no account is not there at
+  all. **All**, signed in, is the account's instead, once the website has
+  answered: every ride saved to it from any phone, with the time stopped,
+  the average, the top speed, the fastest kilometre and the longest ride
+  under it, and *From every phone on your account, since 14 Nov 2026.* at
+  the foot (**All, on the account**, below). Signed out, and until that
+  answer comes, All is the phone's, as the other three are. The two are not
+  meant to agree, and the foot line is what says which All is showing. A
+  phone with no ride on it shows only that it has none, signed in or not.
 
   **A ride, opened.** A row opens its ride on a page of its own
   (`Views/RideView.swift`): the map framed to it, the riding solid, a walk
@@ -368,17 +372,18 @@ says whose they are: *© OpenStreetMap · CyclOSM · OSM France*.
 It is why the record map is an `MKMapView` and not SwiftUI's `Map`, which
 draws nothing of anybody else's.
 
-### On your account
+### All, on the account
 
 Since 2026-11-22 a signed-in rider's rides add up on the website, and My
-rides shows the sum under the card that adds up the phone's. It was under
-the signed-in rows of the Account tab for the few hours before the owner
-moved it. Every save carries the ride in a few numbers the phone has
-already worked out (`Ride.summary` in `Core/Ride.swift`): the distance
-ridden, the active time and the time Start to Finish, the time stopped,
-the top speed and the fastest kilometre, and where the kept line would
-begin and end — the first point 200 m in from each end, so no door is in
-it. They are the whole ride, not the line that is sent: a ride that went
+rides shows the sum as **All** on the card at the top, in place of the
+phone's. It was a section of its own under the card, *On your account*,
+for most of that day, and under the signed-in rows of the Account tab for
+the few hours before; the owner's word was that it is part of All. Every
+save carries the ride in a few numbers the phone has already worked out
+(`Ride.summary` in `Core/Ride.swift`): the distance ridden, the active
+time and the time Start to Finish, the time stopped, the top speed and the
+fastest kilometre, and where the kept line would begin and end — the
+first point 200 m in from each end, so no door is in it. They are the whole ride, not the line that is sent: a ride that went
 out past the four cities adds every kilometre of it, and one that never
 came near them is sent with no line at all, for its numbers alone —
 *Saved*, with *It was outside the cities, so it is not a bike route, but
@@ -387,23 +392,26 @@ one. The website keeps them with the account and adds them to its
 totals; with nobody signed in it ignores them, and a rider with no
 account gets nothing new and has nothing more kept.
 
-The section reads `GET /api/rides?totals=1` (`Core/AccountTotals.swift`):
-distance, rides, riding time, stopped, the average, the top speed and the
-fastest kilometre where there are any, and the longest ride, with *Every
-ride saved to this account, from any phone, since 14 Nov 2026.* under them.
-Every figure carries its unit — *9 h 43 min*, *43 min*, *2 min 17 s*,
-*13.1 km/h*, *8.6 km* — the hours, minutes and seconds in the chosen
-language, since a 9:43 on a line of its own, as it read at first, could
-be anything; a ride's own row keeps its *34 min* and *1:12*. It asks when
-My rides appears signed in, and when who is signed in changes, and not
-again for the same account within a minute — never in the background and
-never on a timer, one row read on the website each time. The last answer
-is kept on the phone for the account it was, so My rides opens on
-numbers; with no signal they stay, under *As of Sun 22 Nov 17:08
-— the site could not be reached.* Before the first answer a muted Distance
-row waits with a spinner, and an account with nothing added up yet says
-*Your rides add up here from the next one you save.* Signing out or
-deleting the account forgets the numbers on the phone.
+All reads `GET /api/rides?totals=1` (`Core/AccountTotals.swift`): the
+distance large, as the other spans have it, and *12 rides · 9 h 43 min
+riding* under it; then, a row each, the time stopped, the average, the top
+speed and the fastest kilometre where there are any, and the longest ride;
+and *From every phone on your account, since 14 Nov 2026.* at the foot.
+There are no bars, as All never had. Every figure carries its unit —
+*9 h 43 min*, *43 min*, *2 min 17 s*, *13.1 km/h*, *8.6 km* — the hours,
+minutes and seconds in the chosen language, since a 9:43 on a line of its
+own, as it read at first, could be anything; a ride's own row keeps its
+*34 min* and *1:12*, and so does the phone's own line on the card. It asks
+when My rides appears signed in, whichever span is chosen, and when who
+is signed in changes, and not again for the same account within a minute
+— never in the background and never on a timer, one row read on the
+website each time. The last answer is kept on the phone for the account it
+was, so All opens on the account's numbers; with no signal they stay, with
+*As of Sun 22 Nov 17:08 — the site could not be reached.* at the foot.
+Before the first answer, and for an account with nothing added up yet,
+All is the phone's own sum, as it is signed out — numbers either way, and
+no spinner. Signing out or deleting the account forgets the numbers on the
+phone.
 
 ## The rules of a recording
 
@@ -540,9 +548,9 @@ rewritten every five points, about sixty metres, and at every pause.
 - **Nothing of it is in the four cities**: saved with nobody signed in, it
   is *Not kept · outside the cities* and never sent, as ever. Saved signed
   in, it is sent with an empty line for its numbers alone, which the
-  account adds up (**On your account**, above), and is *Saved*; a session
-  the website no longer honours answers `signed-out`, and it is Not kept
-  after all.
+  account adds up (**All, on the account**, above), and is *Saved*; a
+  session the website no longer honours answers `signed-out`, and it is
+  Not kept after all.
 
 - **The answer is lost on the way back**: from the phone that is the same as
   a save that never arrived, and the ride is sent again — and the website
@@ -568,7 +576,7 @@ repository's `CLAUDE.md` under **What the app reads**.
 | | |
 |---|---|
 | `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }` signed in, where the ride is kept, and `{ counted: true }` with no `ride` signed out, where it is counted and not kept. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account. Since 2026-11-22 every save carries `summary`, the whole ride in numbers, which a signed-in account adds up and the website otherwise ignores: `meters`, `seconds` (the active time), `total`, `stopped`, and where there are any `top` (km/h to one decimal), `fastest` (seconds) and `start` and `end` (`[lat, lng]`, 200 m in from each end). A ride with nothing inside the four cities, saved signed in, goes with `line: []` and no `anon`, answered `{ counted: true }`, or `signed-out` with no session, which marks it Not kept |
-| `GET /api/rides?totals=1` | what the signed-in account's rides add up to, for **On your account**: `{ ready, user, totals }`, `totals` null before any ride is added up, or `rides`, `meters`, `seconds`, `stopped`, `top` (km/h, or null), `fastest` (seconds, or null), `longest` (metres) and `since` (milliseconds since 1970). Asked when My rides appears signed in and when who is signed in changes, once a minute at most |
+| `GET /api/rides?totals=1` | what the signed-in account's rides add up to, for **All** on My rides: `{ ready, user, totals }`, `totals` null before any ride is added up, or `rides`, `meters`, `seconds`, `stopped`, `top` (km/h, or null), `fastest` (seconds, or null), `longest` (metres) and `since` (milliseconds since 1970). Asked when My rides appears signed in and when who is signed in changes, once a minute at most |
 | `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
 | `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
@@ -647,8 +655,8 @@ Rattatee/
             ListPicker.swift    Add to a list
             RadioRow.swift      the radio's row while riding, and the list of stations
             FinishCards.swift   Save, Too short, and what came of it
-            RidesTab.swift      My rides, and On your account under its card
-            StatsCard.swift     how far today, this week, this month, in all
+            RidesTab.swift      My rides
+            StatsCard.swift     how far today, this week, this month, and in all, the account's signed in
             RideView.swift      one ride, opened
             AccountView.swift   the Account tab, the colours, deleting an account
             SignIn.swift        the username form and the Apple and Google buttons
@@ -718,8 +726,8 @@ launched in each state and photographed. The pictures are the run's
   - *Precise Location* — collected, for App Functionality, linked, not
     used for tracking. That is the ride of somebody signed in, which the
     website keeps under their account, its numbers added up there with
-    the account's others (**On your account**) — derived from the same
-    points, so no new kind of data. A ride saved with nobody signed in
+    the account's others (**All, on the account**) — derived from the
+    same points, so no new kind of data. A ride saved with nobody signed in
     is sent, counted and let go, which is not collecting it; the answer
     stays *collected* because the app does both.
   - *User ID* — collected only when signed in, for App Functionality,
