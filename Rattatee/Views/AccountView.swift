@@ -2,8 +2,9 @@ import SwiftUI
 
 /// The Account tab: making an account or signing in — with a username and a
 /// password, or Apple or Google — which nobody has to do; signing out and
-/// deleting the account; the language; the colour and the background; and
-/// the privacy page. What the account's rides add up to is on My rides,
+/// deleting the account; the language; the colour and the background; the
+/// privacy page; and, at the foot, which version and build this is. What the
+/// account's rides add up to is on My rides,
 /// under All on the card at the top (`StatsCard`).
 struct AccountTab: View {
     @Environment(Store.self) private var store
@@ -70,6 +71,15 @@ struct AccountTab: View {
 
                 Section {
                     Link(L.t("privacyLink"), destination: API.privacy)
+                } footer: {
+                    // Which build this is, for somebody telling the owner
+                    // what went wrong: the builds of one version on
+                    // TestFlight are told apart by the number in brackets.
+                    Text(L.t("version", ["version": Self.version]))
+                        .foregroundStyle(Theme.muted)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 8)
+                        .textSelection(.enabled)
                 }
                 .listRowBackground(Theme.card)
             }
@@ -79,6 +89,16 @@ struct AccountTab: View {
             .sheet(isPresented: $deleting) { DeleteAccountView() }
         }
     }
+
+    /// The version people see and the build, "1.0 (142)", read from the app
+    /// itself: a tag sets the first and the package workflow the second
+    /// (docs/RELEASING.md), so nothing here changes for a release.
+    private static let version: String = {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let shown = info["CFBundleShortVersionString"] as? String ?? "?"
+        guard let build = info["CFBundleVersion"] as? String else { return shown }
+        return "\(shown) (\(build))"
+    }()
 }
 
 /// One colour to choose: a dot in its daytime accent, ringed when chosen,

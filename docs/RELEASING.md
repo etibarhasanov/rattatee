@@ -64,6 +64,10 @@ The build number is `BUILD_NUMBER_BASE` (100, at the top of the workflow)
 plus the run number, so it only goes up. Without a tag, the version is the
 `MARKETING_VERSION` in the project.
 
+Both are at the foot of the Account tab, *Version 1.0 (142)*, read from the
+installed app, so a tester can say which build they have. A build from Xcode
+says `(1)`, the project's own `CURRENT_PROJECT_VERSION`.
+
 ## The four secrets, once
 
 The workflow signs with Xcode's automatic signing and an App Store Connect

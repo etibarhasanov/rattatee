@@ -1349,6 +1349,12 @@
     "et": "Sõida tunnelisse",
     "ru": "Въезжайте в тоннель"
   },
+  "version": {
+    "az": "Versiya {version}",
+    "en": "Version {version}",
+    "et": "Versioon {version}",
+    "ru": "Версия {version}"
+  },
   "voiceOff": {
     "az": "Səs sönülüdür",
     "en": "Voice is off",
