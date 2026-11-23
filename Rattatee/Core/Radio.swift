@@ -26,18 +26,23 @@ struct Station: Codable, Identifiable, Equatable {
 /// sixty megabytes of mobile data an hour. It is live: there is nothing to
 /// rewind and no song to choose.
 ///
-/// The stations are compiled in, `Seed/stations.json`, the website's own
-/// eleven (`data/radio.json` there, one a language) and nine beside them.
+/// The stations are compiled in, `Seed/stations.json`: ERR's five and Radio
+/// Paradise's two. App Review can ask to see each broadcaster's permission,
+/// and these two are the only broadcasters likely to give it. The other
+/// thirteen were taken off before release (README.md says why for each).
+/// One comes back when its broadcaster says yes in writing, never just
+/// because its address plays.
 /// An address that dies is a line in that file and a new build; having the
 /// website hand the list over instead is the next step, and README.md says
 /// what it would promise.
 ///
 /// WHICH STATION
 ///
-/// The one the rider last chose, kept on the phone. Until they choose, the
-/// one marked for the language the app is in — Raadio Tallinn in Estonian,
-/// Наше Радио in Russian — so the first press plays something they can
-/// follow.
+/// The one the rider last chose, kept on the phone; one that has since left
+/// the list counts as none chosen. Until they choose, the one marked for the
+/// language the app is in — Raadio Tallinn in Estonian, Raadio 4 in Russian —
+/// so the first press plays something they can follow. Azerbaijani has
+/// none of its own, so it starts on the first, Raadio Tallinn.
 ///
 /// WHEN IT PLAYS
 ///
