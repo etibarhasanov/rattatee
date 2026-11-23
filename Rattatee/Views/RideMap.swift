@@ -368,7 +368,7 @@ private final class Stroke: MKPolyline {
 }
 
 /// A station of a way by train, at one end of its rail.
-private final class Station: NSObject, MKAnnotation {
+private final class RailStation: NSObject, MKAnnotation {
     let coordinate: CLLocationCoordinate2D
     let title: String?
 
@@ -559,7 +559,7 @@ private struct MapCanvas: UIViewRepresentable {
         private var drawn: [(mark: Int, stroke: Stroke)] = []
         private var paths: BikePaths?
         private var pin: MKPointAnnotation?
-        private var stations: [Station] = []
+        private var stations: [RailStation] = []
         private var stationsFrom = ""
         private var look = ""
 
@@ -649,7 +649,7 @@ private struct MapCanvas: UIViewRepresentable {
             if from != stationsFrom {
                 stationsFrom = from
                 map.removeAnnotations(stations)
-                stations = canvas.stations.map { Station(name: $0.name, at: $0.at) }
+                stations = canvas.stations.map { RailStation(name: $0.name, at: $0.at) }
                 map.addAnnotations(stations)
             }
 
@@ -732,7 +732,7 @@ private struct MapCanvas: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            if let station = annotation as? Station {
+            if let station = annotation as? RailStation {
                 let view = mapView.dequeueReusableAnnotationView(withIdentifier: "station") as? StationView
                     ?? StationView(annotation: station, reuseIdentifier: "station")
                 view.annotation = station
