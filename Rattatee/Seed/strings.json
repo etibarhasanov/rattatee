@@ -246,16 +246,16 @@
     "ru": "Создайте аккаунт во вкладке «Аккаунт», чтобы добавлять места в свои списки."
   },
   "goalNoWay": {
-    "az": "Buradan yol tapılmadı. Yenə də ora sürüb gedişi yaza bilərsən.",
-    "en": "No way was found from here. You can still ride there and record it.",
-    "et": "Siit ei leitud teed. Võid siiski sinna sõita ja sõidu salvestada.",
-    "ru": "Путь отсюда не найден. Всё равно можно доехать и записать поездку."
+    "az": "Yol tapılmadı. Yenə də ora sürə bilərsən.",
+    "en": "No way found. You can still ride there.",
+    "et": "Teed ei leitud. Võid ikka sinna sõita.",
+    "ru": "Путь не найден. Но доехать всё равно можно."
   },
   "goalNote": {
-    "az": "Xəritədəki xətt təklif olunan yoldur. Onunla get və ya öz yolunla — yazılan sənin həqiqətən getdiyin yoldur.",
-    "en": "The line on the map is a suggested way. Ride it or your own — what is recorded is the way you really go.",
-    "et": "Kaardil olev joon on soovitatud tee. Sõida seda või oma teed — salvestatakse see, kust sa päriselt sõidad.",
-    "ru": "Линия на карте — предложенный путь. Езжайте по нему или по-своему: записывается то, как вы едете на самом деле."
+    "az": "Xətt sadəcə təklifdir. İstədiyin yolla sür.",
+    "en": "The line is just a suggestion. Ride any way you like.",
+    "et": "Joon on vaid soovitus. Sõida, kust tahad.",
+    "ru": "Линия — лишь подсказка. Езжайте как хотите."
   },
   "goalTo": {
     "az": "{name}",
