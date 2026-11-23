@@ -635,7 +635,7 @@ totals are the whole ride whatever the line leaves out.
 
 **Sign in with Apple needs the website to know this app.** Apple signs its
 token for a bundle id, and `functions/api/_apple.js` there lists the ids it
-accepts; this app's is `ee.tallinntastebuds.rattatee`.
+accepts; this app's is `ee.tallinntastebuds.rattatee.app`.
 
 **The words are compiled in**, unlike Kohuke's, because the app has to say
 "Recording" with no signal. `Rattatee/Seed/strings.json` holds every string
@@ -723,7 +723,7 @@ shows every screen, but only a phone on a bike records a ride.
   when pressed; Google and riding without an account both work.
 - **Release** carries the entitlement, so archiving needs the paid developer
   team, with the **Sign in with Apple** capability on the app id
-  `ee.tallinntastebuds.rattatee`.
+  `ee.tallinntastebuds.rattatee.app`.
 
 **A build on GitHub, when asked**, `.github/workflows/ios.yml` — Actions →
 build → Run workflow, on the branch to check. Since 2026-11-18 a push no
@@ -737,7 +737,7 @@ launched in each state and photographed. The pictures are the run's
 ### To TestFlight
 
 1. In App Store Connect, make the app: bundle id
-   `ee.tallinntastebuds.rattatee`, name Rattatee.
+   `ee.tallinntastebuds.rattatee.app`, name Rattatee.
 2. In Xcode: **Product → Archive** with the Release configuration, then
    **Distribute App → App Store Connect**.
 3. Fill in what review asks for, below.

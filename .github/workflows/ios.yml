@@ -95,7 +95,7 @@ jobs:
             fi
           }
           check "display name"        '"CFBundleDisplayName" => "Rattatee"'
-          check "bundle id"           '"CFBundleIdentifier" => "ee.tallinntastebuds.rattatee"'
+          check "bundle id"           '"CFBundleIdentifier" => "ee.tallinntastebuds.rattatee.app"'
           check "encryption answer"   '"ITSAppUsesNonExemptEncryption"'
           check "launch screen colour" '"UIColorName" => "LaunchPaper"'
           check "location permission" '"NSLocationWhenInUseUsageDescription"'
@@ -118,7 +118,7 @@ jobs:
         run: |
           set -euo pipefail
           app=build/Build/Products/Debug-iphonesimulator/Rattatee.app
-          bundle=ee.tallinntastebuds.rattatee
+          bundle=ee.tallinntastebuds.rattatee.app
           dev=$(xcrun simctl list devices available -j | python3 -c '
           import json, sys
           d = json.load(sys.stdin)["devices"]

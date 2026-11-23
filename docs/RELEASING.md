@@ -85,7 +85,7 @@ all three app repositories (Tallinn Taste Buds, Kohuke and Rattatee).
      included. Apple lets you download it once.
 
 The app's record has to exist in App Store Connect before the first upload
-(bundle id `ee.tallinntastebuds.rattatee`); `docs/` says how where it covers the listing.
+(bundle id `ee.tallinntastebuds.rattatee.app`); `docs/` says how where it covers the listing.
 
 If the run stops at **Check the signing secrets are set**, one of the four
 is missing, and the error names it.
