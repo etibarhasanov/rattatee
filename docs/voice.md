@@ -1,8 +1,8 @@
 # The voice: what to record
 
 The turns of a way are said aloud in recordings of the owner's voice — see
-`Rattatee/Core/Guide.swift`. This is the dictionary: sixteen phrases, each in
-English, Estonian, Russian and Azerbaijani, sixty-four recordings in all.
+`Rattatee/Core/Guide.swift`. This is the dictionary: seventeen phrases, each in
+English, Estonian, Russian and Azerbaijani, sixty-eight recordings in all.
 
 The app joins them. Before a corner it plays **In 200 metres** and then the
 turn; at the corner it plays the turn alone. So each phrase is recorded on
@@ -12,6 +12,13 @@ A tunnel is said like a turn, at its entrance. Where it starts just past
 a corner — the Veerenni path under the railway turns left into it — the
 two are played one after the other, **Turn left** then **Enter the
 tunnel**, so the second does not cut the first off.
+
+Off the way, the voice reassures as well as warns, at the owner's word: a
+rider with the phone in a pocket cannot see that the app is already finding
+a new way, so **You're off the way** and **Going the wrong way** each say
+that one will be found, and when it comes, **New way found** says it was.
+Those two have a full stop in the middle: keep the pause there as short as
+a comma's, since the long pauses are where the take is cut.
 
 | File | English (`en-`) | Estonian (`et-`) | Russian (`ru-`) | Azerbaijani (`az-`) |
 |---|---|---|---|---|
@@ -24,8 +31,9 @@ tunnel**, so the second does not cut the first off.
 | `around` | Turn around | Pööra ümber | Развернитесь | Geri dön |
 | `arrive` | You have arrived | Oled kohal | Вы на месте | Çatdın |
 | `tunnel` | Enter the tunnel | Sõida tunnelisse | Въезжайте в тоннель | Tunelə gir |
-| `off` | You're off the way | Oled teelt maas | Вы сошли с пути | Yoldan çıxdın |
-| `wrong-way` | Going the wrong way | Vale suund | Вы едете не в ту сторону | Yanlış istiqamətdə gedirsən |
+| `off` | You're off the way. Don't worry, we'll find a new one | Oled teelt maas. Ära muretse, leiame uue | Вы сошли с пути. Не волнуйтесь, мы найдём новый | Yoldan çıxdın. Narahat olma, yenisini tapacağıq |
+| `wrong-way` | Going the wrong way. Turn around, or we'll find a new one | Vale suund. Pööra ümber või leiame uue | Вы едете не в ту сторону. Развернитесь, или мы найдём новый путь | Yanlış istiqamətdə gedirsən. Geri dön, ya da yenisini tapacağıq |
+| `new-way` | New way found, let's go | Uus tee leitud, lähme | Новый путь найден, поехали | Yeni yol tapıldı, gedək |
 | `train` | Your train leaves from here | Sinu rong läheb siit | Ваш поезд отходит отсюда | Qatarın buradan gedir |
 
 The train is said once, on the platform of a way by train, where the
@@ -59,10 +67,13 @@ on screen says so — "Roundabout, exit 2" — and the voice says nothing.
 The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
-**Recorded so far: Azerbaijani, English and Estonian, all but the
-train**, on 2026-11-18, each language in one take. Russian is still to do,
-and the train in every language; all four are to be recorded again whole,
-so that each stays one take. Until a phrase is, the phone's voice reads it.
+**Recorded so far: Azerbaijani, English and Estonian, the fifteen phrases
+before the train**, on 2026-11-18, each language in one take, when off the
+way and the wrong way were the warning alone. Russian is still to do, and
+in every language the train, the new way and the two reassurances; all
+four are to be recorded again whole, so that each stays one take. Until a
+phrase is, the phone's voice reads it — the row's shorter words, for the
+two off the way.
 
 ## Recording
 

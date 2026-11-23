@@ -257,9 +257,10 @@ the phone remembers: a speaker and *Voice*, or a struck-through speaker and
 before, since a ride with nowhere to go hears nothing from it but the
 greeting at Start; until 2026-11-22 it was a small speaker at the end of the
 turn row, where it was easy to miss. The voice is the owner's,
-recorded: sixteen phrases in each language, listed in `docs/voice.md`,
+recorded: seventeen phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
-Azerbaijani, English and Estonian are recorded, all but the train;
+Azerbaijani, English and Estonian are recorded, all but the three added on
+2026-11-23 — the train, the new way, and off the way with its promise;
 Russian is not yet, and until a phrase is the phone's own voice reads it,
 in English and Russian, and nothing does in Estonian or Azerbaijani,
 which iOS has no voice for. A roundabout is in the row and
@@ -298,15 +299,18 @@ trying every half minute; a tap tries at once (`Core/Radio.swift`,
 **Off the way, a new one.** It says first, and only then recalculates, at
 the owner's word. More than sixty metres from the way for two points in a
 row, the row says "You're off the way · 80 m from it" in place of the next
-turn, and the voice says it once; riding the way backwards for forty
-metres, it says "Going the wrong way". A few dozen metres off is often on
+turn, and the voice says it once, with a promise — "You're off the way.
+Don't worry, we'll find a new one" — since with the phone in a pocket the
+rider cannot see the app is on it; riding the way backwards for forty
+metres, it says "Going the wrong way. Turn around, or we'll find a new
+one". A few dozen metres off is often on
 purpose — a shop, a shortcut, a closed path — so nothing more happens yet,
 and back on the way the turns come back. Once the rider is plainly going
 wrong — 150 m from the way, 150 m ridden backwards along it, or 250 m
 ridden since it was said — the app asks the website for a new way from
 where they are, by itself and with no button, since the phone is in a
-pocket. The new way takes the old one's place and its first turn is said
-as any way's is. With no signal the row says "No new way yet" and it asks
+pocket. The new way takes the old one's place, the voice says "New way
+found, let's go", and its first turn is said as any way's is. With no signal the row says "No new way yet" and it asks
 again thirty seconds later. The question carries which way the rider is
 going — `heading`, worked out from the last thirty metres of the ride —
 and the website answers a way that sets off that way, so somebody who

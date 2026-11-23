@@ -466,6 +466,8 @@ final class Store {
         }
         goal.ways = ways
         take(0, in: &goal)
+        // After `take`, whose `forget` would hush it.
+        guide.found()
         endPicking(&goal)
         // Measured from where the ride is now, not where it was asked: the
         // rider has gone on while the website answered.

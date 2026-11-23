@@ -74,6 +74,7 @@ final class Guide {
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
         case wrongWay = "wrong-way"
+        case newWay = "new-way"
     }
 
     /// What has been said on this way, so each corner is said twice and no
@@ -150,14 +151,28 @@ final class Guide {
     }
 
     /// The rider has left the way: said once when the Store first sees it,
-    /// and not again until they have been back on a way. A new way is not
-    /// announced — its first turn is, as any way's is.
+    /// and not again until they have been back on a way. The recordings
+    /// carry a promise as well as the news — "You're off the way. Don't
+    /// worry, we'll find a new one" — at the owner's word, since a rider
+    /// told only that they are lost, with the phone in a pocket, has no way
+    /// to know the app is already on it. The row's words, which the phone
+    /// reads where there is no recording, stay short: they share the row
+    /// with how far off the rider is.
     func warn(_ kind: Lost.Kind) {
         guard voice else { return }
         switch kind {
         case .off: say([.off], L.t("lostOff"))
         case .back: say([.wrongWay], L.t("lostBack"))
         }
+    }
+
+    /// The new way that promise was about has come (`Store.reroute`): said
+    /// once, so the rider hears it kept. Its first turn follows as any way's
+    /// does, and where that corner is already close enough to say, it cuts
+    /// this off, which is the right way round.
+    func found() {
+        guard voice else { return }
+        say([.newWay], L.t("lostNew"))
     }
 
     /// A new ride has started: one line for the time of day, said once.

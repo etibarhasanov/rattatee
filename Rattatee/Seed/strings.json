@@ -569,6 +569,12 @@
     "et": "Sealt, kus sa praegu oled",
     "ru": "Оттуда, где вы сейчас"
   },
+  "lostNew": {
+    "az": "Yeni yol tapıldı, gedək",
+    "en": "New way found, let's go",
+    "et": "Uus tee leitud, lähme",
+    "ru": "Новый путь найден, поехали"
+  },
   "lostNone": {
     "az": "Hələ yeni yol yoxdur",
     "en": "No new way yet",
