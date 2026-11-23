@@ -52,9 +52,9 @@ on screen says so — "Roundabout, exit 2" — and the voice says nothing.
 The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
-**Recorded so far: Azerbaijani, English and Estonian, all fifteen of
-each**, on 2026-11-18, each language in one take. Twenty-four of them are to
-be said again, Estonian whole — see **Said again** below.
+**Recorded: Azerbaijani, English and Estonian, all fifteen of each**, on
+2026-11-18, each language in one take; and on 2026-11-23 twenty-four of
+them again, Estonian whole — see **Said again** below.
 
 **Russian is made, not recorded.** At the owner's word on 2026-11-23 it is
 said by Dmitri, an open voice for Piper (`ru_RU-dmitri-medium`), rather
@@ -71,11 +71,12 @@ into "сошлись". Then it was finished like the recordings (**Cutting**).
 
 ## Said again
 
-On 2026-11-23 nine of the recordings were found to have lost a quiet
-sound at an edge when they were cut, three to have a stray sound or word
-in them and two to say a part faintly. These are to be recorded again, in
-this order, in one memo — and with them all of Estonian, which the owner
-chose on 2026-11-23 to say again whole rather than mend five of fifteen:
+On 2026-11-23 nine of the first recordings were found to have lost a
+quiet sound at an edge when they were cut, three to have a stray sound or
+word in them and two to say a part faintly. The owner said them again the
+same day, in this order, in one memo, once each — and with them all of
+Estonian, which they chose to say again whole rather than mend five of
+fifteen:
 
 | Clip | Say | What was wrong |
 |---|---|---|
@@ -108,6 +109,18 @@ They were found without listening: by Whisper, an open speech recogniser,
 writing down what each file says, and by where sound is still going when
 a file stops. Whisper is weak in Azerbaijani and writes Estonian "õ" as
 "e", so a clip not in this list is not proven right — only not shown wrong.
+
+The new take was cut as **Cutting** says, and checked the same way: every
+file now ends in the room's silence, and Whisper writes each back as its
+line, near enough for its weak languages. Five were said with a stop in
+the middle — "Riding late, let's go", "Hoia paremale", "Sõida
+tunnelisse" and the Azerbaijani afternoon and evening — which is cut to
+0.3 s, from the silence either side. Three were trimmed by hand: lip
+clicks before `et-morning` and a breath before `en-late`, and the breath
+out that follows `az-late` for most of a second, which is faded over
+120 ms from just after the K of *getdik*. `et-late` keeps a quiet trailing
+sound after "hilja?", at about a twentieth of the words' loudness; the
+first take had it too, so it is taken to be how the question is said.
 
 ## Recording
 
