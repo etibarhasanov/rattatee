@@ -463,10 +463,12 @@ phone.
 - A jump faster than **60 km/h** between two kept points is dropped.
 - Coordinates are rounded to **5 decimals**.
 - Every kept point also carries its **time** and its **accuracy**.
-- Core Location is asked for the `fitness` activity and the best accuracy,
-  and never to pause on its own. The permission is **While Using the App**
-  with the `location` background mode; "Always" is never asked for.
-  `Core/Recorder.swift` says why that is enough.
+- Core Location is asked for the `otherNavigation` activity and the best
+  accuracy, and never to pause on its own. Not `fitness`: with that, iOS
+  moves the fixes onto the roads and paths its own map knows, and a ride
+  down a cycle path was recorded down the road beside it. The permission is
+  **While Using the App** with the `location` background mode; "Always" is
+  never asked for. `Core/Recorder.swift` says why that is enough.
 - There is no auto-pause. Pause is a button.
 
 ### Only the riding is sent

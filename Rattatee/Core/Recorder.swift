@@ -20,11 +20,48 @@ import Observation
 /// a paused ride costs no battery and a locked phone with a paused ride is
 /// simply asleep.
 ///
-/// What is asked of Core Location is what a cycling app asks for: `fitness`
-/// as the activity, the best accuracy there is, and never pausing on its own
-/// (`pausesLocationUpdatesAutomatically` would stop a ride at a long red
-/// light and not start it again until the app was opened). Which fixes are
-/// good enough to keep is decided in `Store.add`, the same as the website's.
+/// What is asked of Core Location is the best accuracy there is, and never
+/// pausing on its own (`pausesLocationUpdatesAutomatically` would stop a ride
+/// at a long red light and not start it again until the app was opened).
+/// Which fixes are good enough to keep is decided in `Store.add`, the same as
+/// the website's.
+///
+/// THE PHONE IS NOT TO PUT THE RIDE ON A ROAD
+///
+/// The activity asked for is `otherNavigation`. Until 2026-11-23 it was
+/// `fitness`, which reads as the one a cycling app wants and is not. With
+/// `fitness`, iOS moves each fix onto a road or path its own map knows before
+/// the app is given it. Apple's engineer, on Apple's forum: "CoreLocation
+/// will correct received/perceived coordinates to known roads and paths based
+/// on the `activityType`. `.fitness` is one of the activity types that will
+/// use corrected coordinates" (developer.apple.com/forums/thread/765927).
+/// Apple's map knows a carriageway far better than the cycle path beside it,
+/// so a ride down the path was handed to the app as a ride down the road.
+/// The owner rode the path beside Rohuneeme tee in Viimsi that day and sent
+/// the screen: the line ran ruler-straight down the right-hand lane of the
+/// road, a dozen metres from the path, round the bend corner for corner.
+///
+/// It is worse than a line drawn in the wrong place. The ride is sent, the
+/// website matches it to streets, and what it knows of how a street rides,
+/// and of which way people ride — the way it then offers first — it learns
+/// from that line. A ride moved onto the road tells it people ride the road.
+///
+/// `otherNavigation` is what Apple's documentation gives for "activities
+/// that don't or may not adhere to roads such as cycling, scooters, trains,
+/// boats and off-road vehicles". The same engineer suggests `other`, which
+/// is documented for a phone in the hand of somebody on a bench, and the
+/// developer who tried it there found the fixes still on the roads. So the
+/// fixes are now the phone's own: truer to where the bike is, and a little
+/// less smooth, since the correction took some of the wander out with it. A
+/// point every twelve metres and the thirty-metre rule below kept the wander
+/// out before and still do, and putting a ride on a street is the website's
+/// to do, from where the bike was.
+///
+/// Changed from a session with no phone to ride with. Apple documents what
+/// each activity is for and not what it does to a fix, so the first ride
+/// down that path with this build is the first proof of it. The blue dot is
+/// the map's own and asks Core Location for itself: where it stands on the
+/// road while the line runs down the path beside it, that is why.
 @MainActor
 @Observable
 final class Recorder: NSObject {
@@ -54,7 +91,8 @@ final class Recorder: NSObject {
         authorization = manager.authorizationStatus
         precise = manager.accuracyAuthorization == .fullAccuracy
         manager.delegate = self
-        manager.activityType = .fitness
+        // Not `.fitness`: THE PHONE IS NOT TO PUT THE RIDE ON A ROAD, above.
+        manager.activityType = .otherNavigation
         manager.desiredAccuracy = kCLLocationAccuracyBest
         // Half the twelve metres a point needs, so a point is never missed
         // for want of a fix, without waking the app for every metre.
