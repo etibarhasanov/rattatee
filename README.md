@@ -179,7 +179,7 @@ to go: **Where to?** stays over the map while riding, under the numbers, and
 a place chosen there, or a touch on the map, is somewhere to go exactly as
 before a ride. The recording goes on underneath; the way is asked for from
 where the rider is and setting off the way they are going (`heading`, as a
-new way off the old one is), and as soon as it arrives the blue line is
+new way off the old one is), and as soon as it arrives the way's line is
 under the ridden one, the card says how much is left and the turns are shown
 and said. The website's first way is taken, with no choice of others, since
 the rider is moving. A touch chooses only while there is nowhere to go yet —
@@ -216,10 +216,20 @@ it now, and until 2026-11-22 it read nothing else, so the ridden way came
 first with no name. The row of buttons still slides sideways here; on the
 website it wraps.
 
-Choosing a place puts it on the map with a suggested way by bike, in blue,
-how far it is and about how long, and **Go**, which is Start. While riding,
-the blue line stays under the line actually ridden and the card says how
-much of the way is left. The way is a suggestion and is not re-drawn when
+Choosing a place puts it on the map with a suggested way by bike, in the
+colour chosen under Account, how far it is and about how long, and **Go**,
+which is Start. While riding, the way's line stays under the line actually
+ridden and the card says how much of the way is left.
+
+The way is drawn as Apple's and Google's maps draw a route: solid, inside a
+darker edge, in a colour of its own (`Theme.way` in `Views/Theme.swift`).
+By day that is the accent. By night it is a stronger shade of the same hue,
+inside the ground's own dark, because the night accents are pale and Apple's
+dark map draws its main roads a pale grey-blue: until 2026-11-23 the way was
+the accent, three-quarters see-through and with no edge, and by night it
+could hardly be told from the roads it ran along. The faint ways on offer
+are the same colour, a little stronger by night than by day (THE WAY IS
+SOLID, AND EDGED in `Views/RideMap.swift`). The way is a suggestion and is not re-drawn when
 the rider leaves it; and arriving finishes nothing — Finish is still a
 button. What is saved is the way really ridden, never the suggestion and
 never the destination.
