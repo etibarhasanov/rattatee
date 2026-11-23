@@ -1,8 +1,9 @@
 # The voice: what to record
 
 The turns of a way are said aloud in recordings of the owner's voice — see
-`Rattatee/Core/Guide.swift`. This is the dictionary: fifteen phrases, each in
-English, Estonian, Russian and Azerbaijani, sixty recordings in all.
+`Rattatee/Core/Guide.swift` — and in Russian by a made one, Dmitri's. This
+is the dictionary: fifteen phrases, each in English, Estonian, Russian and
+Azerbaijani, sixty recordings in all.
 
 The app joins them. Before a corner it plays **In 200 metres** and then the
 turn; at the corner it plays the turn alone. So each phrase is recorded on
@@ -52,8 +53,50 @@ The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
 **Recorded so far: Azerbaijani, English and Estonian, all fifteen of
-each**, on 2026-11-18, each language in one take. Russian is still to do,
-and until it is the phone's voice reads it.
+each**, on 2026-11-18, each language in one take. Fourteen of them are to
+be said again — see **Said again** below.
+
+**Russian is made, not recorded.** At the owner's word on 2026-11-23 it is
+said by Dmitri, an open voice for Piper (`ru_RU-dmitri-medium`), rather
+than the phone's voice or a Russian speaker. Its model card gives the
+recordings it learnt from as NabuCasa's `voice-datasets`, CC0, and says it
+was fine-tuned from Piper's US English lessac voice, whose recordings have
+a licence of their own — written for research, as far as could be told on
+2026-11-23 without reaching the page. The owner knew that and chose it.
+It was made with Piper 1.8.0 (`pip install piper-tts`), one phrase at a
+time, `--length-scale 1.1`, each line of the Russian column ending in a
+full stop and the greetings in "!" — but for `off`, which is "Вы сошли с
+пути!" at `--length-scale 1.2`, since with a full stop it ran "сошли с"
+into "сошлись". Then it was finished like the recordings (**Cutting**).
+
+## Said again
+
+On 2026-11-23 nine of the recordings were found to have lost a quiet
+sound at an edge when they were cut, three to have a stray sound or word
+in them and two to say a part faintly. These are to be recorded again, in
+this order, in one memo:
+
+| Clip | Say | What was wrong |
+|---|---|---|
+| `en-keep-left` | Keep left | the "ft" was cut off |
+| `en-off` | You're off the way | it says "You're way off the way" |
+| `en-late` | Riding late, let's go | a "huh" between the halves |
+| `et-arrive` | Oled kohal | the L was cut off |
+| `et-wrong-way` | Vale suund | cut at both ends |
+| `et-soon` | Kahesaja meetri pärast | "kahe" is swallowed |
+| `et-late` | Liiga hilja? Lähme ikka! | a "hõõ" between the halves |
+| `et-right` | Pööra paremale | "Pöö" is faint |
+| `az-keep-right` | Sağda qal | the S was cut off |
+| `az-wrong-way` | Yanlış istiqamətdə gedirsən | the end was cut off |
+| `az-morning` | Sabahın xeyir, gedək | the end of *gedək* was cut off |
+| `az-afternoon` | Günortan xeyir, gedək | the same, and "Gün" is faint |
+| `az-evening` | Axşamın xeyir, gedək | the end of *gedək* was cut off |
+| `az-late` | Gecə gəzintisi, getdik! | the end was cut off |
+
+They were found without listening: by Whisper, an open speech recogniser,
+writing down what each file says, and by where sound is still going when
+a file stops. Whisper is weak in Azerbaijani and writes Estonian "õ" as
+"e", so a clip not in this list is not proven right — only not shown wrong.
 
 ## Recording
 
@@ -65,6 +108,13 @@ and until it is the phone's voice reads it.
 - Say each a little slower and louder than talking. It will be heard from a
   pocket, over traffic.
 - Twice each is fine; the better one is kept.
+- Say the last sound right out — the T of *left*, the K of *gedək*, the L
+  of *kohal* — and only then stop. A sound let fade is the one the cutting
+  loses.
+- A greeting is one breath, with no stop at the comma: a long one there
+  sounds like two phrases.
+- Several languages can go in one memo, in the order of the list, with
+  five seconds of silence between languages and two before stopping.
 
 ## Where they go
 
@@ -81,6 +131,19 @@ Rattatee/Voice/az-arrive.m4a
 AAC in an `.m4a`, mono. The folder is flat because the project's
 synchronised group copies every resource to the top of the bundle, where two
 files called `left.m4a` would be one.
+
+### Cutting
+
+A memo is cut apart at its pauses. Each phrase is then trimmed to where its
+sound first and last rises above 45 dB under its loudest moment, with 0.12 s
+kept before and 0.15 s after; high-passed at 80 Hz; brought to an average of
+-16.5 dB under a limiter at -1 dB; faded in over 15 ms and out over 30 ms;
+and kept as mono AAC at 64 kb/s, 44.1 kHz.
+
+The first takes were trimmed a tenth of a second either side of where a
+phrase was *loud*, about 20 dB under its peak. A K, a T, an L or an S at
+either end is quieter than that, so nine of them lost one — which is why
+the floor is now 45 dB down.
 
 Until a file is there, that phrase is read by the phone's own voice in
 English and Russian and is silent in Estonian and Azerbaijani, which iOS has

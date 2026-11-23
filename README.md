@@ -269,10 +269,11 @@ the phone remembers: a speaker and *Voice*, or a struck-through speaker and
 before, since a ride with nowhere to go hears nothing from it but the
 greeting at Start; until 2026-11-22 it was a small speaker at the end of the
 turn row, where it was easy to miss. The voice is the owner's,
-recorded: eleven phrases in each language, listed in `docs/voice.md`,
+recorded: fifteen phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
 Azerbaijani, English and Estonian are recorded, all fifteen phrases of
-each; Russian is not yet, and until it is the phone's own voice reads it. A roundabout is in the row and
+each; Russian is said by Dmitri, an open voice made on a computer, at the
+owner's word, for want of a Russian speaker. A roundabout is in the row and
 is not said: a bike is mostly on the path beside one. A tunnel is said
 at its entrance, "Enter the tunnel", and with the turn before it where it
 starts just past one, as the Veerenni path under the railway does. A ride
@@ -700,7 +701,7 @@ Rattatee/
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et, ru and az
             stations.json       the radio's stations
-  Voice/    <lang>-<clip>.m4a   the turns, recorded: Azerbaijani and English so far
+  Voice/    <lang>-<clip>.m4a   the turns and greetings, fifteen in each language
   *.lproj/  InfoPlist.strings   the location and motion questions, in each language
   PrivacyInfo.xcprivacy         the privacy manifest
 Config/     Info.plist          the two background modes and the languages
