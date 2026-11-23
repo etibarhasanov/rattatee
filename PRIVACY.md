@@ -59,11 +59,11 @@ and a password, or Sign in with Apple or Google, and it is the same account
 as on tallinntastebuds.ee. With Apple or Google the site keeps the number
 Apple or Google gives for you — never your email address or your name.
 
-**Delete account**, under Account in the app, removes your account, every
-way into it, and the numbers and totals of your rides at once. The ways of
-rides you saved stay, with no account left for them to belong to, and so
-does what they added to the counts of the streets. To have those ways
-removed too, write to info@avidatech.eu.
+**Delete account**, under Account in the app, removes at once your account,
+every way into it, and every ride it saved: the way you rode, its numbers
+and your totals. What your rides added to the counts of the streets stays,
+as it does for a ride saved with no account: counts of a street, with no
+ride or account in them.
 
 ## What the app does not do
 
