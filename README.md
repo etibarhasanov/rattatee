@@ -296,6 +296,15 @@ station comes back when its broadcaster says yes in writing, and that answer
 is what goes in App Review Information. A rider who had chosen one that left
 starts on their language's station again.
 
+**Not in a release, for now.** At the owner's word on 2026-11-23, the first
+version goes out without the radio, and `develop` keeps it. A tag, or
+`main`, is packaged with `NO_RADIO` (`.github/workflows/release.yml`), which
+turns `Radio.offered` off. The riding screen then has no radio row, the
+voice's button moves to the start of the Pause and Finish row, and nothing
+plays — even for a rider whose last ride on an older build ended with the
+radio on. A package from any other branch, `develop` included, still has the
+radio for testers. To ship the radio, take that line out of the workflow.
+
 When a turn is said the radio goes under it and comes back after, which
 iOS does for other apps' sound and an app has to do for its own. The lock
 screen has the station's name, play and pause, and next and previous for

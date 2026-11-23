@@ -81,6 +81,22 @@ final class Radio {
 
     var on: Bool { state != .off }
 
+    /// Whether this build has a radio at all. A release has none, at the
+    /// owner's word on 2026-11-23: the first version goes out without it,
+    /// and `develop` keeps it. So the package workflow builds a tag, or
+    /// `main`, with `NO_RADIO`, and every other build has the radio. Without
+    /// it, the riding screen has no radio row. Nothing plays, not even for
+    /// a rider whose last ride on an older build ended with the radio on,
+    /// and the lock screen offers nothing. `-kRadio none` draws any build
+    /// as a release would look, for the screenshots.
+    static let offered: Bool = {
+        #if NO_RADIO
+        return false
+        #else
+        return UserDefaults.standard.string(forKey: "kRadio") != "none"
+        #endif
+    }()
+
     /// The voice, so the session is not given away under a phrase.
     @ObservationIgnored weak var guide: Guide?
     /// Screenshots for CI: drawn, never played.
@@ -111,6 +127,7 @@ final class Radio {
         let data = Disk.seed("stations") ?? Data()
         stations = (try? JSONDecoder().decode([Station].self, from: data)) ?? []
         chosen = UserDefaults.standard.string(forKey: "station") ?? ""
+        guard Self.offered else { return }
         listen()
         remote()
     }
@@ -133,6 +150,7 @@ final class Radio {
     }
 
     func play() {
+        guard Self.offered else { return }
         wanted = true
         open = true
         tries = 0
@@ -165,7 +183,7 @@ final class Radio {
     /// and never over something the rider is already listening to.
     func begin() {
         open = true
-        guard wanted, !on, !demo, !AVAudioSession.sharedInstance().isOtherAudioPlaying else { return }
+        guard Self.offered, wanted, !on, !demo, !AVAudioSession.sharedInstance().isOtherAudioPlaying else { return }
         tries = 0
         join()
     }

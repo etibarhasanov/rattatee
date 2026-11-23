@@ -455,18 +455,26 @@ struct LostRow: View {
 /// The foot of the screen while riding: the radio, with the voice's button
 /// at its end where there is somewhere to go, and under them Pause or
 /// Resume, and Finish.
+///
+/// A build without the radio (`Radio.offered`, so every release for now)
+/// has no row for it. The voice's button moves to the start of the Pause
+/// and Finish row, the same height as them, and the card is one row
+/// shorter, so the map has that much more room.
 struct RecordingCard: View {
     @Environment(Store.self) private var store
     let ride: Ride
 
     var body: some View {
         SheetCard {
-            HStack(spacing: 10) {
-                RadioRow()
-                if store.goal != nil { VoiceButton() }
+            if Radio.offered {
+                HStack(spacing: 10) {
+                    RadioRow()
+                    if store.goal != nil { VoiceButton() }
+                }
+                .padding(.bottom, 10)
             }
-            .padding(.bottom, 10)
             HStack(spacing: 10) {
+                if !Radio.offered && store.goal != nil { VoiceButton() }
                 if ride.status == .recording {
                     Button(L.t("ridePause")) { store.pause() }.buttonStyle(.bigQuiet)
                 } else {

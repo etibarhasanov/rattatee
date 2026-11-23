@@ -44,7 +44,8 @@ enum LaunchScript {
     static func stage(_ store: Store) {
         guard let demo = UserDefaults.standard.string(forKey: "kDemo") else { return }
         // `-kRadio playing`, `tuning` or `lost`: the radio's row in that
-        // state, drawn and not played.
+        // state, drawn and not played. `-kRadio none` is a build without
+        // the radio, as a release is (`Radio.offered` reads it).
         switch UserDefaults.standard.string(forKey: "kRadio") {
         case "playing": store.radio.pretend(.playing)
         case "tuning": store.radio.pretend(.tuning)
