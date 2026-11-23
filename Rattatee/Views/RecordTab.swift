@@ -7,7 +7,8 @@ import SwiftUI
 ///
 ///   Ready            Start, and nothing else to read;
 ///                    "Where to?" over the map opens the search
-///   Going somewhere  the place, the suggested way in blue, and Go
+///   Going somewhere  the place, the suggested way in the colour chosen
+///                    under Account, and Go
 ///   Location is off  what to choose in Settings (or Precise Location is)
 ///   Recording        the screen changes: distance, average and when it
 ///                    began over the map, Pause and Finish under it, and

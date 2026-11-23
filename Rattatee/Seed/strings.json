@@ -252,10 +252,10 @@
     "ru": "Путь отсюда не найден. Всё равно можно доехать и записать поездку."
   },
   "goalNote": {
-    "az": "Göy xətt təklif olunan yoldur. Onunla get və ya öz yolunla — yazılan sənin həqiqətən getdiyin yoldur.",
-    "en": "The blue line is a suggested way. Ride it or your own — what is recorded is the way you really go.",
-    "et": "Sinine joon on soovitatud tee. Sõida seda või oma teed — salvestatakse see, kust sa päriselt sõidad.",
-    "ru": "Синяя линия — предложенный путь. Езжайте по нему или по-своему: записывается то, как вы едете на самом деле."
+    "az": "Xəritədəki xətt təklif olunan yoldur. Onunla get və ya öz yolunla — yazılan sənin həqiqətən getdiyin yoldur.",
+    "en": "The line on the map is a suggested way. Ride it or your own — what is recorded is the way you really go.",
+    "et": "Kaardil olev joon on soovitatud tee. Sõida seda või oma teed — salvestatakse see, kust sa päriselt sõidad.",
+    "ru": "Линия на карте — предложенный путь. Езжайте по нему или по-своему: записывается то, как вы едете на самом деле."
   },
   "goalTo": {
     "az": "{name}",
