@@ -20,8 +20,7 @@ import Observation
 /// kept one. The owner's line was that neither is needed.
 ///
 /// Somebody who does sign in (Account, on My rides) has their rides kept on
-/// the website under the account, listed on their account page there and
-/// drawn on the ride's page here. Since 2026-11-22 every save carries the
+/// the website under the account and drawn on the ride's page here. Since 2026-11-22 every save carries the
 /// ride in a few numbers as well (`Ride.summary`), which the account adds
 /// up — a ride outside the four cities included, sent for those alone
 /// (`send`) — and My rides shows (`AccountTotals`). With nobody
@@ -97,8 +96,7 @@ final class Store {
     static let shortest: Double = 700
     /// The longest name — `MAX_NAME` on the server.
     static let longestName = 60
-    /// A point is kept once the phone is this far from the last kept one —
-    /// `STEP` in assets/ride.js.
+    /// A point is kept once the phone is this far from the last kept one.
     static let step: Double = 12
     /// A jump faster than this, in metres a second, between two kept points
     /// is the phone guessing, not a bike — `JUMP`, 60 km/h.

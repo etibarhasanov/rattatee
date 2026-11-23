@@ -3,8 +3,7 @@ import Foundation
 /// The one door to tallinntastebuds.ee.
 ///
 /// Rattatee has no server of its own, the same as Kohuke and the map app. It
-/// records a ride on the phone and hands it to `/api/rides`, the Function the
-/// website's own recorder saves through, asks `/api/account`,
+/// records a ride on the phone and hands it to `/api/rides`, asks `/api/account`,
 /// `/api/google` and `/api/apple` who is riding, and asks `/api/rides`
 /// again, on My rides, what that account's rides add up to.
 ///

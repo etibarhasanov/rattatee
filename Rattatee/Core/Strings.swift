@@ -5,11 +5,11 @@ import Observation
 ///
 /// Kohuke reads most of its strings from the website at launch. Rattatee
 /// cannot: it has to say "Recording" in a pocket on a train with no signal,
-/// and most of what it says the website's recorder does not (the website's
-/// tells you to keep the screen on; this one tells you to lock it). So every
-/// string is compiled in, from `Seed/strings.json`. The ones the website has
-/// too were copied from its `data/ui.json` under the same keys — `ride*` and
-/// `account*` — so a sentence fixed there can be copied here by key.
+/// and the website has nothing to say about riding. So every string is
+/// compiled in, from `Seed/strings.json`. The ones the website has too were
+/// copied from its `data/ui.json` under the same keys — `account*` — so a
+/// sentence fixed there can be copied here by key. The `ride*` ones are this
+/// app's own.
 ///
 /// The language is the one chosen under Account, or, until somebody
 /// chooses, the one iOS picked for this app: the phone's own, or the one

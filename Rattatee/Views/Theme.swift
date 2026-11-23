@@ -49,8 +49,8 @@ enum Look: String, CaseIterable, Identifiable {
 /// below), at the owner's word on 2026-11-23, where each had a pale tint of
 /// its own hue that read as a template's.
 ///
-/// `way` and `wayEdge` are this app's alone, since the site's map draws its
-/// own: the suggested way on the map and the edge it is drawn inside. By day
+/// `way` and `wayEdge` are this app's alone: the suggested way on the map
+/// and the edge it is drawn inside. By day
 /// the way is the accent itself, inside a darker shade of it; by night it is
 /// a stronger shade of the same hue than the accent, inside the ground's own
 /// dark — THE WAY IS SOLID, AND EDGED, in RideMap.swift.
