@@ -41,10 +41,11 @@ import Observation
 /// the screen: the line ran ruler-straight down the right-hand lane of the
 /// road, a dozen metres from the path, round the bend corner for corner.
 ///
-/// It is worse than a line drawn in the wrong place. The ride is sent, the
-/// website matches it to streets, and what it knows of how a street rides,
-/// and of which way people ride — the way it then offers first — it learns
-/// from that line. A ride moved onto the road tells it people ride the road.
+/// It is more than a line drawn in the wrong place, for the line is what is
+/// sent. The website counts a ride into squares a street wide, and finds its
+/// doors — the ways no map has — where a ridden line leaves every way its
+/// router knows. A line the phone has laid on the nearest road is counted in
+/// that road's squares, and can never leave the map.
 ///
 /// `otherNavigation` is what Apple's documentation gives for "activities
 /// that don't or may not adhere to roads such as cycling, scooters, trains,
@@ -54,8 +55,7 @@ import Observation
 /// fixes are now the phone's own: truer to where the bike is, and a little
 /// less smooth, since the correction took some of the wander out with it. A
 /// point every twelve metres and the thirty-metre rule below kept the wander
-/// out before and still do, and putting a ride on a street is the website's
-/// to do, from where the bike was.
+/// out before and still do.
 ///
 /// Changed from a session with no phone to ride with. Apple documents what
 /// each activity is for and not what it does to a fix, so the first ride
