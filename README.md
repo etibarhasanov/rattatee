@@ -223,9 +223,14 @@ first with no name. The row of buttons still slides sideways here; on the
 website it wraps.
 
 Choosing a place puts it on the map with a suggested way by bike, in the
-colour chosen under Account, how far it is and about how long, and **Go**,
-which is Start. While riding, the way's line stays under the line actually
-ridden and the card says how much of the way is left.
+colour chosen under Account, and **Go**, which is Start. The card says the
+way as a row under the address, the way Google's map lists a journey: how
+long first, in the largest figures on the card after the name, and then how
+far — *18 min · 3.6 km*, and *Ridden* after it on the way riders have
+ridden. Where there is more than one way the buttons are under the row, and
+the row is the one chosen (`WayRow` in `Views/RecordTab.swift`). While
+riding, the way's line stays under the line actually ridden and the card
+says how much of the way is left.
 
 The way is drawn as Apple's and Google's maps draw a route: solid, inside a
 darker edge, in a colour of its own (`Theme.way` in `Views/Theme.swift`).
@@ -244,15 +249,29 @@ never the destination.
 the city it is quicker: ride to Ülemiste, the train two stops, ride on. Where
 the website finds one that is — `trains` in `GET /api/v1/route`, counted
 from setting off and leaving within the hour — it is one more button after
-the bike ways, *15 min · train 09:31*, and the card says *Leave at 09:25:
-ride to Ülemiste, the RE34 at 09:31 to Kitseküla, ride on*. The rides are
+the bike ways, *15 min · train 09:31*. Chosen, its row on the card is three
+lines: *09:25 – 09:40*, setting off and at the door; a ride, the train and a
+ride as a pill each, the rides with their minutes and the train in its
+orange with its name, *6 › RE34 › 3*; and the train's own times and
+stations, *09:31 Ülemiste → 09:35 Kitseküla*. Nothing in it is a sentence,
+so nothing has to be declined in four languages. Until 2026-11-23 it was
+one, after the address — *Leave at 09:25: ride to Ülemiste, the RE34 at
+09:31 to Kitseküla, ride on* — three lines of grey to find a time in, which
+the owner set beside Google's list of buses; it is still what VoiceOver
+reads. The minutes in the pills are the rides alone: the train's, and the
+two on the platform the website counts, are in the figure at the front. The
+time at the door is the time to set off and that figure on. The rides are
 drawn as any way by bike is, in the colour chosen under Account, and the
 rail is not: it is orange, as Elron's trains are, a solid line a little
 thicker than a ride with a darker edge, the way Google's map draws a train
 among its blue lines. While the way is on offer its rail is a faint orange
 among the faint lines, and its button is filled orange when it is the one
 chosen (`Theme.train` in `Views/Theme.swift`, and THE RAIL IS ORANGE, AND
-THE RIDES ARE NOT in `Views/RideMap.swift`). While riding, the station is a corner
+THE RIDES ARE NOT in `Views/RideMap.swift`). The two stations of the way
+chosen are on the map as Google's map marks a bus's stops: a white dot at
+each end of the rail, ringed in the rail's darker edge, with the station's
+name beside it, before the ride and during it. A way by train still on
+offer has none (THE STATIONS ARE NAMED, in the same file). While riding, the station is a corner
 like any other, with a train in the row in place of an arrow — *Train RE34
 at 09:31 to Kitseküla* — read once by the phone's own voice on the platform,
 since no recording says which train. On the train nothing is recorded: a

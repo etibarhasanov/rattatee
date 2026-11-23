@@ -167,8 +167,8 @@ struct LocationOffCard: View {
     }
 }
 
-/// Somewhere to go: the place, how far by the suggested way, and Go, which
-/// is Start. The way is a suggestion and says so; what is recorded is where
+/// Somewhere to go: the place, the way chosen as a row, and Go, which is
+/// Start. The way is a suggestion and says so; what is recorded is where
 /// the rider really went.
 ///
 /// A place — not a street — can also go on one of the rider's lists on the
@@ -183,7 +183,10 @@ struct GoalCard: View {
         let listable = goal.spot.kind != .street
         SheetCard {
             Text(goal.spot.name).font(.title2.bold()).foregroundStyle(Theme.ink).lineLimit(2)
-            Text(line).font(.subheadline).foregroundStyle(Theme.muted)
+            // A pin whose street has not come yet has nothing to say here,
+            // and no line is better than an empty one.
+            if !line.isEmpty { Text(line).font(.subheadline).foregroundStyle(Theme.muted) }
+            if case .found(let way) = goal.way { WayRow(way: way).padding(.top, 12) }
             if goal.ways.count > 1 { WayChips(goal: goal) }
             // "No way found" outranks the sign-in line: it is about the ride.
             Note(text: listable && store.user == nil && goal.way != .missing ? L.t("goalListSignIn") : note)
@@ -198,25 +201,134 @@ struct GoalCard: View {
         .sheet(isPresented: $listing) { ListPicker(spot: goal.spot) }
     }
 
+    /// Under the name: where the place is and what kind it is, and, until
+    /// the website answers, that a way is being looked for. The way itself
+    /// is the row under this (`WayRow`).
     private var line: String {
         var parts = goal.spot.detail.isEmpty ? [] : [goal.spot.detail]
-        switch goal.way {
-        case .looking: parts.append(L.t("goalFinding"))
-        case .found(let way):
-            let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
-            if let train = way.train {
-                parts.append(L.t("goalTrain", ["leave": train.leave, "from": train.from, "line": train.name,
-                                               "at": train.at, "to": train.to, "min": min]))
-            } else {
-                parts.append(L.t("goalWay", ["dist": L.distance(way.metres), "min": min]))
-            }
-        case .missing: break
-        }
+        if goal.way == .looking { parts.append(L.t("goalFinding")) }
         return parts.joined(separator: " · ")
     }
 
     private var note: String {
         goal.way == .missing ? L.t("goalNoWay") : L.t("goalNote")
+    }
+}
+
+/// The way chosen, on the card before a ride, as a row the way Google's map
+/// lists a journey: how long it takes, and then what it is made of.
+///
+/// THE WAY IS A ROW, NOT A SENTENCE
+///
+/// By bike that is how far, and *Ridden* where riders have been along it:
+///
+///     18 min   3.6 km
+///
+/// By train it is three lines: when to set off and when the rider is at the
+/// door; a ride, the train and a ride as a pill each, the rides with their
+/// minutes and the train in its orange with its name; and the train's own
+/// two times and stations.
+///
+///     14 min   17:26 – 17:40
+///              (bike 6) › (train R31) › (bike 1)
+///              17:34 Kitseküla → 17:39 Tallinn
+///
+/// Until 2026-11-23 all of that was one sentence after the address —
+/// "Leave at 17:26: ride to Kitseküla, the R31 at 17:34 to Tallinn, ride
+/// on · 14 min" — three lines of grey to read through for a time. The owner
+/// sent it beside Google's list of buses that day and asked for something
+/// like that. The sentence is still what VoiceOver reads, since a row of
+/// pills is nothing to listen to.
+///
+/// Nothing in the row is a sentence, so nothing in it has to be declined:
+/// the times and names are the website's, and the two words are `min` and
+/// `Ridden`. The minutes in the pills are the rides alone and do not add up
+/// to the whole: the train's own minutes and the two on the platform the
+/// website counts are in the figure at the front and in no pill. The time
+/// at the door is `leave` and that same figure on, so the two agree.
+///
+/// The buttons under the row stay, at the owner's choice of the two ways
+/// this was drawn: a row for every way was the other, and cost the map a
+/// quarter of its height where there are three ways. So the row says again
+/// what the chosen button says, and for a way by train says the rest.
+struct WayRow: View {
+    let way: Way
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(String(way.minutes)).font(.title3.bold()).foregroundStyle(Theme.ink)
+                Text(L.t("goalMin")).font(.footnote.weight(.semibold)).foregroundStyle(Theme.muted)
+            }
+            if let train = way.train {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(times(train)).font(.headline).foregroundStyle(Theme.ink)
+                    legs(train)
+                    Text(stations(train)).font(.footnote).foregroundStyle(Theme.muted).lineLimit(1)
+                }
+            } else {
+                Text(L.distance(way.metres)).font(.headline).foregroundStyle(Theme.ink)
+                if way.style == .ridden {
+                    Text(L.t("goalRidden")).font(.footnote).foregroundStyle(Theme.muted)
+                }
+            }
+        }
+        .monospacedDigit()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(said)
+    }
+
+    /// "17:26 – 17:40": setting off, and at the door.
+    private func times(_ train: Train) -> String {
+        guard let arrive = train.arrive(after: way.minutes) else { return train.leave }
+        return train.leave + " – " + arrive
+    }
+
+    /// "17:34 Kitseküla → 17:39 Tallinn": the train alone, each time beside
+    /// its station. A website that does not say when it gets in leaves that
+    /// one time out.
+    private func stations(_ train: Train) -> String {
+        [[train.at, train.from], [train.until, train.to]]
+            .map { $0.filter { !$0.isEmpty }.joined(separator: " ") }
+            .joined(separator: " → ")
+    }
+
+    /// A ride, the train, a ride, with an arrow between: each a pill.
+    private func legs(_ train: Train) -> some View {
+        HStack(spacing: 5) {
+            ForEach(Array(train.legs.enumerated()), id: \.offset) { index, leg in
+                if index > 0 {
+                    Image(systemName: "chevron.right").font(.caption2.weight(.semibold)).foregroundStyle(Theme.muted)
+                }
+                if leg.bike {
+                    pill("bicycle", leg.minutes.map { String($0) } ?? "", ink: Theme.ink, ground: Theme.wash)
+                } else {
+                    pill("tram.fill", train.name, ink: Theme.onTrain, ground: Theme.train)
+                }
+            }
+        }
+    }
+
+    /// One leg: what it is by, and beside it how many minutes or which
+    /// train. The picture alone, where the website did not say.
+    private func pill(_ symbol: String, _ text: String, ink: Color, ground: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: symbol).font(.caption)
+            if !text.isEmpty { Text(text).font(.footnote.weight(.semibold)) }
+        }
+        .padding(.horizontal, 8)
+        .frame(minHeight: 24)
+        .foregroundStyle(ink)
+        .background(ground, in: Capsule())
+    }
+
+    /// What VoiceOver reads in the row's place: the whole of it, as the
+    /// sentence the card used to print.
+    private var said: String {
+        let min = String(way.minutes)
+        guard let train = way.train else { return L.t("goalWay", ["dist": L.distance(way.metres), "min": min]) }
+        return L.t("goalTrain", ["leave": train.leave, "from": train.from, "line": train.name,
+                                 "at": train.at, "to": train.to, "min": min])
     }
 }
 
@@ -264,7 +376,7 @@ struct WayChips: View {
     /// long and when the train goes, since that is what it hangs on. Where
     /// the website says what kind of way it is, that comes first.
     private func chip(_ way: Way) -> String {
-        let min = String(max(1, Int((Double(way.seconds) / 60).rounded())))
+        let min = String(way.minutes)
         if let train = way.train { return L.t("goalTrainChip", ["min": min, "at": train.at]) }
         let gaps = ["min": min, "dist": L.distance(way.metres)]
         switch way.style {
