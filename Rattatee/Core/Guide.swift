@@ -19,8 +19,8 @@ import Observation
 /// distance but the one: a recording can only say what was recorded. The
 /// street is in the row.
 ///
-/// Where a recording is missing — Russian is the one language not recorded
-/// yet — the phone's own voice reads the row's words instead, in English and
+/// Where a recording is missing — Russian is not recorded yet, nor the train
+/// in any language — the phone's own voice reads the row's words instead, in English and
 /// Russian.
 /// iOS has no Estonian or Azerbaijani voice, so in those a missing recording
 /// is silence.
@@ -69,7 +69,7 @@ final class Guide {
 
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
-        case soon, left, right, straight, around, arrive, tunnel, off
+        case soon, left, right, straight, around, arrive, tunnel, train, off
         case morning, afternoon, evening, late
         case keepLeft = "keep-left"
         case keepRight = "keep-right"
@@ -119,10 +119,14 @@ final class Guide {
         // sentence for a car.
         guard voice, let next = way.next(from: here) else { return }
         let corner = "\(Int(next.step.along))"
-        // The station of a way by train: no recording says which train, so
-        // the phone's own voice reads the row, once, on the platform.
+        // The station of a way by train, said once on the platform. No
+        // recording can say which train or when, so the owner's says only
+        // "Your train leaves from here" and the row says the rest. Where
+        // that is not recorded yet, the phone's own voice reads the row
+        // instead, as it did before there was a recording — which is
+        // silence in Estonian and Azerbaijani, and was the reason for one.
         if next.step.turn == .train {
-            if next.metres <= Self.now, said.insert(corner + "-now").inserted { speak(next.step.words) }
+            if next.metres <= Self.now, said.insert(corner + "-now").inserted { say([.train], next.step.words) }
             return
         }
         guard let turn = clip(next.step) else { return }

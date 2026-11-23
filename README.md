@@ -238,8 +238,8 @@ among the faint lines, and its button is filled orange when it is the one
 chosen (`Theme.train` in `Views/Theme.swift`, and THE RAIL IS ORANGE, AND
 THE RIDES ARE NOT in `Views/RideMap.swift`). While riding, the station is a corner
 like any other, with a train in the row in place of an arrow — *Train RE34
-at 09:31 to Kitseküla* — read once by the phone's own voice on the platform,
-since no recording says which train. On the train nothing is recorded: a
+at 09:31 to Kitseküla* — and said once on the platform, *Your train leaves
+from here*, since no recording can say which train. On the train nothing is recorded: a
 point on the rail stretch of the way is not kept, so a saved ride is never
 a railway, and it goes on from the far station. The clock keeps running, as
 it does at a red light. A website from before the trains answers without
@@ -257,10 +257,12 @@ the phone remembers: a speaker and *Voice*, or a struck-through speaker and
 before, since a ride with nowhere to go hears nothing from it but the
 greeting at Start; until 2026-11-22 it was a small speaker at the end of the
 turn row, where it was easy to miss. The voice is the owner's,
-recorded: eleven phrases in each language, listed in `docs/voice.md`,
+recorded: sixteen phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
-Azerbaijani, English and Estonian are recorded, all fifteen phrases of
-each; Russian is not yet, and until it is the phone's own voice reads it. A roundabout is in the row and
+Azerbaijani, English and Estonian are recorded, all but the train;
+Russian is not yet, and until a phrase is the phone's own voice reads it,
+in English and Russian, and nothing does in Estonian or Azerbaijani,
+which iOS has no voice for. A roundabout is in the row and
 is not said: a bike is mostly on the path beside one. A tunnel is said
 at its entrance, "Enter the tunnel", and with the turn before it where it
 starts just past one, as the Veerenni path under the railway does. A ride

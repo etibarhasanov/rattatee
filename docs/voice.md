@@ -1,8 +1,8 @@
 # The voice: what to record
 
 The turns of a way are said aloud in recordings of the owner's voice — see
-`Rattatee/Core/Guide.swift`. This is the dictionary: fifteen phrases, each in
-English, Estonian, Russian and Azerbaijani, sixty recordings in all.
+`Rattatee/Core/Guide.swift`. This is the dictionary: sixteen phrases, each in
+English, Estonian, Russian and Azerbaijani, sixty-four recordings in all.
 
 The app joins them. Before a corner it plays **In 200 metres** and then the
 turn; at the corner it plays the turn alone. So each phrase is recorded on
@@ -26,6 +26,14 @@ tunnel**, so the second does not cut the first off.
 | `tunnel` | Enter the tunnel | Sõida tunnelisse | Въезжайте в тоннель | Tunelə gir |
 | `off` | You're off the way | Oled teelt maas | Вы сошли с пути | Yoldan çıxdın |
 | `wrong-way` | Going the wrong way | Vale suund | Вы едете не в ту сторону | Yanlış istiqamətdə gedirsən |
+| `train` | Your train leaves from here | Sinu rong läheb siit | Ваш поезд отходит отсюда | Qatarın buradan gedir |
+
+The train is said once, on the platform of a way by train, where the
+ride to the station would otherwise have said "You have arrived". It
+cannot say which train or when — a recording only says what was recorded
+— so the row on screen does: *Train RE34 at 09:31 to Kitseküla*. Until
+it was recorded the phone's own voice read that row, which in Estonian
+and Azerbaijani was nothing at all.
 
 ## The greeting
 
@@ -51,9 +59,10 @@ on screen says so — "Roundabout, exit 2" — and the voice says nothing.
 The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
-**Recorded so far: Azerbaijani, English and Estonian, all fifteen of
-each**, on 2026-11-18, each language in one take. Russian is still to do,
-and until it is the phone's voice reads it.
+**Recorded so far: Azerbaijani, English and Estonian, all but the
+train**, on 2026-11-18, each language in one take. Russian is still to do,
+and the train in every language; all four are to be recorded again whole,
+so that each stays one take. Until a phrase is, the phone's voice reads it.
 
 ## Recording
 
@@ -64,7 +73,9 @@ and until it is the phone's voice reads it.
   between them. They are cut apart afterwards.
 - Say each a little slower and louder than talking. It will be heard from a
   pocket, over traffic.
-- Twice each is fine; the better one is kept.
+- Once each. The session that cuts them apart cannot listen, so it
+  counts them: a phrase said twice moves every name after it along by
+  one. A slip is a fresh take from the top, not the line said again.
 
 ## Where they go
 
