@@ -331,8 +331,8 @@ struct Ride: Codable, Identifiable, Equatable {
     }
 }
 
-/// The few sums the recorder and the upload need, the same as the website's
-/// `assets/ride.js` and the server's `functions/api/rides.js`.
+/// The few sums the recorder and the upload need, the same as the server's
+/// `functions/api/rides.js`.
 enum Geo {
     /// Metres between two points, on the flat-earth approximation the website
     /// uses; at a dozen metres apart in Tallinn it is exact to the centimetre.
@@ -461,7 +461,7 @@ enum Geo {
             let step = Double(inside.count - 1) / Double(maxPoints - 1)
             kept = (0..<maxPoints).map { inside[Int((Double($0) * step).rounded())] }
         }
-        // Counted from the first point kept, as the website's recorder counts.
+        // Counted from the first point kept.
         let zero = points.first?.t ?? 0
         return kept.map {
             let row = [round5($0.lat), round5($0.lng), max(0, ($0.t - zero).rounded()), $0.acc.rounded()]

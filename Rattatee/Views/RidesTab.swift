@@ -11,7 +11,7 @@ import SwiftUI
 /// signed in or not, and the account's sum waits for the first ride here.
 ///
 /// The list is the phone's own. The server has a list of its own now
-/// (`GET /api/rides?mine=1`, which the website's account page reads), but it
+/// (`GET /api/rides?mine=1`), but it
 /// knows nothing of a ride still waiting here, which is the ride this
 /// screen most needs to show. Reading the server's as well, so rides follow
 /// an account to a new phone, is the next thing this tab would grow.
