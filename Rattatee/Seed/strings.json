@@ -161,6 +161,30 @@
     "et": "Ootab",
     "ru": "Ждёт"
   },
+  "clipNewWay": {
+    "az": "Yeni yol tapıldı, gedək",
+    "en": "New way found, let's go",
+    "et": "Uus tee leitud, lähme",
+    "ru": "Новый путь найден, поехали"
+  },
+  "clipOff": {
+    "az": "Yoldan çıxdın. Narahat olma, yenisini tapacağıq",
+    "en": "You're off the way. Don't worry, we'll find a new one",
+    "et": "Oled teelt maas. Ära muretse, leiame uue",
+    "ru": "Вы сошли с пути. Не волнуйтесь, мы найдём новый"
+  },
+  "clipTrain": {
+    "az": "Qatarın buradan gedir",
+    "en": "Your train leaves from here",
+    "et": "Sinu rong läheb siit",
+    "ru": "Ваш поезд отходит отсюда"
+  },
+  "clipWrongWay": {
+    "az": "Yanlış istiqamətdə gedirsən. Geri dön, ya da yenisini tapacağıq",
+    "en": "Going the wrong way. Turn around, or we'll find a new one",
+    "et": "Vale suund. Pööra ümber või leiame uue",
+    "ru": "Вы едете не в ту сторону. Развернитесь, или мы найдём новый путь"
+  },
   "close": {
     "az": "Bağla",
     "en": "Close",
@@ -568,12 +592,6 @@
     "en": "From where you are now",
     "et": "Sealt, kus sa praegu oled",
     "ru": "Оттуда, где вы сейчас"
-  },
-  "lostNew": {
-    "az": "Yeni yol tapıldı, gedək",
-    "en": "New way found, let's go",
-    "et": "Uus tee leitud, lähme",
-    "ru": "Новый путь найден, поехали"
   },
   "lostNone": {
     "az": "Hələ yeni yol yoxdur",

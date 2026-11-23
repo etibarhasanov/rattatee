@@ -14,17 +14,19 @@ import Observation
 ///
 /// The owner's, recorded: one short file a phrase, in each of the app's four
 /// languages, under `Rattatee/Voice/` as `<lang>-<clip>.m4a` — `et-left.m4a`,
-/// `ru-keep-right.m4a`. `docs/voice.md` is the list of them and what each
-/// says. That is why the phrases are few and carry no street name and no
-/// distance but the one: a recording can only say what was recorded. The
-/// street is in the row.
+/// `ru-keep-right.m4a`. That is why the phrases are few and carry no street
+/// name and no distance but the one: a recording can only say what was
+/// recorded. The street is in the row.
 ///
-/// Where a recording is missing — Russian is not recorded yet, nor the train
-/// in any language — the phone's own voice reads the row's words instead, in English and
-/// Russian.
-/// iOS has no Estonian or Azerbaijani voice, so in those a missing recording
-/// is silence.
-/// That is a stand-in for trying the thing out, not the plan.
+/// WHAT IT SAYS IS IN THE CODE
+///
+/// Each recording says one string of strings.json word for word —
+/// `Clip.words` is which — and the owner records from that string, not the
+/// other way round. `docs/voice.md` lists them, and CI fails when its table
+/// and strings.json part. Where a recording is missing, the phone's own
+/// voice reads the same string, in English and Russian; iOS has no Estonian
+/// or Azerbaijani voice, so in those a missing recording is silence. The
+/// owner's word, on 2026-11-23: the voices are according to the code.
 ///
 /// IN A POCKET, OVER MUSIC
 ///
@@ -75,6 +77,34 @@ final class Guide {
         case keepRight = "keep-right"
         case wrongWay = "wrong-way"
         case newWay = "new-way"
+
+        /// What the recording says, word for word, out of strings.json: the
+        /// owner records this string, and the phone's own voice reads it
+        /// where there is no recording, so the two never say different
+        /// things. To say a phrase differently, the string changes first.
+        /// `docs/voice.md` is these, and CI holds its table to them. Key by
+        /// key, so the strings check sees each.
+        var words: String {
+            switch self {
+            case .soon: return L.t("turnSoon")
+            case .left: return L.t("turnLeft")
+            case .right: return L.t("turnRight")
+            case .keepLeft: return L.t("turnKeepLeft")
+            case .keepRight: return L.t("turnKeepRight")
+            case .straight: return L.t("turnStraight")
+            case .around: return L.t("turnAround")
+            case .arrive: return L.t("turnArrive")
+            case .tunnel: return L.t("turnTunnel")
+            case .off: return L.t("clipOff")
+            case .wrongWay: return L.t("clipWrongWay")
+            case .newWay: return L.t("clipNewWay")
+            case .train: return L.t("clipTrain")
+            case .morning: return L.t("greetMorning")
+            case .afternoon: return L.t("greetAfternoon")
+            case .evening: return L.t("greetEvening")
+            case .late: return L.t("greetLate")
+            }
+        }
     }
 
     /// What has been said on this way, so each corner is said twice and no
@@ -121,13 +151,15 @@ final class Guide {
         guard voice, let next = way.next(from: here) else { return }
         let corner = "\(Int(next.step.along))"
         // The station of a way by train, said once on the platform. No
-        // recording can say which train or when, so the owner's says only
-        // "Your train leaves from here" and the row says the rest. Where
-        // that is not recorded yet, the phone's own voice reads the row
-        // instead, as it did before there was a recording — which is
-        // silence in Estonian and Azerbaijani, and was the reason for one.
+        // recording can say which train or when, so it says only "Your
+        // train leaves from here" and the row says the rest. Until
+        // 2026-11-23 the phone's own voice read the row, which named the
+        // train in English and Russian and was silence in Estonian and
+        // Azerbaijani; now the phone reads the recording's words like
+        // every other phrase, so a language says the same before and after
+        // it is recorded.
         if next.step.turn == .train {
-            if next.metres <= Self.now, said.insert(corner + "-now").inserted { say([.train], next.step.words) }
+            if next.metres <= Self.now, said.insert(corner + "-now").inserted { say([.train]) }
             return
         }
         guard let turn = clip(next.step) else { return }
@@ -140,12 +172,12 @@ final class Guide {
             if let after = way.steps.first(where: { $0.along > next.step.along }), after.turn == .tunnel,
                after.along - next.step.along <= Self.now,
                said.insert("\(Int(after.along))-now").inserted {
-                return say([turn, .tunnel], next.step.words + ", " + after.words)
+                return say([turn, .tunnel])
             }
-            say([turn], next.step.words)
+            say([turn])
         } else if next.step.turn != .arrive, Self.soon.contains(next.metres) {
             if said.insert(corner + "-soon").inserted {
-                say([.soon, turn], L.t("turnSoon") + ", " + next.step.words)
+                say([.soon, turn])
             }
         }
     }
@@ -155,14 +187,14 @@ final class Guide {
     /// carry a promise as well as the news — "You're off the way. Don't
     /// worry, we'll find a new one" — at the owner's word, since a rider
     /// told only that they are lost, with the phone in a pocket, has no way
-    /// to know the app is already on it. The row's words, which the phone
-    /// reads where there is no recording, stay short: they share the row
-    /// with how far off the rider is.
+    /// to know the app is already on it. Those are their own strings,
+    /// `clipOff` and `clipWrongWay`: the row's, `lostOff` and `lostBack`,
+    /// stay short, since they share the row with how far off the rider is.
     func warn(_ kind: Lost.Kind) {
         guard voice else { return }
         switch kind {
-        case .off: say([.off], L.t("lostOff"))
-        case .back: say([.wrongWay], L.t("lostBack"))
+        case .off: say([.off])
+        case .back: say([.wrongWay])
         }
     }
 
@@ -172,7 +204,7 @@ final class Guide {
     /// this off, which is the right way round.
     func found() {
         guard voice else { return }
-        say([.newWay], L.t("lostNew"))
+        say([.newWay])
     }
 
     /// A new ride has started: one line for the time of day, said once.
@@ -180,19 +212,16 @@ final class Guide {
     /// first turn, if it comes while this is still playing, cuts it off.
     func greet(at now: Date = Date()) {
         guard voice else { return }
-        let (clip, text) = Self.greeting(hour: Calendar.current.component(.hour, from: now))
-        say([clip], text)
+        say([Self.greeting(hour: Calendar.current.component(.hour, from: now))])
     }
 
-    /// Which greeting an hour of the phone's clock gets: its recording, and
-    /// its words for the phone's voice where there is none. Written out key
-    /// by key so the strings check in CI can see every key the app asks for.
-    static func greeting(hour: Int) -> (Clip, String) {
+    /// Which greeting an hour of the phone's clock gets.
+    static func greeting(hour: Int) -> Clip {
         switch hour {
-        case 5..<12: return (.morning, L.t("greetMorning"))
-        case 12..<18: return (.afternoon, L.t("greetAfternoon"))
-        case 18..<22: return (.evening, L.t("greetEvening"))
-        default: return (.late, L.t("greetLate"))
+        case 5..<12: return .morning
+        case 12..<18: return .afternoon
+        case 18..<22: return .evening
+        default: return .late
         }
     }
 
@@ -211,10 +240,11 @@ final class Guide {
     }
 
     /// The recordings one after another, or, where one of them is not in the
-    /// bundle, the words in the phone's voice.
-    private func say(_ clips: [Clip], _ words: String) {
+    /// bundle, the same words in the phone's voice — all of them, so a
+    /// sentence is never half one voice and half the other.
+    private func say(_ clips: [Clip]) {
         let files = clips.compactMap { Bundle.main.url(forResource: "\(L.lang)-\($0.rawValue)", withExtension: "m4a") }
-        guard files.count == clips.count else { return speak(words) }
+        guard files.count == clips.count else { return speak(clips.map(\.words).joined(separator: ", ")) }
         hush()
         if let radio, radio.on {
             radio.duck(true)

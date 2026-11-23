@@ -50,6 +50,25 @@ jobs:
           if set(strings) - used:
               sys.exit('in strings.json and never asked for: ' + ', '.join(sorted(set(strings) - used)))
           print(len(strings), 'strings, each in az, en, et and ru, each used')
+          # The voice is according to the code: each recording says one
+          # string word for word (Clip.words in Guide.swift), and the owner
+          # records from docs/voice.md, so its table is those strings.
+          guide = open('Rattatee/Core/Guide.swift').read()
+          enum = guide[guide.index('enum Clip:'):guide.index('var words: String {')]
+          files = dict(re.findall(r'case (\w+) = "([\w-]+)"', enum))
+          for line in re.findall(r'case ([\w, ]+)\n', enum):
+              files.update({c.strip(): c.strip() for c in line.split(',')})
+          clips = {files[c]: k for c, k in re.findall(r'case \.(\w+): return L\.t\("(\w+)"\)', guide)}
+          rows = re.findall(r'^\| `([\w-]+)` \|(?: [^|`]+ \|)? `(\w+)` \| (.+?) \| (.+?) \| (.+?) \| (.+?) \|$',
+                            open('docs/voice.md').read(), re.M)
+          table = {f: k for f, k, *_ in rows}
+          if table != clips:
+              sys.exit('docs/voice.md and Clip.words name different phrases or keys: '
+                       + ', '.join(sorted(set(table.items()) ^ set(clips.items()), key=str)))
+          wrong = [f for f, k, en, et, ru, az in rows if [en, et, ru, az] != [strings[k][l] for l in ('en', 'et', 'ru', 'az')]]
+          if wrong:
+              sys.exit('docs/voice.md says something other than strings.json for: ' + ', '.join(wrong))
+          print(len(rows), 'phrases in docs/voice.md, each its string word for word')
           PY
 
       - name: Show the selected Xcode
