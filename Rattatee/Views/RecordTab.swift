@@ -63,10 +63,13 @@ struct RecordTab: View {
         // The way is asked for from where the phone is, which it may only
         // say a moment after the place was chosen.
         .onChange(of: store.recorder.here == nil) { Task { await store.findWay() } }
-        // And asked for before anything is chosen, where iOS already lets
-        // the app know: a pin then has somewhere to draw its way from, and
-        // does not wait on the phone's first fix as well as on the website.
-        .onAppear { if store.recorder.allowed { store.recorder.locate() } }
+        // And asked for before anything is chosen: a pin then has somewhere
+        // to draw its way from, and does not wait on the phone's first fix
+        // as well as on the website. On a new install this is where iOS asks
+        // the location question — the map is the first thing the app shows,
+        // and without it the map has no blue dot until Start is pressed.
+        // Once refused, `locate()` asks nothing; Start says how to allow it.
+        .onAppear { store.recorder.locate() }
     }
 
     /// Whether a touch on the map is somewhere to go — a tap on a place it
