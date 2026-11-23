@@ -50,8 +50,9 @@ import Observation
 @MainActor
 @Observable
 final class Guide {
-    /// Whether it speaks: the speaker button in the row. Kept on the phone,
-    /// and on until somebody turns it off.
+    /// Whether it speaks: the voice's button at the end of the radio's row
+    /// (`VoiceButton`). Kept on the phone, and on until somebody turns it
+    /// off.
     var voice: Bool {
         didSet {
             UserDefaults.standard.set(voice, forKey: "voice")

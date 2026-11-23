@@ -3,7 +3,8 @@ import SwiftUI
 /// The Account tab: making an account or signing in — with a username and a
 /// password, or Apple or Google — which nobody has to do; signing out and
 /// deleting the account; the language; the colour and the background; and
-/// the privacy page.
+/// the privacy page. What the account's rides add up to is on My rides,
+/// under All on the card at the top (`StatsCard`).
 struct AccountTab: View {
     @Environment(Store.self) private var store
     @State private var deleting = false

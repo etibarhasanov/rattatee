@@ -1,9 +1,9 @@
 # Rattatee
 
 Record a bike ride in Tallinn with the phone in your pocket. The iPhone app
-that saves rides to [Tallinn Tastebuds](https://tallinntastebuds.ee), where
-they are collected to become a map of confirmed bike routes, per street and
-per direction.
+that sends rides to [Tallinn Tastebuds](https://tallinntastebuds.ee), where
+they are counted into what the site knows of how each street rides, per
+street and per direction — and kept there too, for whoever is signed in.
 
 *Rattatee* is Estonian for a bike path.
 
@@ -26,10 +26,17 @@ the same as Kohuke (`etibarhasanov/kohuke`) and the map app
 the website's recorder does, `POST /api/rides`. Its project structure,
 sign-in and networking are copied from Kohuke.
 
-**Nobody has to sign in.** What the rides are for is their points. People
-ride, press Save, and that is it: the ride is kept with no account on it.
-Signing in is there for whoever wants it, on the **Account** tab, and buys one
-thing — the ride is also listed on their account page on the website.
+**Nobody has to sign in, and then the ride is theirs alone.** People ride,
+press Save, and that is it: the ride stays on the phone, and the website
+counts the streets it went down and keeps nothing of it — since
+2026-11-20, when the owner drew that line; for three days before it such a
+ride was kept there with no account on it. The save card says so before
+Save is pressed, and that saving rides wants an account. Signing in is
+there for whoever wants that, on the **Account** tab: a ride saved signed in
+is kept on the website under the account, listed on the account page there
+and drawn on its page here, and added up with the account's others on My
+rides. Nothing tells the two kinds apart on the phone beyond that,
+and nothing offers to move a ride to an account afterwards.
 
 ## What it does
 
@@ -74,10 +81,18 @@ Three tabs.
   the rides and the riding time for **Today**, **Week**, **Month** or
   **All**, with a bar a day for the week (`Views/StatsCard.swift`). A week
   starts on Monday and a month on its 1st, in the phone's time zone. Saved
-  and waiting rides count; a ride Not kept does not. It is added up on the
-  phone from the rides already there, so it asks the website for nothing
-  and works with no signal — the server could not say it better anyway,
-  since a ride saved with no account is nobody's there from the next day.
+  and waiting rides count; a ride Not kept does not. Today, Week and Month
+  are added up on the phone from the rides already there, so they ask the
+  website for nothing and work with no signal — the server could not say
+  them better anyway, since a ride saved with no account is not there at
+  all. **All**, signed in, is the account's instead, once the website has
+  answered: every ride saved to it from any phone, with the time stopped,
+  the average, the top speed, the fastest kilometre and the longest ride
+  under it, and *From every phone on your account, since 14 Nov 2026.* at
+  the foot (**All, on the account**, below). Signed out, and until that
+  answer comes, All is the phone's, as the other three are. The two are not
+  meant to agree, and the foot line is what says which All is showing. A
+  phone with no ride on it shows only that it has none, signed in or not.
 
   **A ride, opened.** A row opens its ride on a page of its own
   (`Views/RideView.swift`): the map framed to it, the riding solid, a walk
@@ -85,7 +100,13 @@ Three tabs.
   the rider stopped, a ring where it began and a dot where it ended; the
   save card's numbers; the ride **part by part** (below); the fastest kilometre and how long was
   spent standing; the speed along the way as a line; and each kilometre's
-  time, with a bar for its speed and the fastest one in full colour. All of
+  time, with a bar for its speed and the fastest one in full colour. The
+  map on the page stays still, so a thumb on it scrolls the page; a tap
+  opens it over the whole screen, where it moves and zooms like any map,
+  anywhere along the ride, and **Whole ride** frames it again. Until
+  2026-11-21 the page's map could only zoom, and a map that cannot move
+  zooms only on its middle. A part of the ride opens a map of its own
+  (below). All of
   it is the phone's own ride, so it opens with no signal and for a ride saved
   with no account. The sums are the website's — `rideInsight()` in its
   `functions/api/_rides.js`, ported step for step to `Core/Insight.swift` —
@@ -97,20 +118,20 @@ Three tabs.
   asked for by its id, `GET /api/rides/<id>`, and the line the website keeps
   is drawn solid over the phone's, which goes faint: what is left of the
   phone's at each end is the 200 m that was never kept. A ride saved with no
-  account cannot be asked for — the website answers a ride only to the
-  account it is under — so its page says how much was kept, from the
-  answer to its save. Waiting and Not kept are in the pill under the title.
+  account was never kept, so there is nothing to ask for and its page says
+  nothing of the website: the line is the phone's own. Waiting and Not
+  kept are in the pill under the title.
   **Remove from this phone** is at the foot, as the swipe is, and never for
   a ride still waiting.
 - **Account.** **Create account** or **Sign in** with a username and a
   password, as in Kohuke, or continue with Apple or Google where the
   website offers them — the same accounts as the site and Kohuke, made on
   the spot the first time — or, signed in, sign out and delete the
-  account. **Language**: the phone's, or English, Eesti or Русский for this
-  app alone, switched at once. Under **Look**,
-  the colour, one of the website's four (Red, Green, Blue, Plum), and the
-  background: **Like the phone**, which is where a new install starts,
-  **Light** or **Dark**. Then Privacy.
+  account, whose rides add up on My rides. **Language**: the phone's, or
+  English, Eesti or Русский for this app alone, switched at once. Under
+  **Look**, the colour, one of the website's four (Red, Green, Blue, Plum),
+  and the background: **Like the phone**, which is where a new install
+  starts, **Light** or **Dark**. Then Privacy.
 
 ### Search and go
 
@@ -158,7 +179,7 @@ to go: **Where to?** stays over the map while riding, under the numbers, and
 a place chosen there, or a touch on the map, is somewhere to go exactly as
 before a ride. The recording goes on underneath; the way is asked for from
 where the rider is and setting off the way they are going (`heading`, as a
-new way off the old one is), and as soon as it arrives the blue line is
+new way off the old one is), and as soon as it arrives the way's line is
 under the ridden one, the card says how much is left and the turns are shown
 and said. The website's first way is taken, with no choice of others, since
 the rider is moving. A touch chooses only while there is nowhere to go yet —
@@ -184,17 +205,31 @@ ends, the solid one is on top and a tap there changes nothing.
 measured along it. The buttons say how long and how far and nothing about
 which is nicer, because the router does not say.
 
-From 2026-11-19 a way can say what kind it is, and there can be five:
-*Ridden*, *Fastest*, *Safest*, *Quietest*, *Shortest* — `style` in the
-website's answer, where its second router answered. The button then starts
-with the name, *Safest · 14 min · 4.0 km*. Where the website sends no
-names the buttons are as they were. The row of buttons still slides
-sideways here; on the website it wraps.
+The one exception is the way people have ridden. Where riders have been
+along one of the ways, in the direction it goes and at their own pace, the
+website puts it first and marks it `ridden: true`, and its button starts
+with the word: *Ridden · 14 min · 4.0 km*, as on the website's own bar.
+For a day from 2026-11-19 the website named every way — *Fastest*,
+*Safest*, *Quietest* and *Shortest* too — in a field called `style`, and
+then took the names back. The app still reads `style`, though nothing sends
+it now, and until 2026-11-22 it read nothing else, so the ridden way came
+first with no name. The row of buttons still slides sideways here; on the
+website it wraps.
 
-Choosing a place puts it on the map with a suggested way by bike, in blue,
-how far it is and about how long, and **Go**, which is Start. While riding,
-the blue line stays under the line actually ridden and the card says how
-much of the way is left. The way is a suggestion and is not re-drawn when
+Choosing a place puts it on the map with a suggested way by bike, in the
+colour chosen under Account, how far it is and about how long, and **Go**,
+which is Start. While riding, the way's line stays under the line actually
+ridden and the card says how much of the way is left.
+
+The way is drawn as Apple's and Google's maps draw a route: solid, inside a
+darker edge, in a colour of its own (`Theme.way` in `Views/Theme.swift`).
+By day that is the accent. By night it is a stronger shade of the same hue,
+inside the ground's own dark, because the night accents are pale and Apple's
+dark map draws its main roads a pale grey-blue: until 2026-11-23 the way was
+the accent, three-quarters see-through and with no edge, and by night it
+could hardly be told from the roads it ran along. The faint ways on offer
+are the same colour, a little stronger by night than by day (THE WAY IS
+SOLID, AND EDGED in `Views/RideMap.swift`). The way is a suggestion and is not re-drawn when
 the rider leaves it; and arriving finishes nothing — Finish is still a
 button. What is saved is the way really ridden, never the suggestion and
 never the destination.
@@ -205,7 +240,13 @@ the website finds one that is — `trains` in `GET /api/v1/route`, counted
 from setting off and leaving within the hour — it is one more button after
 the bike ways, *15 min · train 09:31*, and the card says *Leave at 09:25:
 ride to Ülemiste, the RE34 at 09:31 to Kitseküla, ride on*. The rides are
-the solid line and the rail dashed. While riding, the station is a corner
+drawn as any way by bike is, in the colour chosen under Account, and the
+rail is not: it is orange, as Elron's trains are, a solid line a little
+thicker than a ride with a darker edge, the way Google's map draws a train
+among its blue lines. While the way is on offer its rail is a faint orange
+among the faint lines, and its button is filled orange when it is the one
+chosen (`Theme.train` in `Views/Theme.swift`, and THE RAIL IS ORANGE, AND
+THE RIDES ARE NOT in `Views/RideMap.swift`). While riding, the station is a corner
 like any other, with a train in the row in place of an arrow — *Train RE34
 at 09:31 to Kitseküla* — read once by the phone's own voice on the platform,
 since no recording says which train. On the train nothing is recorded: a
@@ -219,8 +260,13 @@ under the numbers a row shows the next corner: an arrow, how far, what to
 do and the street it is onto. A voice says the same, since the phone is in
 a pocket — "In 200 metres, turn right" about two hundred metres before, and
 "Turn right" at the corner — over music, which is turned down for the
-second it takes, and with the screen locked. The speaker in the row
-switches it off and on, and the phone remembers. The voice is the owner's,
+second it takes, and with the screen locked. A button at the foot of the
+riding screen, at the end of the radio's row, switches it off and on, and
+the phone remembers: a speaker and *Voice*, or a struck-through speaker and
+*Off*. It is there from the moment somewhere to go is chosen and not
+before, since a ride with nowhere to go hears nothing from it but the
+greeting at Start; until 2026-11-22 it was a small speaker at the end of the
+turn row, where it was easy to miss. The voice is the owner's,
 recorded: eleven phrases in each language, listed in `docs/voice.md`,
 which is why it says no street names and no distance but the one.
 Azerbaijani, English and Estonian are recorded, all fifteen phrases of
@@ -231,16 +277,43 @@ starts just past one, as the Veerenni path under the railway does. A ride
 with nowhere to go has no row and no voice (`Core/Guide.swift`).
 
 **A radio, under the voice.** At the foot of the riding screen, over Pause
-and Finish, a row says **📻 Play radio**. A tap plays a station: Raadio
-Tallinn in Estonian, Radio Paradise in English, Наше Радио in Russian and
-Baku Retro FM in Azerbaijani, until the rider chooses another. Playing, the
+and Finish, a row says **📻 Play radio** — the whole width with nowhere to
+go, and beside the voice's button where there is somewhere, so the music and
+the voice are two buttons side by side and either can be had without the
+other. A tap plays a station: Raadio
+Tallinn in Estonian and Azerbaijani, Radio Paradise in English and Raadio 4
+in Russian, until the rider chooses another. Playing, the
 row is the station's name between two buttons, the next station and the one
 before, as a car's seek buttons go; a tap on the name stops it, and a longer
-press opens every station — twenty, `Seed/stations.json` — to choose from.
+press opens every station — seven, `Seed/stations.json` — to choose from.
 The phone remembers the station, and whether the radio was on: a ride
 starts with it if the last one ended with it, after the greeting, so the
 first time is always a press. It never starts over something the rider is
 already listening to, and it stops at Finish.
+
+**Only stations whose broadcaster allows it.** App Review asks a radio app
+to show that it may play each stream (guidelines 5.2.2 and 5.2.3), and a
+TestFlight build for outside testers is reviewed the same way. So the list
+is ERR's five — Raadio Tallinn, Raadio 2, Vikerraadio, Klassikaraadio,
+Raadio 4 — and Radio Paradise's two. Neither broadcaster's terms forbid
+another app, and neither has yet said yes in writing, which App Review can ask
+for. The other thirteen were taken off before release. SomaFM's
+terms refuse any new app, and Yle's forbid using its radio stream
+addresses outside Yle. Radio France's four FIP stations reach other apps
+only through partnership deals. Наше Радио, Baku Retro FM, Joy Türk Rock,
+Metropol FM, ROKS, Itapema FM and Loca FM publish no permission at all. A
+station comes back when its broadcaster says yes in writing, and that answer
+is what goes in App Review Information. A rider who had chosen one that left
+starts on their language's station again.
+
+**Not in a release, for now.** At the owner's word on 2026-11-23, the first
+version goes out without the radio, and `develop` keeps it. A tag, or
+`main`, is packaged with `NO_RADIO` (`.github/workflows/release.yml`), which
+turns `Radio.offered` off. The riding screen then has no radio row, the
+voice's button moves to the start of the Pause and Finish row, and nothing
+plays — even for a rider whose last ride on an older build ended with the
+radio on. A package from any other branch, `develop` included, still has the
+radio for testers. To ship the radio, take that line out of the workflow.
 
 When a turn is said the radio goes under it and comes back after, which
 iOS does for other apps' sound and an app has to do for its own. The lock
@@ -307,8 +380,12 @@ in Settings.
 
 Every colour has a day and a night. Red and Blue by day, and Green and Plum
 by night, are the website's own styles to the value; the other four were
-drawn to sit beside them (`Palette` in `Views/Theme.swift`). The choice is
-kept on the phone, as the website keeps its style in the browser.
+drawn to sit beside them (`Palette` in `Views/Theme.swift`). By day the
+background is not the colour's: all four stand on the same warm paper white,
+so the accent is the one colour on the screen. The choice is
+kept on the phone, as the website keeps its style in the browser. Some
+things read the same whatever the colour: saved, waiting and not kept, and
+the rail of a way by train, which is orange.
 
 ### Bike paths on the map
 
@@ -330,6 +407,47 @@ says whose they are: *© OpenStreetMap · CyclOSM · OSM France*.
 
 It is why the record map is an `MKMapView` and not SwiftUI's `Map`, which
 draws nothing of anybody else's.
+
+### All, on the account
+
+Since 2026-11-22 a signed-in rider's rides add up on the website, and My
+rides shows the sum as **All** on the card at the top, in place of the
+phone's. It was a section of its own under the card, *On your account*,
+for most of that day, and under the signed-in rows of the Account tab for
+the few hours before; the owner's word was that it is part of All. Every
+save carries the ride in a few numbers the phone has already worked out
+(`Ride.summary` in `Core/Ride.swift`): the distance ridden, the active
+time and the time Start to Finish, the time stopped, the top speed and the
+fastest kilometre, and where the kept line would begin and end — the
+first point 200 m in from each end, so no door is in it. They are the whole ride, not the line that is sent: a ride that went
+out past the four cities adds every kilometre of it, and one that never
+came near them is sent with no line at all, for its numbers alone —
+*Saved*, with *It was outside the cities, so it is not a bike route, but
+it is added up on your account* where a ride kept as a route says it is
+one. The website keeps them with the account and adds them to its
+totals; with nobody signed in it ignores them, and a rider with no
+account gets nothing new and has nothing more kept.
+
+All reads `GET /api/rides?totals=1` (`Core/AccountTotals.swift`): the
+distance large, as the other spans have it, and *12 rides · 9 h 43 min
+riding* under it; then, a row each, the time stopped, the average, the top
+speed and the fastest kilometre where there are any, and the longest ride;
+and *From every phone on your account, since 14 Nov 2026.* at the foot.
+There are no bars, as All never had. Every figure carries its unit —
+*9 h 43 min*, *43 min*, *2 min 17 s*, *13.1 km/h*, *8.6 km* — the hours,
+minutes and seconds in the chosen language, since a 9:43 on a line of its
+own, as it read at first, could be anything; a ride's own row keeps its
+*34 min* and *1:12*, and so does the phone's own line on the card. It asks
+when My rides appears signed in, whichever span is chosen, and when who
+is signed in changes, and not again for the same account within a minute
+— never in the background and never on a timer, one row read on the
+website each time. The last answer is kept on the phone for the account it
+was, so All opens on the account's numbers; with no signal they stay, with
+*As of Sun 22 Nov 17:08 — the site could not be reached.* at the foot.
+Before the first answer, and for an account with nothing added up yet,
+All is the phone's own sum, as it is signed out — numbers either way, and
+no spinner. Signing out or deleting the account forgets the numbers on the
+phone.
 
 ## The rules of a recording
 
@@ -429,6 +547,16 @@ long, and the speed where it moved.
   thirteen of them made a 12 km/h ride read 5.8. The active time is the
   riding time less the stretches set aside and the stops, counted once
   where they overlap and less whatever fell in a pause.
+- **A part shows where it was.** A tap on a part opens a still map under
+  its row, framed to it: riding bold over the rest of the ride drawn
+  faint, a walk or a train bold in its dots or dashes, a wait or a stop a
+  ringed dot where the rider stood, with the streets round it. One part is
+  open at a time; a tap on its row again puts it away, and a tap on its
+  map opens it over the whole screen on the same part, where **Whole
+  ride** frames the rest. The page's own map could not do it: by the time
+  the list is on the screen, that map has scrolled away above it. The
+  part's points are picked out by its times (`Timeline.points(of:in:)`),
+  so nothing more is stored and nothing is asked of the website.
 - **None of it is sent but the riding.** Fewer points and a shorter time,
   never a label, never a point of a walk, a train or a stop. The website
   keeps bike routes; the session is the rider's and stays on the phone.
@@ -453,11 +581,26 @@ rewritten every five points, about sixty metres, and at every pause.
 - **The server refuses it**: `short`, `fast` and `malformed` are final and
   the ride is listed as *Not kept*, still on the phone. `often` (the day's
   cap) waits for the next UTC midnight. Anything else is tried again.
+- **Nothing of it is in the four cities**: saved with nobody signed in, it
+  is *Not kept · outside the cities* and never sent, as ever. Saved signed
+  in, it is sent with an empty line for its numbers alone, which the
+  account adds up (**All, on the account**, above), and is *Saved*; a
+  session the website no longer honours answers `signed-out`, and it is
+  Not kept after all.
 
-One known gap, accepted for the first version: `/api/rides` has no request
-id, so if the server stores a ride and its answer is lost on the way back,
-the next try stores it a second time. The fix is an optional field on the
-route that the server uses to recognise a repeat.
+- **The answer is lost on the way back**: from the phone that is the same as
+  a save that never arrived, and the ride is sent again — and the website
+  does it again, counted a second time signed out and kept as a second ride
+  signed in. That is the one known gap, and it is accepted: for an hour on
+  2026-11-20 every save carried `request`, the ride's own id, for the
+  website to know a repeat by, and the owner took it out the same day
+  rather than have the website remember an id for every ride it says it
+  keeps nothing of.
+
+A ride saved with nobody signed in is marked so on the phone
+(`Ride.phoneOnly`) and is sent with no session even if somebody signs in
+before it has gone, so what its save card said — it stays on this phone —
+is what happens.
 
 ## What it asks the website for
 
@@ -468,14 +611,15 @@ repository's `CLAUDE.md` under **What the app reads**.
 
 | | |
 |---|---|
-| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }`. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account |
+| `POST /api/rides` | `{ action: "save", anon: true, name, seconds, line }`, answered `{ ride: { id, meters, seconds } }` signed in, where the ride is kept, and `{ counted: true }` with no `ride` signed out, where it is counted and not kept. `line` is `[lat, lng, t, acc]` a point: five decimals, whole seconds since the ride began, whole metres — and `[lat, lng, t, acc, alt]`, from 2026-11-18, where the fix had a height, whole metres above the sea. `anon` is what lets a save with no session through; with a session the ride is on the account. Since 2026-11-22 every save carries `summary`, the whole ride in numbers, which a signed-in account adds up and the website otherwise ignores: `meters`, `seconds` (the active time), `total`, `stopped`, and where there are any `top` (km/h to one decimal), `fastest` (seconds) and `start` and `end` (`[lat, lng]`, 200 m in from each end). A ride with nothing inside the four cities, saved signed in, goes with `line: []` and no `anon`, answered `{ counted: true }`, or `signed-out` with no session, which marks it Not kept |
+| `GET /api/rides?totals=1` | what the signed-in account's rides add up to, for **All** on My rides: `{ ready, user, totals }`, `totals` null before any ride is added up, or `rides`, `meters`, `seconds`, `stopped`, `top` (km/h, or null), `fastest` (seconds, or null), `longest` (metres) and `since` (milliseconds since 1970). Asked when My rides appears signed in and when who is signed in changes, once a minute at most |
 | `GET /api/rides/<id>` | one saved ride, to the account it is under: `ride` with `meters` and `line`, the stored `[lat, lng]` pairs with the ends off. Asked when a saved ride's page opens signed in, and drawn over the phone's line; `not-found` and `signed-out` draw nothing. The rest of the answer, `insight`, is worked out on the phone instead |
 | `GET /api/places` | the whole roll, with no query, once a week: the copy Where to? answers the first letters from and a tap on the map is matched against, keeping `id`, `name`, `lat`, `lng` and `map` |
 | `GET /api/places?q=&near=&limit=` | the search: the website's places and the city's venues, reading `id`, `name`, `address`, `category`, `lat`, `lng` and `map` |
 | `GET /api/geocode?q=` | streets, addresses and districts: `results` with `label`, `where`, `lat`, `lng` |
 | `GET /api/lookup`, `POST /api/lookup` | **Look for it on Google Maps**: `ready`, then `{ q }` answered by `ok`, `why` and `places` in the search's rows. The button goes away on `why: "no-key"` and says it is resting on any other refusal |
 | `GET /api/v1/route?from=&to=&mode=bike` | asked first: everything `/api/route` answers below, with `version: 1`, and `trains` — each `seconds`, `meters`, `leave`, and `legs`, a ride (`kind: "bike"`, `meters`, `seconds`, `line`, `steps`) or the train (`kind: "train"`, `name`, `from`, `to`, `at`, `until`, `meters`, `line`). An answer without `version`, or none, and `/api/route` is asked instead |
-| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields — up to four from 2026-11-19, where the ways have names: `style` on the way and on each of the others, `ridden`, `fastest`, `safest`, `quietest` or `shortest`, which the card prints on the button, and a way without one, or with a word this build does not know, is a button with no name; and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout`, `arrive` and `tunnel`, where the way goes into one; one the app does not know is left out |
+| `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields — and `ridden: true` on the way people have ridden, which the website puts first and the card names on its button (`style`, a name on every way, was sent for a day from 2026-11-19 and taken back; it is still read, and a word this build does not know is a button with no name); and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout`, `arrive` and `tunnel`, where the way goes into one; one the app does not know is left out |
 | `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
 | `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
 | `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |
@@ -484,12 +628,14 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `POST /api/apple` | Apple's token and its nonce, answered as a sign-in |
 
 A line longer than 3,500 points, about forty kilometres, is thinned evenly
-before it is sent, and points outside the box the server accepts are left
-out (`Geo.line` in `Core/Ride.swift`).
+before it is sent, and points outside the four boxes the server counts rides in — Tallinn, Tartu,
+Pärnu and Narva, fourteen kilometres round each — are left out (`Geo.line` in `Core/Ride.swift`).
+The `summary` beside it is worked out over every point, so the account's
+totals are the whole ride whatever the line leaves out.
 
 **Sign in with Apple needs the website to know this app.** Apple signs its
 token for a bundle id, and `functions/api/_apple.js` there lists the ids it
-accepts; this app's is `ee.tallinntastebuds.rattatee`.
+accepts; this app's is `ee.tallinntastebuds.rattatee.app`.
 
 **The words are compiled in**, unlike Kohuke's, because the app has to say
 "Recording" with no signal. `Rattatee/Seed/strings.json` holds every string
@@ -500,8 +646,6 @@ nothing asks for.
 
 ### What the website does not have yet
 
-- **A request id on a save**, so a retry after a lost answer is not a second
-  ride. See above.
 - **The server's list in My rides.** `GET /api/rides?mine=1` answers a
   signed-in account's rides; the app lists only what is on the phone, so
   rides do not follow an account to a new phone yet.
@@ -513,7 +657,8 @@ nothing asks for.
   asks for when it opens, with this file as what it falls back on, would
   mend one without a release — and would be a promise, a station's `id`,
   `name` and `url` at the least, written into the website's **What the app
-  reads**.
+  reads**. That list would have to hold only stations that said yes:
+  the website's eleven today include ones the app took off.
 
 ---
 
@@ -527,9 +672,10 @@ Rattatee/
             Recorder.swift      Core Location, in the background too
             Motion.swift        which stretches were walked or driven, asked once at Finish
             Timeline.swift      the ride part by part: a train carried, a stop settled, what is listed
-            Ride.swift          a ride, a point, and the sums
+            Ride.swift          a ride, a point, the sums, and the summary sent with it
             Insight.swift       a ride's kilometres and speeds, and what the website kept of it
             Store.swift         every ride on the phone, and sending them
+            AccountTotals.swift what the account's rides add up to, from the website
             Search.swift        places, streets, Google, and the way there and its turns
             Guide.swift         the voice that says the turns
             Radio.swift         the radio on a ride, and going under that voice
@@ -547,7 +693,7 @@ Rattatee/
             RadioRow.swift      the radio's row while riding, and the list of stations
             FinishCards.swift   Save, Too short, and what came of it
             RidesTab.swift      My rides
-            StatsCard.swift     how far today, this week, this month, in all
+            StatsCard.swift     how far today, this week, this month, and in all, the account's signed in
             RideView.swift      one ride, opened
             AccountView.swift   the Account tab, the colours, deleting an account
             SignIn.swift        the username form and the Apple and Google buttons
@@ -577,7 +723,7 @@ shows every screen, but only a phone on a bike records a ride.
   when pressed; Google and riding without an account both work.
 - **Release** carries the entitlement, so archiving needs the paid developer
   team, with the **Sign in with Apple** capability on the app id
-  `ee.tallinntastebuds.rattatee`.
+  `ee.tallinntastebuds.rattatee.app`.
 
 **A build on GitHub, when asked**, `.github/workflows/ios.yml` — Actions →
 build → Run workflow, on the branch to check. Since 2026-11-18 a push no
@@ -591,7 +737,7 @@ launched in each state and photographed. The pictures are the run's
 ### To TestFlight
 
 1. In App Store Connect, make the app: bundle id
-   `ee.tallinntastebuds.rattatee`, name Rattatee.
+   `ee.tallinntastebuds.rattatee.app`, name Rattatee.
 2. In Xcode: **Product → Archive** with the Release configuration, then
    **Distribute App → App Store Connect**.
 3. Fill in what review asks for, below.
@@ -614,16 +760,27 @@ launched in each state and photographed. The pictures are the run's
   to a place the user chose, while a ride is being recorded; nothing plays
   otherwise.*
 - **App Privacy**, matching `PrivacyInfo.xcprivacy`:
-  - *Precise Location* — collected, for App Functionality, not used for
-    tracking. Linked to the user only when they are signed in.
+  - *Precise Location* — collected, for App Functionality, linked, not
+    used for tracking. That is the ride of somebody signed in, which the
+    website keeps under their account, its numbers added up there with
+    the account's others (**All, on the account**) — derived from the
+    same points, so no new kind of data. A ride saved with nobody signed in
+    is sent, counted and let go, which is not collecting it; the answer
+    stays *collected* because the app does both.
   - *User ID* — collected only when signed in, for App Functionality,
     linked, not used for tracking.
   - Nothing else: no analytics, no advertising, no third-party code. What
     is typed into the search, and where the phone is when a way is asked
     for, go to the website to be answered and are not kept with anything
     that says who asked.
+- **Required-reason APIs**, also in `PrivacyInfo.xcprivacy`: UserDefaults
+  for the app's own settings (`CA92.1`), and a file's modification date
+  (`C617.1`), which `Core/Venues.swift` reads to tell when its copy of the
+  places is a week old. Code that starts reading a file's date, the disk's
+  free space, the time since boot or the keyboards needs its line there
+  too, or App Store Connect refuses the build.
 - **Privacy policy URL**: `https://tallinntastebuds.ee/privacy`, which says
-  what is kept of a ride.
+  what is kept of a ride, and that one saved with no account is not kept.
 - **Account deletion** is in the app, under Account, as review requires of
   an app that can make an account.
 - **Sign-in is optional**, so review needs no demo account.
@@ -640,7 +797,9 @@ Connect refuses an icon that has one, even a fully opaque one.
 ## Done when
 
 - A ride recorded on a real iPhone with the screen locked for the whole
-  ride saves and comes back from `GET /api/rides?bbox=`.
+  ride saves — and, saved signed in, comes back from `GET
+  /api/rides?bbox=`; saved signed out it is answered `counted` and comes
+  back from nowhere.
 - Killing the app mid-ride, or losing signal at Save, does not lose the
   ride.
 - The project archives for TestFlight with the permission texts and the

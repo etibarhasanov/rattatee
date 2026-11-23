@@ -191,7 +191,7 @@ struct SearchSheet: View {
         // Side by side, and each may fail on its own.
         let here = store.recorder.here
         async let places = try? Search.places(q, near: here)
-        async let streets = try? Search.streets(q)
+        async let streets = try? Search.streets(q, near: here)
         let (a, b) = await (places, streets)
         guard !Task.isCancelled else { return }
         // One of the two answering is an answer; neither is no connection.

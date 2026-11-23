@@ -26,18 +26,23 @@ struct Station: Codable, Identifiable, Equatable {
 /// sixty megabytes of mobile data an hour. It is live: there is nothing to
 /// rewind and no song to choose.
 ///
-/// The stations are compiled in, `Seed/stations.json`, the website's own
-/// eleven (`data/radio.json` there, one a language) and nine beside them.
+/// The stations are compiled in, `Seed/stations.json`: ERR's five and Radio
+/// Paradise's two. App Review can ask to see each broadcaster's permission,
+/// and these two are the only broadcasters likely to give it. The other
+/// thirteen were taken off before release (README.md says why for each).
+/// One comes back when its broadcaster says yes in writing, never just
+/// because its address plays.
 /// An address that dies is a line in that file and a new build; having the
 /// website hand the list over instead is the next step, and README.md says
 /// what it would promise.
 ///
 /// WHICH STATION
 ///
-/// The one the rider last chose, kept on the phone. Until they choose, the
-/// one marked for the language the app is in — Raadio Tallinn in Estonian,
-/// Наше Радио in Russian — so the first press plays something they can
-/// follow.
+/// The one the rider last chose, kept on the phone; one that has since left
+/// the list counts as none chosen. Until they choose, the one marked for the
+/// language the app is in — Raadio Tallinn in Estonian, Raadio 4 in Russian —
+/// so the first press plays something they can follow. Azerbaijani has
+/// none of its own, so it starts on the first, Raadio Tallinn.
 ///
 /// WHEN IT PLAYS
 ///
@@ -76,6 +81,22 @@ final class Radio {
 
     var on: Bool { state != .off }
 
+    /// Whether this build has a radio at all. A release has none, at the
+    /// owner's word on 2026-11-23: the first version goes out without it,
+    /// and `develop` keeps it. So the package workflow builds a tag, or
+    /// `main`, with `NO_RADIO`, and every other build has the radio. Without
+    /// it, the riding screen has no radio row. Nothing plays, not even for
+    /// a rider whose last ride on an older build ended with the radio on,
+    /// and the lock screen offers nothing. `-kRadio none` draws any build
+    /// as a release would look, for the screenshots.
+    static let offered: Bool = {
+        #if NO_RADIO
+        return false
+        #else
+        return UserDefaults.standard.string(forKey: "kRadio") != "none"
+        #endif
+    }()
+
     /// The voice, so the session is not given away under a phrase.
     @ObservationIgnored weak var guide: Guide?
     /// Screenshots for CI: drawn, never played.
@@ -106,6 +127,7 @@ final class Radio {
         let data = Disk.seed("stations") ?? Data()
         stations = (try? JSONDecoder().decode([Station].self, from: data)) ?? []
         chosen = UserDefaults.standard.string(forKey: "station") ?? ""
+        guard Self.offered else { return }
         listen()
         remote()
     }
@@ -128,6 +150,7 @@ final class Radio {
     }
 
     func play() {
+        guard Self.offered else { return }
         wanted = true
         open = true
         tries = 0
@@ -160,7 +183,7 @@ final class Radio {
     /// and never over something the rider is already listening to.
     func begin() {
         open = true
-        guard wanted, !on, !demo, !AVAudioSession.sharedInstance().isOtherAudioPlaying else { return }
+        guard Self.offered, wanted, !on, !demo, !AVAudioSession.sharedInstance().isOtherAudioPlaying else { return }
         tries = 0
         join()
     }

@@ -5,13 +5,27 @@ import Observation
 
 /// Every ride on this phone, and who is signed in, if anybody is.
 ///
-/// NOBODY HAS TO SIGN IN
+/// NOBODY HAS TO SIGN IN, AND THEN THE RIDE IS THEIRS ALONE
 ///
-/// What the rides are collected for is their points, so the app asks for no
-/// account: people ride, press Save, and that is it. A ride is sent with
-/// `anon: true`, which is what lets `/api/rides` take it with no session.
-/// Somebody who does sign in (Account, on My rides) gets one thing for it:
-/// their rides are also listed on their account page on the website.
+/// The app asks for no account: people ride, press Save, and that is it. A
+/// ride is sent with `anon: true`, which is what lets `/api/rides` take it
+/// with no session, and since 2026-11-20 the website does not keep such a
+/// ride: it counts the streets the ride went down, into what it knows of
+/// how each street rides, and lets the ride go. The ride is the file on
+/// this phone and nothing else, and the save card says so before Save is
+/// pressed. So a ride saved with nobody signed in is marked `phoneOnly` and
+/// sent with no session even if somebody signs in before it has gone:
+/// what the card said is what happens. Nothing afterwards offers to move
+/// such a ride to an account, and nothing on the phone tells it from a
+/// kept one. The owner's line was that neither is needed.
+///
+/// Somebody who does sign in (Account, on My rides) has their rides kept on
+/// the website under the account, listed on their account page there and
+/// drawn on the ride's page here. Since 2026-11-22 every save carries the
+/// ride in a few numbers as well (`Ride.summary`), which the account adds
+/// up — a ride outside the four cities included, sent for those alone
+/// (`send`) — and My rides shows (`AccountTotals`). With nobody
+/// signed in the website ignores them and nothing more is kept.
 ///
 /// THE RIDE IS KEPT ON THE PHONE UNTIL THE SERVER SAYS IT HAS IT
 ///
@@ -25,11 +39,14 @@ import Observation
 /// again whenever there is a reason to think it might go now: the app coming
 /// to the front, the network coming back, Try now.
 ///
-/// One known gap: `/api/rides` has no request id. If the server stores a ride
-/// and its answer is then lost, the phone cannot tell that from never having
-/// reached it, and the next try stores it a second time. The owner chose to
-/// accept that for v1; the fix is an optional field on the route, which
-/// README.md describes.
+/// One known gap. A ride whose answer was lost on the way back looks, from
+/// here, exactly like one that never arrived, and is sent again — and the
+/// website does it again: counted a second time with nobody signed in,
+/// kept as a second ride with somebody. For an hour on 2026-11-20 every
+/// save carried `request`, the ride's own id, for the website to know a
+/// repeat by. The owner took it out the same day: a small chance and a
+/// small harm, and not worth the website remembering an id for every ride
+/// it says it keeps nothing of.
 @MainActor
 @Observable
 final class Store {
@@ -460,6 +477,7 @@ final class Store {
     func save(name: String) async {
         guard let i = currentIndex, rides[i].status == .finished else { return }
         rides[i].name = String(name.trimmingCharacters(in: .whitespacesAndNewlines).prefix(Self.longestName))
+        rides[i].phoneOnly = user == nil
         rides[i].status = .waiting
         goal = nil
         guide.forget()
@@ -580,29 +598,63 @@ final class Store {
         min(60 * pow(2, Double(max(0, tries - 1))), 6 * 3600)
     }
 
+    /// Send one ride, and file what the website said.
+    ///
+    /// A RIDE OUTSIDE THE CITIES STILL ADDS UP ON AN ACCOUNT
+    ///
+    /// The website takes a line only inside its four cities, and `Geo.line`
+    /// leaves the rest out. A ride with nothing inside them (`Ride.outside`)
+    /// has no line at all, and until 2026-11-22 it was marked Not kept ·
+    /// outside the cities on the phone and never sent. With nobody signed in
+    /// it still is: there is nothing to count and nobody to count it for.
+    /// Saved signed in, it now goes with an empty line and its `summary`,
+    /// and the website adds its numbers up on the account and answers
+    /// `counted`, keeping no line — so a rider's totals are every ride they
+    /// saved, the one in the countryside included.
+    ///
+    /// Whether it goes is decided here, at sending, from what was true at
+    /// Save and what is true now. Saved with nobody signed in
+    /// (`phoneOnly`), it is not sent, whoever has signed in since — the
+    /// rule that sends an in-city ride with no session. Saved signed in, it
+    /// is sent if the phone still holds the site's session cookie
+    /// (`API.holdsSession`), and not on `user`, which is only what `whoAmI`
+    /// last heard: nil from launch until the site answers, and for the
+    /// whole launch with no signal, which would have filed a signed-in
+    /// rider's ride Not kept for good. It goes without `anon`, since with
+    /// no account there is nothing to do with it, so a session the site no
+    /// longer honours is answered `signed-out`, and the ride is Not kept ·
+    /// outside, as it would have been signed out. One request, once, for a
+    /// kind of ride that is rare already.
     private func send(_ id: String) async {
         guard let ride = self.ride(id) else { return }
-        let line = Geo.line(ride.points)
+        let outside = ride.outside
         var outcome = ride
 
-        if line.count < 2 {
-            // Nothing of it is inside the box the server takes rides in.
+        if outside && (ride.phoneOnly == true || !API.holdsSession) {
             outcome.status = .refused
             outcome.problem = "outside"
         } else {
+            let line: [[Double]] = outside ? [] : Geo.line(ride.points)
+            var body: [String: Any] = [
+                "action": "save",
+                "name": ride.name,
+                // The active time: what the server shares out between the
+                // pieces and judges the speed over.
+                "seconds": max(1, ride.ridden()),
+                "line": line,
+                // The whole ride in numbers, for a signed-in rider's
+                // account to add up; ignored with no session.
+                "summary": ride.summary
+            ]
+            // Lets a save with no session through, to be counted and not
+            // kept; with one, the session wins and the ride is on the
+            // account. Not for a ride outside the cities: above.
+            if !outside { body["anon"] = true }
             do {
-                let data = try await API.post("api/rides", [
-                    "action": "save",
-                    // Lets a save with no session through; with one, the
-                    // session wins and the ride is on the account.
-                    "anon": true,
-                    "name": ride.name,
-                    // The active time: what the server shares out between
-                    // the pieces and judges the speed over.
-                    "seconds": max(1, ride.ridden()),
-                    "line": line
-                ])
+                let data = try await API.post("api/rides", body, signed: ride.phoneOnly != true)
                 let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+                // `ride` where the website kept it; `counted` and no
+                // `ride` where it did not, which leaves the two below nil.
                 let saved = object?["ride"] as? [String: Any]
                 outcome.status = .saved
                 outcome.serverId = saved?["id"] as? String
@@ -615,10 +667,17 @@ final class Store {
                 switch refusal.code {
                 case "short", "fast", "malformed":
                     outcome.status = .refused
+                    // A ride outside the cities says why it really was
+                    // not kept — the empty line, to a server that does
+                    // not take one yet.
+                    if outside { outcome.problem = "outside" }
+                case "signed-out" where outside:
+                    outcome.status = .refused
+                    outcome.problem = "outside"
                 case "often":
                     outcome.notBefore = Self.nextUTCMidnight()
                 default:
-                    // 503 not-ready, no-salt, anything new: try again later.
+                    // 503 not-ready, anything new: try again later.
                     // That includes `signed-out` from a server that does not
                     // take `anon` yet. Later, not at once — see sendWaiting().
                     outcome.tries = (outcome.tries ?? 0) + 1

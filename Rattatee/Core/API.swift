@@ -4,8 +4,9 @@ import Foundation
 ///
 /// Rattatee has no server of its own, the same as Kohuke and the map app. It
 /// records a ride on the phone and hands it to `/api/rides`, the Function the
-/// website's own recorder saves through, and asks `/api/account`,
-/// `/api/google` and `/api/apple` who is riding.
+/// website's own recorder saves through, asks `/api/account`,
+/// `/api/google` and `/api/apple` who is riding, and asks `/api/rides`
+/// again, on My rides, what that account's rides add up to.
 ///
 /// Requests go through one `URLSession` whose cookie store is the system's.
 /// The website's session is an HttpOnly cookie (`ttb_s`), and a native
@@ -82,13 +83,27 @@ enum API {
         let status: Int
     }
 
+    /// Whether the phone holds the site's session cookie, `ttb_s`. Not
+    /// whether the site still honours it — only the site can say that — but
+    /// without one no request can be signed in, so there is nothing to ask.
+    /// Unlike `Store.user`, it is known at launch and with no signal. One
+    /// caller: a ride outside the four cities — `Store.send`.
+    static var holdsSession: Bool {
+        HTTPCookieStorage.shared.cookies(for: base)?.contains { $0.name == "ttb_s" } ?? false
+    }
+
     /// A JSON POST, the way the website's own pages send one. Answers the
     /// bytes that came back, or throws a `Refusal` carrying the route's own
     /// word for what went wrong.
+    ///
+    /// `signed: false` sends it with no cookie, so the website sees nobody
+    /// signed in whoever is, and keeps none the answer sets. One caller: a
+    /// ride saved with nobody signed in — `Store.send`.
     @discardableResult
-    static func post(_ path: String, _ body: [String: Any]) async throws -> Data {
+    static func post(_ path: String, _ body: [String: Any], signed: Bool = true) async throws -> Data {
         var request = URLRequest(url: url(path))
         request.httpMethod = "POST"
+        request.httpShouldHandleCookies = signed
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)

@@ -42,9 +42,10 @@ designed with its frequency in mind before it is written:
    a day; before that wait, each sent every waiting ride again. Save, Try now
    and signing in are a person asking and go past it, never past `often`.
 3. **A refusal sending again cannot change is final.** `short`, `fast` and
-   `malformed` today. A new one is added to that list and to the site's
-   section together, or an installed app sends that ride for ever — slowly
-   now, but for ever.
+   `malformed` today, and `signed-out` for a ride with nothing inside the
+   four cities, which goes without `anon` (`Store.send`). A new one is added
+   to that list and to the site's section together, or an installed app
+   sends that ride for ever — slowly now, but for ever.
 4. **Typing is debounced and has a floor**: 300 ms and three letters, as
    Where to? is.
 5. **Keep what does not change.** The places roll is kept a week in

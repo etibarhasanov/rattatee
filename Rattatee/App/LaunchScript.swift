@@ -27,13 +27,25 @@ enum LaunchScript {
     /// `-kOpen YES` on the My rides tab opens its newest ride.
     static var open: Bool { UserDefaults.standard.bool(forKey: "kOpen") }
 
+    /// `-kMap YES`, with `-kOpen YES`, opens that ride's map over the whole
+    /// screen.
+    static var map: Bool { UserDefaults.standard.bool(forKey: "kMap") }
+
+    /// `-kPart <n>`, with `-kMap YES`, opens that map on the ride's nth
+    /// part instead, counting from nought, as a tap on that part's own map
+    /// does.
+    static var part: Int? {
+        UserDefaults.standard.object(forKey: "kPart") == nil ? nil : UserDefaults.standard.integer(forKey: "kPart")
+    }
+
     /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides,
     /// and goal and going, which have somewhere to ride to.
     @MainActor
     static func stage(_ store: Store) {
         guard let demo = UserDefaults.standard.string(forKey: "kDemo") else { return }
         // `-kRadio playing`, `tuning` or `lost`: the radio's row in that
-        // state, drawn and not played.
+        // state, drawn and not played. `-kRadio none` is a build without
+        // the radio, as a release is (`Radio.offered` reads it).
         switch UserDefaults.standard.string(forKey: "kRadio") {
         case "playing": store.radio.pretend(.playing)
         case "tuning": store.radio.pretend(.tuning)
@@ -105,8 +117,17 @@ enum LaunchScript {
             let kept = ride(.waiting, name: "Kalamaja", metres: 8600, seconds: 2040, problem: "offline")
             store.pretend([kept], shown: kept.id)
         case "rides":
+            // The newest, which `-kOpen YES` opens, stands twice on its way:
+            // 45 seconds at a light a third of the way along and four
+            // minutes somewhere two thirds along, so its page lists five
+            // parts — riding, waiting, riding, stopped, riding — for
+            // `-kPart` to open.
+            var newest = ride(.waiting, name: "Kalamaja", metres: 8600, seconds: 2040, ago: 3600, problem: "offline")
+            for (share, stood) in [(0.33, 45.0), (0.66, 240.0)] {
+                for i in Int(Double(newest.points.count) * share)..<newest.points.count { newest.points[i].t += stood }
+            }
             store.pretend([
-                ride(.waiting, name: "Kalamaja", metres: 8600, seconds: 2040, ago: 3600, problem: "offline"),
+                newest,
                 ride(.saved, name: "Pirita", metres: 21300, seconds: 4320, ago: 2 * 86_400),
                 ride(.saved, metres: 5100, seconds: 1140, ago: 3 * 86_400),
                 ride(.refused, name: "Kadriorg", metres: 3900, seconds: 240, ago: 5 * 86_400, problem: "fast")

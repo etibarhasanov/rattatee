@@ -68,11 +68,19 @@ struct Ride: Codable, Identifiable, Equatable {
         /// Save was pressed and the server has not confirmed it yet. Sent
         /// again and again until it does — see `RideBook.send`.
         case waiting
-        /// The server stored it; `serverId` is its id there.
+        /// The server answered. Signed in, it stored the ride and
+        /// `serverId` is its id there. With nobody signed in it counted
+        /// the streets the ride went down and kept nothing — `phoneOnly`
+        /// — so there is no id, and the ride is this file and no more.
+        /// Signed in with nothing of it inside the four cities (`outside`)
+        /// there is no id either: there was no line to keep, and only its
+        /// `summary` was added up on the account.
         case saved
         /// The server refused it for a reason sending again cannot change
-        /// (`short`, `fast`, `malformed`). Kept on the phone so it is not
-        /// lost silently, and listed as Not kept.
+        /// (`short`, `fast`, `malformed`), or it was never sent: nothing of
+        /// it was inside the four cities and no account was there to add up
+        /// its numbers (`outside`, the phone's own word). Kept on the phone
+        /// so it is not lost silently, and listed as Not kept.
         case refused
     }
 
@@ -139,11 +147,20 @@ struct Ride: Codable, Identifiable, Equatable {
         (aside ?? []).reduce(0) { $0 + Geo.length($1) }
     }
 
-    /// What the server answered.
+    /// Save was pressed with nobody signed in, so what the save card
+    /// said holds whatever happens next: the ride stays on this phone and
+    /// the website counts it without keeping it. It is sent with no
+    /// session even if somebody signs in before it has gone. Nil for a
+    /// ride saved before this was written, which is sent as it always was.
+    var phoneOnly: Bool?
+
+    /// What the server answered, for a ride it kept: nothing, for one it
+    /// only counted.
     var serverId: String?
     var serverMeters: Int?
     /// The server's word for the last refusal: "often", "short", "fast",
-    /// "malformed", or "offline" for no answer at all.
+    /// "malformed", or "offline" for no answer at all — and "outside",
+    /// which is the phone's: see `Status.refused`.
     var problem: String?
     /// "often" means not again before the next UTC midnight; any other
     /// failure means not again before a wait that doubles with `tries`.
@@ -254,6 +271,60 @@ struct Ride: Codable, Identifiable, Equatable {
         return (Date(timeIntervalSince1970: first.t), Date(timeIntervalSince1970: last.t))
     }
 
+    /// Whether nothing of the ride is inside the four cities (`Geo.cities`):
+    /// fewer than two points there, so `Geo.line` has no line to send. With
+    /// nobody signed in such a ride is not sent at all; signed in it goes
+    /// with an empty line, for its `summary` alone — `Store.send`.
+    var outside: Bool {
+        points.lazy.filter(Geo.inCity).prefix(2).count < 2
+    }
+
+    /// The ride in a few numbers, sent as `summary` beside the line on every
+    /// save, which a signed-in rider's account adds up and My rides shows
+    /// (`AccountTotals`). The website ignores it with no session, so
+    /// it goes on every save rather than the phone deciding when: one
+    /// payload, and the server is what knows whether there is an account.
+    ///
+    /// It is the whole ride as ridden, where the line is not. The line is
+    /// only what is inside the four cities, thinned past `Geo.maxPoints`,
+    /// and the server takes 200 m off each end of it; these are worked out
+    /// over every point the rider kept, so a ride into the countryside adds
+    /// up to every kilometre of it on the account, and one that never came
+    /// near a city adds up too, with no line at all. Nothing set aside at
+    /// Finish is in them: `points` is the riding, as everywhere else.
+    ///
+    /// - `meters`: the distance ridden (`metres`, gaps not counted).
+    /// - `seconds`: the active time, the same number sent as the save's own
+    ///   `seconds`; `total`: Start to Finish with the pauses left out.
+    /// - `stopped`: seconds spent standing, as the ride's page says it
+    ///   (`Insight`), and `fastest`, its fastest whole kilometre in seconds,
+    ///   left out of a ride under one.
+    /// - `top`: the save card's top speed, the fastest half-minute in km/h
+    ///   to one decimal, left out where there is none.
+    /// - `start` and `end`: `[lat, lng]` where the line the website keeps
+    ///   would begin and end — the first point `Geo.ends` of riding in from
+    ///   each end — so the account can say where rides set off and arrive
+    ///   without anybody's door in it. Both left out of a ride under twice
+    ///   that, which has no middle to name.
+    var summary: [String: Any] {
+        let insight = Insight(self)
+        var sum: [String: Any] = [
+            "meters": Int(metres.rounded()),
+            "seconds": ridden(),
+            "total": seconds(),
+            "stopped": Int((insight?.stopped ?? 0).rounded())
+        ]
+        if let top = topSpeed { sum["top"] = (top * 10).rounded() / 10 }
+        if let fastest = insight?.fastest { sum["fastest"] = Int(fastest.seconds.rounded()) }
+        if metres >= Geo.ends * 2,
+           let start = Geo.point(Geo.ends, into: points),
+           let end = Geo.point(Geo.ends, into: points.reversed()) {
+            sum["start"] = [Geo.round5(start.lat), Geo.round5(start.lng)]
+            sum["end"] = [Geo.round5(end.lat), Geo.round5(end.lng)]
+        }
+        return sum
+    }
+
     /// The name, or "Ride · Fri 14 Nov" when it was not given one.
     var title: String {
         name.isEmpty ? L.t("rideUntitled", ["date": L.date(started)]) : name
@@ -301,6 +372,33 @@ enum Geo {
         return m
     }
 
+    /// How much of each end of a ride the website never keeps — `ENDS` on
+    /// the server, in `functions/api/rides.js`, where a ride's first and
+    /// last 200 m are cut off before it is stored or counted, which is
+    /// where a home or a workplace would be. The save card promises it in
+    /// so many words ("the first and last 200 m are left off"), and
+    /// `Store.shortest` is built on it. Change it there, change it here.
+    static let ends: Double = 200
+
+    /// The first point `distance` of riding into a line, counted as
+    /// `length` counts — a gap is not riding — or nil for a line not that
+    /// long. The server's `cut()` beside `ENDS`, over the whole ride rather
+    /// than the line it was sent; the end of a ride is the same asked of
+    /// the points reversed.
+    static func point<S: Sequence>(_ distance: Double, into points: S) -> Point? where S.Element == Point {
+        var run = 0.0
+        var last: Point?
+        for p in points {
+            if let last {
+                let d = metres(last, p)
+                if d <= gap { run += d }
+                if run >= distance { return p }
+            }
+            last = p
+        }
+        return nil
+    }
+
     /// The ridden line in the pieces it is drawn in: cut where two points
     /// are a gap apart, and where a stretch set aside fell between them, so
     /// a walk is a dotted line on the map and never a straight solid one
@@ -322,11 +420,25 @@ enum Geo {
 
     static func round5(_ x: Double) -> Double { (x * 100_000).rounded() / 100_000 }
 
-    /// The box the server accepts points in — `nearTallinn()` in the
-    /// website's `functions/api/_lib.js`. A ride with one point outside it is
-    /// refused whole, so points outside are left out before sending.
-    static func inTallinn(_ p: Point) -> Bool {
-        abs(p.lat - 59.437) <= 0.55 && abs(p.lng - 24.7536) <= 1.1
+    /// The boxes the server counts a ride in — `CITIES` in the website's
+    /// `functions/api/_lib.js`, restated here: Tallinn, Tartu, Pärnu and
+    /// Narva, fourteen kilometres each way from the middle, Narva's cut in
+    /// the east at the river. Until 2026-11-20 it was one box, some sixty
+    /// kilometres round Tallinn. Change one there, change it here.
+    ///
+    /// Only a ride is held to them. A way and an address are asked for
+    /// anywhere in Estonia, and the server is what says no to those.
+    static let cities: [(south: Double, north: Double, west: Double, east: Double)] = [
+        (59.311, 59.563, 24.5066, 25.0006),
+        (58.252, 58.504, 26.489, 26.969),
+        (58.26, 58.512, 24.257, 24.737),
+        (59.251, 59.503, 27.943, 28.21)
+    ]
+
+    /// A ride with one point outside the boxes is refused whole, so points
+    /// outside are left out before sending.
+    static func inCity(_ p: Point) -> Bool {
+        cities.contains { p.lat >= $0.south && p.lat <= $0.north && p.lng >= $0.west && p.lng <= $0.east }
     }
 
     /// The most points one ride may carry — `MAX_POINTS` on the server.
@@ -334,7 +446,7 @@ enum Geo {
 
     /// The line as the server takes it: `[lat, lng, t, acc]` — five decimals,
     /// whole seconds since the first point, whole metres — and `alt` after
-    /// them in whole metres where the fix had a height, inside the box, and
+    /// them in whole metres where the fix had a height, inside the boxes, and
     /// no more than `maxPoints` of it. The server keeps the last two only if
     /// every point has them and they are sane (a `t` from 0 to a day, an
     /// accuracy up to a kilometre), which these always are short of a ride
@@ -343,7 +455,7 @@ enum Geo {
     /// about forty kilometres, so this only happens on very long days, and a
     /// point every 24 m instead of every 12 still follows the streets.
     static func line(_ points: [Point]) -> [[Double]] {
-        let inside = points.filter(inTallinn)
+        let inside = points.filter(inCity)
         var kept = inside
         if inside.count > maxPoints {
             let step = Double(inside.count - 1) / Double(maxPoints - 1)

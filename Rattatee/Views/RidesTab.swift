@@ -3,6 +3,13 @@ import SwiftUI
 /// My rides: every ride recorded on this phone, newest first, each with
 /// whether it reached the server. A row opens the ride (`RideView`).
 ///
+/// At the top, what the rides add up to (`StatsCard`): the phone's for
+/// Today, Week and Month, and for All, signed in, what the account's add up
+/// to on the website once it has said — two sums that are not meant to
+/// agree, the account's footed with what it counts. The card is a section
+/// of the list, so a phone with no ride on it shows only that it has none,
+/// signed in or not, and the account's sum waits for the first ride here.
+///
 /// The list is the phone's own. The server has a list of its own now
 /// (`GET /api/rides?mine=1`, which the website's account page reads), but it
 /// knows nothing of a ride still waiting here, which is the ride this
@@ -38,7 +45,19 @@ struct RidesTab: View {
             .navigationDestination(for: String.self) { id in
                 RideView(id: id == "first" ? listed.first?.id ?? id : id)
             }
+            .onAppear(perform: askTotals)
+            .onChange(of: store.user) { askTotals() }
         }
+    }
+
+    /// The account's totals, from the website, for All on the card: each
+    /// time My rides appears and whenever who is signed in changes, which
+    /// `AccountTotals` turns into once a minute at most. Nothing is asked
+    /// signed out, nor for CI's screenshots. It is asked whichever span is
+    /// chosen, so All has its numbers by the time it is pressed.
+    private func askTotals() {
+        guard !store.demo, let user = store.user else { return }
+        AccountTotals.shared.ask(for: user)
     }
 
     /// Everything but the ride on the Record tab.
@@ -63,7 +82,7 @@ struct RidesTab: View {
 
     private var list: some View {
         List {
-            Section { StatsCard(rides: listed) }
+            Section { StatsCard(rides: listed, user: store.demo ? nil : store.user) }
                 .listRowBackground(Theme.card)
             if !store.waiting.isEmpty {
                 Section { banner }
@@ -86,7 +105,7 @@ struct RidesTab: View {
                     Text(month.title)
                 } footer: {
                     if month.title == months.last?.title {
-                        Text(L.t("ridesFoot")).padding(.top, 6)
+                        Text(store.user == nil ? L.t("ridesFootPhone") : L.t("ridesFoot")).padding(.top, 6)
                     }
                 }
                 .listRowBackground(Theme.card)

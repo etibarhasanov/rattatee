@@ -2,7 +2,9 @@ import Foundation
 
 /// What a ride's points say beyond its distance and time: each kilometre's
 /// time, the fastest one, the speed along the way, and how long was spent
-/// standing. The ride page draws it (`Views/RideView.swift`).
+/// standing. The ride page draws it (`Views/RideView.swift`), and its time
+/// standing and fastest kilometre go to the website in every save's
+/// `summary` (`Ride.summary`), for a signed-in account's totals.
 ///
 /// The website works out the same for a ride it keeps — `rideInsight()` in
 /// its `functions/api/_rides.js` — and this is that function, step for step
@@ -56,7 +58,18 @@ struct Insight {
         let aside = ride.aside ?? []
         guard points.count > 1 else { return nil }
 
-        // How far along and how long riding by each point.
+        // How far along and how long riding by each point. A still leg adds
+        // its time to `stopped` and neither its time nor its metres here.
+        // Until 2026-11-22 it added its metres all the same, covered in no
+        // moving time: some 12 m of drift at every red light, so a kilometre
+        // with a light read a few seconds quick, and a pause the phone was
+        // carried 231 m through, short of `Geo.gap`, put all 231 in no time.
+        // On the website, whose `rideInsight()` had the same line, a ride
+        // with 34 minutes of riding answered a top speed of 253 km/h that
+        // day; it was fixed the same way in the same hour. So the kilometres
+        // here are the ones ridden, a few metres short of the ride's
+        // distance, and the `fastest` every save sends (`Ride.summary`) is
+        // as honest as the page; its `stopped` was right all along.
         var along = [0.0], moving = [0.0]
         var stopped = 0.0
         for i in 1..<points.count {
@@ -68,7 +81,7 @@ struct Insight {
             }
             let still = dt > 0 && d / dt < Self.still
             if still { stopped += dt }
-            along.append(along[i - 1] + d)
+            along.append(along[i - 1] + (still ? 0 : d))
             moving.append(moving[i - 1] + (still ? 0 : dt))
         }
         let total = along[along.count - 1]

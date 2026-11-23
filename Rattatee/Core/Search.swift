@@ -114,10 +114,11 @@ struct Way: Equatable {
     /// Where it is a way by train: what the card and the map say of it.
     /// Nil for a way that is all bike, which is nearly every one.
     var train: Train?
-    /// What kind of way it is, where the website says: `style` in
-    /// /api/route, from 2026-11-19. Nil for a way with no name — from a
-    /// website before the names, where its second router did not answer,
-    /// and for a kind this build does not know.
+    /// What kind of way it is, where the website says. It says one thing
+    /// now: `ridden: true` on the way people have ridden and held their
+    /// pace on, which it puts first. The other four are `style`, a name the
+    /// website gave every way for a day from 2026-11-19 and then took back.
+    /// Nil for a way with no name, which is every way but a ridden one.
     var style: Style?
 
     enum Style: String { case ridden, fastest, safest, quietest, shortest }
@@ -213,7 +214,7 @@ struct Train: Equatable {
     let to: String
     let at: String
     let leave: String
-    /// The legs in order, to draw: a ride solid, the rail dashed.
+    /// The legs in order, to draw: a ride as any way, the rail orange.
     let legs: [(bike: Bool, line: [CLLocationCoordinate2D])]
     /// Where along the way's line the rail runs. A point kept there would
     /// be the train's, not the bike's, and `Store.add` keeps none.
@@ -287,7 +288,7 @@ struct Lost: Equatable {
 ///
 /// Nothing here is Rattatee's. The places are `GET /api/places?q=`, the one
 /// search of the city the website's find bar and the map app use; the streets
-/// are `GET /api/geocode?q=`; the way and its turns are `GET /api/v1/route` with `mode=bike`,
+/// are `GET /api/geocode?q=` with `near`; the way and its turns are `GET /api/v1/route` with `mode=bike`,
 /// or `GET /api/route` where that does not answer;
 /// and what none of them knows is `POST /api/lookup`, the website's **Look
 /// for it on Google Maps**, offered from five letters as it is there. A place
@@ -331,9 +332,18 @@ enum Search {
         return list.compactMap { spot($0) }
     }
 
-    /// Streets, addresses and districts for these letters.
-    static func streets(_ q: String) async throws -> [Spot] {
-        guard let object = try await rows("api/geocode", ["q": q]) as? [String: Any],
+    /// Streets, addresses and districts for these letters — anywhere in
+    /// Estonia, nearest first, where the phone knows where the rider is, and
+    /// Tallinn's where it does not. `near` goes to one decimal, about ten
+    /// kilometres, which is all the website uses of it: finer would tell it
+    /// where somebody is standing for nothing, and would make every rider's
+    /// request a different address, so none was answered from its cache.
+    static func streets(_ q: String, near: CLLocationCoordinate2D?) async throws -> [Spot] {
+        var query = ["q": q]
+        if let near {
+            query["near"] = "\((near.latitude * 10).rounded() / 10),\((near.longitude * 10).rounded() / 10)"
+        }
+        guard let object = try await rows("api/geocode", query) as? [String: Any],
               let list = object["results"] as? [[String: Any]] else { throw Failed() }
         return list.enumerated().compactMap { i, row in
             guard let lat = row["lat"] as? Double, let lng = row["lng"] as? Double,
@@ -463,7 +473,10 @@ enum Search {
         // from before it sent any answers none, and the way is still a way.
         let steps = (object["steps"] as? [[String: Any]] ?? []).compactMap { way.step($0) }
         way.steps = steps.sorted { $0.along < $1.along }
+        // Until this read `ridden`, the ridden way came first with a button
+        // like any other's: the website had stopped sending `style`.
         way.style = (object["style"] as? String).flatMap(Way.Style.init(rawValue:))
+            ?? (object["ridden"] as? Bool == true ? Way.Style.ridden : nil)
         return way
     }
 }

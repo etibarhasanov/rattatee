@@ -248,4 +248,20 @@ enum Timeline {
         close()
         return parts.sorted { $0.from < $1.from }
     }
+
+    /// The points a part is drawn with, when it is opened on the ride's page:
+    /// for riding, its stretch of `Ride.points`; for a wait or a stop, the
+    /// two points of the leg it stood over, where it arrived and where it
+    /// left; for a walk or a train, its own stretch of `Ride.aside`.
+    ///
+    /// `parts(of:)` begins and ends every part on a point's own time, so
+    /// the times say which points are whose and nothing else need be kept.
+    static func points(of part: Part, in ride: Ride) -> [Point] {
+        switch part.kind {
+        case .ride, .wait, .stop:
+            return ride.points.filter { $0.t >= part.from && $0.t <= part.to }
+        case .walk, .vehicle:
+            return (ride.aside ?? []).first { $0.first?.t == part.from && $0.last?.t == part.to } ?? []
+        }
+    }
 }

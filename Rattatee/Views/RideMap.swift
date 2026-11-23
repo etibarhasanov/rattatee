@@ -72,8 +72,8 @@ struct RideMap: View {
     /// The stretches Finish set aside as walked or driven: dotted and faint,
     /// so they read as where the rider went and not as a way to ride.
     var aside: [[Point]] = []
-    /// Where the rider is going and the suggested way there, in the accent
-    /// under the line actually ridden.
+    /// Where the rider is going and the suggested way there, in its own
+    /// colour (`Theme.way`) under the line actually ridden.
     var goal: Goal?
     /// Where the phone last said it was: the near end of the dotted line
     /// and of the frame the way is shown in.
@@ -148,14 +148,31 @@ struct RideMap: View {
                 // onto one (`Store.pick`).
                 if points.isEmpty || goal.picking != nil {
                     for (k, other) in goal.ways.enumerated() where k != goal.chosen {
-                        all.append(MapLine(coordinates: other.line, kind: .other, way: k))
+                        if let train = other.train {
+                            // A way by train on offer: its rides faint, as
+                            // any way on offer is, and its rail a faint
+                            // orange. A tap on either chooses it.
+                            for leg in train.legs {
+                                all.append(MapLine(coordinates: leg.line, kind: leg.bike ? .other : .otherRail, way: k))
+                            }
+                        } else {
+                            all.append(MapLine(coordinates: other.line, kind: .other, way: k))
+                        }
                     }
                 }
                 if let train = way.train {
-                    // A way by train: the rides solid, as any way, and the
-                    // rail dashed, so it is not read as a road.
-                    for leg in train.legs { all.append(MapLine(coordinates: leg.line, kind: leg.bike ? .way : .rail)) }
+                    // A way by train: the rides drawn as any way is, and
+                    // the rail over their ends — THE RAIL IS ORANGE, AND
+                    // THE RIDES ARE NOT, at `MapLine.Kind`. Each edge goes
+                    // on before what it edges, so the colour lies inside it.
+                    for leg in train.legs where leg.bike { all.append(MapLine(coordinates: leg.line, kind: .wayEdge)) }
+                    for leg in train.legs where leg.bike { all.append(MapLine(coordinates: leg.line, kind: .way)) }
+                    for leg in train.legs where !leg.bike {
+                        all.append(MapLine(coordinates: leg.line, kind: .railEdge))
+                        all.append(MapLine(coordinates: leg.line, kind: .rail))
+                    }
                 } else {
+                    all.append(MapLine(coordinates: way.line, kind: .wayEdge))
                     all.append(MapLine(coordinates: way.line, kind: .way))
                 }
             } else if goal.way == .looking, points.isEmpty, let here {
@@ -176,11 +193,60 @@ struct RideMap: View {
 
 /// One line on the map and what it is, which is how it is drawn.
 struct MapLine {
+    /// THE RAIL IS ORANGE, AND THE RIDES ARE NOT
+    ///
+    /// A way by train is two rides and a train between them. The rides are
+    /// drawn as every way by bike is, in the colour chosen under Account.
+    /// The rail is the trains' own orange (`Theme.train`), solid, a little
+    /// thicker than a ride and with a darker edge (`Theme.trainEdge`) — the
+    /// way Google's map draws a train among its blue lines, which is the
+    /// picture the owner sent on 2026-11-20. So what is ridden and what is
+    /// sat through are told apart at a glance, and which of the faint lines
+    /// on offer has a train in it is on the map before the card is read.
+    ///
+    /// For a few hours that day the whole way was orange, rides and rail,
+    /// and the rail dashed as it had been since the trains came. The owner
+    /// looked at it and said the bike should be as it was. It had a second
+    /// fault as well: Green and Plum draw the line ridden in a burnt orange,
+    /// so on the rides of a way by train what was ridden and what was left
+    /// were two oranges. The rail is never ridden — a point on it is not
+    /// kept (`Store.add`) — so an orange rail meets no ridden line.
+    ///
+    /// A line has no edge of its own in MapKit. The edge is a second line
+    /// under the first, wider and darker, which is why the way chosen and
+    /// its rail are two kinds each.
+    ///
+    /// THE WAY IS SOLID, AND EDGED
+    ///
+    /// Until 2026-11-23 the way chosen was the accent at three quarters,
+    /// five points wide, and nothing round it. By day the accents are deep
+    /// and that held. By night they are pale — they are made to be read as
+    /// writing on a dark card — and Apple's dark map draws its main roads a
+    /// pale grey-blue, so a pale line three-quarters see-through, lying on
+    /// the very roads it follows, was one more road. The owner sent Plum and
+    /// Blue by night that day: the way to Viimsi could hardly be found, and
+    /// the faint ways on offer, at three in ten, not at all.
+    ///
+    /// So the way has a colour of its own, `Theme.way`, and is drawn as
+    /// Apple's and Google's maps draw a route: solid, inside an edge
+    /// (`Theme.wayEdge`) a point and a half wide on each side. By day the
+    /// colour is the accent and the edge a darker shade of it, which looks
+    /// much as it did. By night the colour is a stronger shade of the same
+    /// hue — what sets it apart from the roads is that they are grey and it
+    /// is not — and the edge is the ground's own dark, which cuts each road
+    /// the way crosses. The faint ways on offer are that colour too, at a
+    /// half by night, where three in ten of it on a dark map is nothing.
+    ///
+    /// The colours were chosen by drawing them over the owner's two
+    /// screenshots in all four hues, beside the rail and the line ridden,
+    /// not on a phone: the first build with them is the first time they are
+    /// on Apple's map itself.
     enum Kind: Int {
-        /// A way on offer and not chosen; the way; its stretch by rail; the
-        /// straight line before there is a way; a stretch set aside; the
-        /// line ridden.
-        case other, way, rail, crow, aside, ridden
+        /// A way on offer and not chosen, and the rail of one that goes by
+        /// train; the edge of the way and the way, and the edge and the
+        /// orange of its stretch by rail; the straight line before there is
+        /// a way; a stretch set aside; the line ridden.
+        case other, otherRail, wayEdge, way, railEdge, rail, crow, aside, ridden
     }
 
     let coordinates: [CLLocationCoordinate2D]
@@ -508,20 +574,40 @@ private struct MapCanvas: UIViewRepresentable {
             let line = MKPolylineRenderer(polyline: stroke)
             line.lineCap = .round
             line.lineJoin = .round
-            let accent = colour(Theme.accent, in: mapView)
+            let way = colour(Theme.way, in: mapView)
+            let train = colour(Theme.train, in: mapView)
+            let night = mapView.traitCollection.userInterfaceStyle == .dark
             switch stroke.kind {
             case .other:
-                line.strokeColor = accent.withAlphaComponent(0.3)
+                // Three in ten by day, and half by night — THE WAY IS
+                // SOLID, AND EDGED, at `MapLine.Kind`.
+                line.strokeColor = way.withAlphaComponent(night ? 0.5 : 0.3)
                 line.lineWidth = 4
+            case .otherRail:
+                // Half by day as well, where a ride on offer is three in
+                // ten: orange that faint is a peach, and Apple's map is a
+                // warm white itself.
+                line.strokeColor = train.withAlphaComponent(0.5)
+                line.lineWidth = 5
+            case .wayEdge:
+                // A point and a half of edge on each side of the way.
+                line.strokeColor = colour(Theme.wayEdge, in: mapView)
+                line.lineWidth = 8
             case .way:
-                line.strokeColor = accent.withAlphaComponent(0.75)
+                // The whole colour, for the edge under it would show
+                // through, and a road under that.
+                line.strokeColor = way
                 line.lineWidth = 5
+            case .railEdge:
+                // A point and a half of edge on each side of the orange.
+                line.strokeColor = colour(Theme.trainEdge, in: mapView)
+                line.lineWidth = 9
             case .rail:
-                line.strokeColor = accent.withAlphaComponent(0.75)
-                line.lineWidth = 5
-                line.lineDashPattern = [8, 8]
+                // The whole colour, as the way is, and a point wider.
+                line.strokeColor = train
+                line.lineWidth = 6
             case .crow:
-                line.strokeColor = accent.withAlphaComponent(0.6)
+                line.strokeColor = way.withAlphaComponent(0.6)
                 line.lineWidth = 4
                 line.lineDashPattern = [1, 9]
             case .aside:
@@ -671,11 +757,11 @@ private struct MapCanvas: UIViewRepresentable {
             var chosen = CGFloat.infinity
             for (_, stroke) in drawn {
                 switch stroke.kind {
-                case .other:
+                case .other, .otherRail:
                     guard let way = stroke.way else { continue }
                     let away = Self.distance(from: at, to: stroke, in: map)
                     if away < (nearest?.away ?? .infinity) { nearest = (way, away) }
-                case .way, .rail:
+                case .wayEdge, .way, .railEdge, .rail:
                     chosen = min(chosen, Self.distance(from: at, to: stroke, in: map))
                 case .crow, .aside, .ridden:
                     // Not a way to choose, and the ridden line is long.
