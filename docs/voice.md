@@ -53,8 +53,8 @@ The wording is yours to change: say a phrase the way you would say it, and
 it is right. Only the meaning has to match the file.
 
 **Recorded so far: Azerbaijani, English and Estonian, all fifteen of
-each**, on 2026-11-18, each language in one take. Fourteen of them are to
-be said again — see **Said again** below.
+each**, on 2026-11-18, each language in one take. Twenty-four of them are to
+be said again, Estonian whole — see **Said again** below.
 
 **Russian is made, not recorded.** At the owner's word on 2026-11-23 it is
 said by Dmitri, an open voice for Piper (`ru_RU-dmitri-medium`), rather
@@ -74,18 +74,29 @@ into "сошлись". Then it was finished like the recordings (**Cutting**).
 On 2026-11-23 nine of the recordings were found to have lost a quiet
 sound at an edge when they were cut, three to have a stray sound or word
 in them and two to say a part faintly. These are to be recorded again, in
-this order, in one memo:
+this order, in one memo — and with them all of Estonian, which the owner
+chose on 2026-11-23 to say again whole rather than mend five of fifteen:
 
 | Clip | Say | What was wrong |
 |---|---|---|
 | `en-keep-left` | Keep left | the "ft" was cut off |
 | `en-off` | You're off the way | it says "You're way off the way" |
 | `en-late` | Riding late, let's go | a "huh" between the halves |
-| `et-arrive` | Oled kohal | the L was cut off |
-| `et-wrong-way` | Vale suund | cut at both ends |
 | `et-soon` | Kahesaja meetri pärast | "kahe" is swallowed |
-| `et-late` | Liiga hilja? Lähme ikka! | a "hõõ" between the halves |
+| `et-left` | Pööra vasakule | — |
 | `et-right` | Pööra paremale | "Pöö" is faint |
+| `et-keep-left` | Hoia vasakule | — |
+| `et-keep-right` | Hoia paremale | — |
+| `et-straight` | Sõida otse | — |
+| `et-around` | Pööra ümber | — |
+| `et-arrive` | Oled kohal | the L was cut off |
+| `et-tunnel` | Sõida tunnelisse | — |
+| `et-off` | Oled teelt maas | — |
+| `et-wrong-way` | Vale suund | cut at both ends |
+| `et-morning` | Tere hommikust, lähme | — |
+| `et-afternoon` | Tere päevast, lähme | — |
+| `et-evening` | Tere õhtust, lähme | — |
+| `et-late` | Liiga hilja? Lähme ikka! | a "hõõ" between the halves |
 | `az-keep-right` | Sağda qal | the S was cut off |
 | `az-wrong-way` | Yanlış istiqamətdə gedirsən | the end was cut off |
 | `az-morning` | Sabahın xeyir, gedək | the end of *gedək* was cut off |
