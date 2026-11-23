@@ -245,6 +245,12 @@
     "et": "Loo konto vaates Konto, et lisada kohti oma nimekirjadesse.",
     "ru": "Создайте аккаунт во вкладке «Аккаунт», чтобы добавлять места в свои списки."
   },
+  "goalMin": {
+    "az": "dəq",
+    "en": "min",
+    "et": "min",
+    "ru": "мин"
+  },
   "goalNoWay": {
     "az": "Yol tapılmadı. Yenə də ora sürə bilərsən.",
     "en": "No way found. You can still ride there.",
@@ -256,6 +262,12 @@
     "en": "The line is just a suggestion. Ride any way you like.",
     "et": "Joon on vaid soovitus. Sõida, kust tahad.",
     "ru": "Линия — лишь подсказка. Езжайте как хотите."
+  },
+  "goalRidden": {
+    "az": "Sürülmüş yol",
+    "en": "Ridden",
+    "et": "Sõidetud",
+    "ru": "Проверено"
   },
   "goalTo": {
     "az": "{name}",

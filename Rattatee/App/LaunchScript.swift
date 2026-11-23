@@ -39,7 +39,8 @@ enum LaunchScript {
     }
 
     /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides,
-    /// and goal and going, which have somewhere to ride to.
+    /// and goal and going, which have somewhere to ride to, and train, which
+    /// is goal with a way by train chosen.
     @MainActor
     static func stage(_ store: Store) {
         guard let demo = UserDefaults.standard.string(forKey: "kDemo") else { return }
@@ -92,6 +93,15 @@ enum LaunchScript {
         switch demo {
         case "goal":
             store.pretend([])
+            store.goal = goal
+        case "train":
+            // A way by train chosen after the two by bike: the card's row
+            // in its three lines, the orange rail, and the two stations
+            // named at its ends.
+            store.pretend([])
+            goal.ways.append(byTrain(ahead.map(\.coordinate)))
+            goal.chosen = goal.ways.count - 1
+            goal.way = .found(goal.ways[goal.chosen])
             store.goal = goal
         case "going":
             store.pretend([ride(.recording, metres: 1300, seconds: 312)])
@@ -154,6 +164,27 @@ enum LaunchScript {
                                 acc: 5))
         }
         return points
+    }
+
+    /// A staged way by train along a line: a ride for its first quarter,
+    /// the rail to three quarters, bowed out to the side the second way by
+    /// bike is not on, and a ride on. Its times are a few minutes on from
+    /// the 9:41 the screenshots' clock is set to: off at 9:43, two minutes'
+    /// ride, two on the platform, three on the train and one more ride.
+    private static func byTrain(_ line: [CLLocationCoordinate2D]) -> Way {
+        let on = line.count / 4, off = line.count * 3 / 4
+        let rail = line[on...off].enumerated().map { i, point in
+            let bow = sin(Double(i) / Double(max(1, off - on)) * .pi) * 0.003
+            return CLLocationCoordinate2D(latitude: point.latitude + bow, longitude: point.longitude - bow)
+        }
+        let first = Array(line[...on]), last = Array(line[off...])
+        var way = Way(metres: 2600, seconds: 480, line: first + rail + last)
+        let from = way.place(of: line[on]).along, to = way.place(of: line[off]).along
+        way.train = Train(name: "RE34", from: "Ülemiste", to: "Kitseküla", at: "09:47", until: "09:50", leave: "09:43",
+                          legs: [(bike: true, line: first, minutes: 2), (bike: false, line: rail, minutes: nil),
+                                 (bike: true, line: last, minutes: 1)],
+                          rail: min(from, to)...max(from, to))
+        return way
     }
 
     /// The share of the time gone by the time `f` of the way is: always

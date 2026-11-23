@@ -159,6 +159,11 @@ jobs:
           shot 16-goal -kDemo goal
           shot 17-going -kDemo going
           shot 18-search -kSheet search
+          # A way by train chosen: the row on the card in its three lines,
+          # and the two stations named at the ends of the rail, by day and
+          # by night.
+          shot 40-goal-train -kDemo train
+          shot 41-goal-train-dark -kDemo train -look dark -hue green
           # The radio: on, with no signal, and its list of stations.
           shot 26-radio -kDemo going -kRadio playing
           shot 27-radio-lost -kDemo recording -kRadio lost
