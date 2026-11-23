@@ -182,6 +182,8 @@ jobs:
           shot 20-plum-light -kDemo going -hue plum
           shot 21-account-dark -kTab 2 -kDoors YES -look dark -hue green
           shot 22-blue-dark -kDemo recording -look dark
+          # The ways by night, where a pale line was lost among the roads.
+          shot 32-goal-plum-dark -kDemo goal -look dark -hue plum
           xcrun simctl ui "$dev" appearance dark
           shot 14-recording-dark -kDemo recording
           shot 15-rides-dark -kDemo rides -kTab 1
