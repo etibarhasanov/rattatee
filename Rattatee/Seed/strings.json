@@ -1032,10 +1032,10 @@
     "ru": "Не получилось. Попробуйте ещё раз чуть позже."
   },
   "signInWhy": {
-    "az": "Sürmək üçün lazım deyil. Daxil olsan, gedişlərin tallinntastebuds.ee saytındakı səhifəndə də olur.",
-    "en": "Not needed to ride. Signed in, your rides are also on your page on tallinntastebuds.ee.",
-    "et": "Sõitmiseks pole vaja. Sisse logituna on sinu sõidud ka sinu lehel saidil tallinntastebuds.ee.",
-    "ru": "Для поездок не нужно. Если войти, ваши поездки будут и на вашей странице на tallinntastebuds.ee."
+    "az": "Sürmək üçün lazım deyil. Daxil olsan, gedişlərin hesabında da saxlanır.",
+    "en": "Not needed to ride. Signed in, your rides are also saved to your account.",
+    "et": "Sõitmiseks pole vaja. Sisse logituna salvestatakse sinu sõidud ka sinu kontole.",
+    "ru": "Для поездок не нужно. Если войти, ваши поездки сохранятся и в вашем аккаунте."
   },
   "statActiveTime": {
     "az": "aktiv vaxt",

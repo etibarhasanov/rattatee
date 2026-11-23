@@ -2,8 +2,7 @@ import MapKit
 import SwiftUI
 
 /// The Record tab: a map, and a card at its foot that is one of the states a
-/// ride goes through — the same five the website's recorder has, in the same
-/// order, plus what only an app needs to say.
+/// ride goes through.
 ///
 ///   Ready            Start, and nothing else to read;
 ///                    "Where to?" over the map opens the search

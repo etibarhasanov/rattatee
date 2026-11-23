@@ -7,9 +7,8 @@ import Observation
 ///
 /// THIS IS WHY THE APP EXISTS
 ///
-/// A web page stops hearing where it is the moment the screen locks, which
-/// is why the website's recorder (`assets/ride.js`) asks you to keep the
-/// screen on and pauses when it goes off. An app with the `location`
+/// A web page stops hearing where it is the moment the screen locks, so a
+/// ride cannot be recorded from one in a pocket. An app with the `location`
 /// background mode (Config/Info.plist) that starts its updates while it is on
 /// screen, with `allowsBackgroundLocationUpdates` set, keeps getting them in
 /// a pocket under the ordinary While Using the App permission. iOS draws the
@@ -29,8 +28,7 @@ import Observation
 @MainActor
 @Observable
 final class Recorder: NSObject {
-    /// A fix worse than this many metres draws the ride through the houses —
-    /// `SURE` in the website's assets/ride.js.
+    /// A fix worse than this many metres draws the ride through the houses.
     static let sure: Double = 30
 
     private(set) var authorization: CLAuthorizationStatus = .notDetermined

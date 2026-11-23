@@ -13,18 +13,21 @@ SwiftUI, iOS 17 and later, iPhone only, no third-party dependencies.
 
 ## Why it exists
 
-The website records rides too, from the bike button on its map. But a web
-page stops being told where it is the moment the screen locks, so its
-recorder asks you to keep the page open and the screen on, and pauses when
-you do not. An app can ask iOS to keep hearing its position in the
-background. That is this app's one job: Start, lock the phone, ride, Finish,
-Save.
+A web page stops being told where it is the moment the screen locks, so a
+ride cannot be recorded from one in a pocket. An app can ask iOS to keep
+hearing its position in the background. That is this app's one job: Start,
+lock the phone, ride, Finish, Save.
+
+**Riding is this app's alone.** The website's pages have nothing about
+bikes: no recorder, no rides, no figures or pictures of them — the owner's
+word on 2026-11-23. What the app needs of the website is its API, and
+nothing here, in the code or on screen, says the website shows a ride.
 
 **It is an interface.** Rattatee has no server and no database of its own,
 the same as Kohuke (`etibarhasanov/kohuke`) and the map app
-(`etibarhasanov/TallinnTasteBudsApp`). It saves through the same Function
-the website's recorder does, `POST /api/rides`. Its project structure,
-sign-in and networking are copied from Kohuke.
+(`etibarhasanov/TallinnTasteBudsApp`). It saves through the website's
+`POST /api/rides`. Its project structure, sign-in and networking are copied
+from Kohuke.
 
 **Nobody has to sign in, and then the ride is theirs alone.** People ride,
 press Save, and that is it: the ride stays on the phone, and the website
@@ -33,8 +36,7 @@ counts the streets it went down and keeps nothing of it — since
 ride was kept there with no account on it. The save card says so before
 Save is pressed, and that saving rides wants an account. Signing in is
 there for whoever wants that, on the **Account** tab: a ride saved signed in
-is kept on the website under the account, listed on the account page there
-and drawn on its page here, and added up with the account's others on My
+is kept by the website under the account, drawn on its page here, and added up with the account's others on My
 rides. Nothing tells the two kinds apart on the phone beyond that,
 and nothing offers to move a ride to an account afterwards.
 
@@ -110,9 +112,9 @@ Three tabs.
   it is the phone's own ride, so it opens with no signal and for a ride saved
   with no account. The sums are the website's — `rideInsight()` in its
   `functions/api/_rides.js`, ported step for step to `Core/Insight.swift` —
-  so a ride reads the same here, on the website and in the map app, less the
-  website's top speed over 200 m, since the save card's over half a minute is
-  already on the page.
+  so a ride reads the same here as in the map app, less `rideInsight()`'s
+  top speed over 200 m, since the save card's over half a minute is already
+  on the page.
 
   What the website has of it is on the page too. Signed in, a saved ride is
   asked for by its id, `GET /api/rides/<id>`, and the line the website keeps
@@ -208,7 +210,7 @@ which is nicer, because the router does not say.
 The one exception is the way people have ridden. Where riders have been
 along one of the ways, in the direction it goes and at their own pace, the
 website puts it first and marks it `ridden: true`, and its button starts
-with the word: *Ridden · 14 min · 4.0 km*, as on the website's own bar.
+with the word: *Ridden · 14 min · 4.0 km*.
 For a day from 2026-11-19 the website named every way — *Fastest*,
 *Safest*, *Quietest* and *Shortest* too — in a field called `style`, and
 then took the names back. The app still reads `style`, though nothing sends
@@ -410,8 +412,8 @@ draws nothing of anybody else's.
 
 ### All, on the account
 
-Since 2026-11-22 a signed-in rider's rides add up on the website, and My
-rides shows the sum as **All** on the card at the top, in place of the
+Since 2026-11-22 the website's server adds up a signed-in rider's rides,
+and My rides shows the sum as **All** on the card at the top, in place of the
 phone's. It was a section of its own under the card, *On your account*,
 for most of that day, and under the signed-in rows of the Account tab for
 the few hours before; the owner's word was that it is part of All. Every
@@ -450,9 +452,6 @@ no spinner. Signing out or deleting the account forgets the numbers on the
 phone.
 
 ## The rules of a recording
-
-The website's, from `assets/ride.js` there, so a ride recorded here is the
-same kind of line:
 
 - A point is kept when it is at least **12 m** from the last kept point and
   the fix is accurate to **30 m** or better.
@@ -639,8 +638,9 @@ accepts; this app's is `ee.tallinntastebuds.rattatee.app`.
 
 **The words are compiled in**, unlike Kohuke's, because the app has to say
 "Recording" with no signal. `Rattatee/Seed/strings.json` holds every string
-in the four languages; the ones the website has too (`ride*`, `account*`)
-were copied from its `data/ui.json` under the same keys. CI fails on a key
+in the four languages; the ones the website has too (`account*`) were
+copied from its `data/ui.json` under the same keys, and the `ride*` ones
+are this app's own. CI fails on a key
 missing a language, a key the code asks for that is not there, and a key
 nothing asks for.
 
