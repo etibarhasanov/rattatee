@@ -55,6 +55,11 @@ git push origin main develop v0.6.9
 
 The tag is what packages it and sends it to TestFlight.
 
+**A release has no radio, for now.** A tag, or a package made from `main`, is
+built with `NO_RADIO`. The riding screen then has no radio row and nothing
+plays (README.md, **Not in a release, for now**). A package from `develop`
+or any other branch still has the radio.
+
 The build number is `BUILD_NUMBER_BASE` (100, at the top of the workflow)
 plus the run number, so it only goes up. Without a tag, the version is the
 `MARKETING_VERSION` in the project.

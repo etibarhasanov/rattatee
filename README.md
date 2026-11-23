@@ -281,15 +281,39 @@ and Finish, a row says **📻 Play radio** — the whole width with nowhere to
 go, and beside the voice's button where there is somewhere, so the music and
 the voice are two buttons side by side and either can be had without the
 other. A tap plays a station: Raadio
-Tallinn in Estonian, Radio Paradise in English, Наше Радио in Russian and
-Baku Retro FM in Azerbaijani, until the rider chooses another. Playing, the
+Tallinn in Estonian and Azerbaijani, Radio Paradise in English and Raadio 4
+in Russian, until the rider chooses another. Playing, the
 row is the station's name between two buttons, the next station and the one
 before, as a car's seek buttons go; a tap on the name stops it, and a longer
-press opens every station — twenty, `Seed/stations.json` — to choose from.
+press opens every station — seven, `Seed/stations.json` — to choose from.
 The phone remembers the station, and whether the radio was on: a ride
 starts with it if the last one ended with it, after the greeting, so the
 first time is always a press. It never starts over something the rider is
 already listening to, and it stops at Finish.
+
+**Only stations whose broadcaster allows it.** App Review asks a radio app
+to show that it may play each stream (guidelines 5.2.2 and 5.2.3), and a
+TestFlight build for outside testers is reviewed the same way. So the list
+is ERR's five — Raadio Tallinn, Raadio 2, Vikerraadio, Klassikaraadio,
+Raadio 4 — and Radio Paradise's two. Neither broadcaster's terms forbid
+another app, and neither has yet said yes in writing, which App Review can ask
+for. The other thirteen were taken off before release. SomaFM's
+terms refuse any new app, and Yle's forbid using its radio stream
+addresses outside Yle. Radio France's four FIP stations reach other apps
+only through partnership deals. Наше Радио, Baku Retro FM, Joy Türk Rock,
+Metropol FM, ROKS, Itapema FM and Loca FM publish no permission at all. A
+station comes back when its broadcaster says yes in writing, and that answer
+is what goes in App Review Information. A rider who had chosen one that left
+starts on their language's station again.
+
+**Not in a release, for now.** At the owner's word on 2026-11-23, the first
+version goes out without the radio, and `develop` keeps it. A tag, or
+`main`, is packaged with `NO_RADIO` (`.github/workflows/release.yml`), which
+turns `Radio.offered` off. The riding screen then has no radio row, the
+voice's button moves to the start of the Pause and Finish row, and nothing
+plays — even for a rider whose last ride on an older build ended with the
+radio on. A package from any other branch, `develop` included, still has the
+radio for testers. To ship the radio, take that line out of the workflow.
 
 When a turn is said the radio goes under it and comes back after, which
 iOS does for other apps' sound and an app has to do for its own. The lock
@@ -631,7 +655,8 @@ nothing asks for.
   asks for when it opens, with this file as what it falls back on, would
   mend one without a release — and would be a promise, a station's `id`,
   `name` and `url` at the least, written into the website's **What the app
-  reads**.
+  reads**. That list would have to hold only stations that said yes:
+  the website's eleven today include ones the app took off.
 
 ---
 

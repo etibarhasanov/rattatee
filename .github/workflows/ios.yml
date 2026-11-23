@@ -163,6 +163,13 @@ jobs:
           shot 26-radio -kDemo going -kRadio playing
           shot 27-radio-lost -kDemo recording -kRadio lost
           shot 28-stations -kDemo recording -kRadio playing -kSheet stations
+          # A release has no radio (release.yml builds tags and main with
+          # NO_RADIO): the riding screen as it ships, with somewhere to go,
+          # without, paused, and in Estonian, where Pause is narrower.
+          shot 36-release-going -kDemo going -kRadio none
+          shot 37-release-recording -kDemo recording -kRadio none
+          shot 38-release-paused -kDemo paused -kRadio none
+          shot 39-release-going-et -kDemo going -kRadio none -AppleLanguages '(et)'
           shot 09-rides-empty -kDemo none -kTab 1
           shot 10-account -kTab 2 -kDoors YES
           # The other two languages, and the night style.
@@ -193,7 +200,7 @@ jobs:
       # One orphan commit, force-pushed over the last, so the branch never
       # grows; it carries the screens of whichever branch pushed last.
       - name: Publish the screens to the ci-screens branch
-        if: github.event_name == 'push' && startsWith(github.ref_name, 'claude/')
+        if: startsWith(github.ref_name, 'claude/')
         shell: bash
         run: |
           set -euo pipefail

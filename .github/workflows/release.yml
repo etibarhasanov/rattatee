@@ -115,6 +115,12 @@ jobs:
             CODE_SIGN_STYLE=Automatic
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER")
           if [ -n "${MARKETING_VERSION:-}" ]; then archive+=(MARKETING_VERSION="$MARKETING_VERSION"); fi
+          # A release has no radio (Radio.offered): a tag, or main, is built
+          # without it, and a branch such as develop keeps it for testers.
+          if [ "$GITHUB_REF_TYPE" = tag ] || [ "$GITHUB_REF_NAME" = main ]; then
+            archive+=('SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) NO_RADIO')
+            echo "Built without the radio, as a release is." >> "$GITHUB_STEP_SUMMARY"
+          fi
           if command -v xcbeautify >/dev/null 2>&1; then
             "${archive[@]}" | xcbeautify --renderer github-actions
           else
