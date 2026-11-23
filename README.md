@@ -380,7 +380,9 @@ in Settings.
 
 Every colour has a day and a night. Red and Blue by day, and Green and Plum
 by night, are the website's own styles to the value; the other four were
-drawn to sit beside them (`Palette` in `Views/Theme.swift`). The choice is
+drawn to sit beside them (`Palette` in `Views/Theme.swift`). By day the
+background is not the colour's: all four stand on the same warm paper white,
+so the accent is the one colour on the screen. The choice is
 kept on the phone, as the website keeps its style in the browser. Some
 things read the same whatever the colour: saved, waiting and not kept, and
 the rail of a way by train, which is orange.

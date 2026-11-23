@@ -30,11 +30,13 @@
 	     UILaunchScreen is what iOS draws while the app starts, before any of
 	     its code has run. Xcode's generated one is empty, which iOS draws in
 	     the system background: plain black on a phone set to dark. LaunchPaper
-	     (Assets.xcassets) is the paper of the colour a new install opens in,
-	     Blue, by day and by night as the phone is set, so the start is the
-	     app's own ground and the map arrives on it. Somebody who chose
-	     another colour or fixed Light or Dark sees Blue's for a moment: the
-	     launch screen is fixed at build time and cannot know. -->
+	     (Assets.xcassets) is the app's own ground as the phone is set: by
+	     day the paper every colour shares (`Palette.dayPaper`), by night
+	     Blue's, the colour a new install opens in, so the start is the app's
+	     own ground and the map arrives on it. Somebody who chose another
+	     colour and sees it by night, or fixed Light or Dark, sees the wrong
+	     one for a moment: the launch screen is fixed at build time and
+	     cannot know. -->
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

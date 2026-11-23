@@ -40,10 +40,14 @@ enum Look: String, CaseIterable, Identifiable {
 
 /// The values of one colour on one background.
 ///
-/// Red by day, Blue by day, Green by night and Plum by night are the website's
-/// `[data-style]` tokens in `assets/styles.css` to the value, as Kohuke's are.
-/// The other four were drawn for this app to sit beside them: the same hue
-/// for the accent, its ground tinted the way the site's own pair is.
+/// By night, Green and Plum are the website's `[data-style]` tokens in
+/// `assets/styles.css` to the value, as Kohuke's are, and Red and Blue were
+/// drawn for this app to sit beside them: the same hue for the accent, its
+/// ground tinted the way the site's own pair is. By day the ink, muted and
+/// accent are still the colour's own — Red's and Blue's the site's — but the
+/// ground is not: every colour stands on the same warm paper white (`dayPaper`
+/// below), at the owner's word on 2026-11-23, where each had a pale tint of
+/// its own hue that read as a template's.
 ///
 /// `way` and `wayEdge` are this app's alone, since the site's map draws its
 /// own: the suggested way on the map and the edge it is drawn inside. By day
@@ -53,10 +57,18 @@ enum Look: String, CaseIterable, Identifiable {
 struct Palette {
     let ink, muted, paper, wash, hairline, accent, here, card, onAccent, way, wayEdge: UInt32
 
+    /// The ground by day, whatever the colour: a warm paper white, nearly
+    /// neutral, so the accent is the only colour on the screen and the white
+    /// cards sit just above it. `dayWash` is a step darker, for quiet buttons
+    /// and chips; `dayHairline` another, for dividers and the edges of fields.
+    static let dayPaper: UInt32 = 0xF6F4EF
+    static let dayWash: UInt32 = 0xECE9E2
+    static let dayHairline: UInt32 = 0xE2DED5
+
     static func of(_ hue: Hue, dark: Bool) -> Palette {
         switch (hue, dark) {
         case (.red, false):
-            return Palette(ink: 0x27141A, muted: 0x7D5754, paper: 0xFFF0EA, wash: 0xF7DDD4, hairline: 0xF0CEC3,
+            return Palette(ink: 0x27141A, muted: 0x7D5754, paper: dayPaper, wash: dayWash, hairline: dayHairline,
                            accent: 0xA81E28, here: 0x0B62C4, card: 0xFFFFFF, onAccent: 0xFFFFFF,
                            way: 0xA81E28, wayEdge: 0x5C1016)
         case (.red, true):
@@ -64,7 +76,7 @@ struct Palette {
                            accent: 0xF08A7E, here: 0x5AA2F0, card: 0x2A1A1D, onAccent: 0x1C1012,
                            way: 0xFF5A6E, wayEdge: 0x1C1012)
         case (.green, false):
-            return Palette(ink: 0x13261B, muted: 0x4F6A58, paper: 0xEEF6F0, wash: 0xD8EADD, hairline: 0xC7DECD,
+            return Palette(ink: 0x13261B, muted: 0x4F6A58, paper: dayPaper, wash: dayWash, hairline: dayHairline,
                            accent: 0x1E7A46, here: 0xC05A12, card: 0xFFFFFF, onAccent: 0xFFFFFF,
                            way: 0x1E7A46, wayEdge: 0x104326)
         case (.green, true):
@@ -72,7 +84,7 @@ struct Palette {
                            accent: 0x6FD39A, here: 0xE0873A, card: 0x1D2A23, onAccent: 0x101A15,
                            way: 0x3DDC84, wayEdge: 0x101A15)
         case (.blue, false):
-            return Palette(ink: 0x0F1D31, muted: 0x4D6079, paper: 0xEDF3FB, wash: 0xD6E3F2, hairline: 0xC6D6EA,
+            return Palette(ink: 0x0F1D31, muted: 0x4D6079, paper: dayPaper, wash: dayWash, hairline: dayHairline,
                            accent: 0x1B4A8C, here: 0xC0267E, card: 0xFFFFFF, onAccent: 0xFFFFFF,
                            way: 0x1B4A8C, wayEdge: 0x0F294D)
         case (.blue, true):
@@ -80,7 +92,7 @@ struct Palette {
                            accent: 0x8DB4F0, here: 0xE05AA8, card: 0x18222F, onAccent: 0x0E1620,
                            way: 0x4C9AFF, wayEdge: 0x0E1620)
         case (.plum, false):
-            return Palette(ink: 0x22152C, muted: 0x6E5A7D, paper: 0xF6F0FA, wash: 0xE8DCF1, hairline: 0xDCCDE8,
+            return Palette(ink: 0x22152C, muted: 0x6E5A7D, paper: dayPaper, wash: dayWash, hairline: dayHairline,
                            accent: 0x6B3FA0, here: 0xC05A12, card: 0xFFFFFF, onAccent: 0xFFFFFF,
                            way: 0x6B3FA0, wayEdge: 0x3B2358)
         case (.plum, true):
