@@ -133,7 +133,11 @@ Three tabs.
   English, Eesti or Русский for this app alone, switched at once. Under
   **Look**, the colour, one of the website's four (Red, Green, Blue, Plum),
   and the background: **Like the phone**, which is where a new install
-  starts, **Light** or **Dark**. Then Privacy.
+  starts, **Light** or **Dark**. Then Privacy, and under it which build
+  this is, *Version 1.0 (142)*: the version a tag gave it and, in
+  brackets, the build number the package workflow did, read from the app
+  itself, so the builds of one version on TestFlight can be told apart
+  (`docs/RELEASING.md`).
 
 ### Search and go
 
@@ -695,7 +699,7 @@ Rattatee/
             RidesTab.swift      My rides
             StatsCard.swift     how far today, this week, this month, and in all, the account's signed in
             RideView.swift      one ride, opened
-            AccountView.swift   the Account tab, the colours, deleting an account
+            AccountView.swift   the Account tab, the colours, deleting an account, the version
             SignIn.swift        the username form and the Apple and Google buttons
             Theme.swift         the website's colours
   Seed/     strings.json        every string, in en, et, ru and az
