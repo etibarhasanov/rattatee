@@ -25,6 +25,7 @@ extension Store {
             user = object["user"] as? String
             googleOffered = object["appGoogle"] as? Bool ?? false
             appleOffered = object["appApple"] as? Bool ?? false
+            shares = object["shares"] as? Bool ?? false
             #if DEBUG
             if LaunchScript.doors { googleOffered = true; appleOffered = true }
             #endif
@@ -71,6 +72,9 @@ extension Store {
     private func arrive(_ answer: [String: Any]) async {
         user = answer["user"] as? String
         await sendWaiting(now: true)
+        // What signing in answers does not say whether this is the account
+        // the website's map shows; asking who this is does.
+        await whoAmI()
     }
 
     func signOut() async {
@@ -88,6 +92,7 @@ extension Store {
 
     private func leave() {
         user = nil
+        shares = false
         ListBook.shared.forget()
         AccountTotals.shared.forget()
         if let cookies = HTTPCookieStorage.shared.cookies(for: API.base) {

@@ -645,10 +645,11 @@ repository's `CLAUDE.md` under **What the app reads**.
 | `GET /api/route?from=&to=&mode=bike` | the suggested way: `meters`, `seconds`, `line`, and `others`, up to two more ways in the same three fields — and `ridden: true` on the way people have ridden, which the website puts first and the card names on its button (`style`, a name on every way, was sent for a day from 2026-11-19 and taken back; it is still read, and a word this build does not know is a button with no name); and for each way `steps`, where it turns — `at`, `turn`, `name`, and `exit` on a roundabout. The words of `turn` are `left`, `right`, `keep-left`, `keep-right`, `straight`, `around`, `roundabout`, `arrive` and `tunnel`, where the way goes into one; one the app does not know is left out |
 | `GET /api/lists` | the signed-in rider's lists: `lists` with `id`, `title` and `n` |
 | `POST /api/lists` | `create` (`title`, answered `id`), `place` (`name`, `address`, `lat`, `lng`, answered `place.id`) and `add` (`id`, `place`), and the errors `signed-out`, `full`, `too-many` and `title` |
-| `GET /api/account` | who the session is, and `appGoogle` / `appApple`, which draw the two sign-in buttons |
+| `GET /api/account` | who the session is, `appGoogle` / `appApple`, which draw the two sign-in buttons, and `shares`, true for the website's own account alone, which is what lets `Live` send anything |
 | `POST /api/account` | `create` and `login` with `username` and `password`, answered with `user` or the errors `taken`, `username`, `password`, `no-match` and `slow-down`; `ticket`, `logout`, `delete` |
 | `GET /api/google?app=<challenge>` | the Google round trip, ending at `tallinntastebuds://signin` |
 | `POST /api/apple` | Apple's token and its nonce, answered as a sign-in |
+| `POST /api/seen` | `{ lat, lng, at }` — where the rider was 200 m of riding ago, five decimals and whole seconds since 1970 — for the pin on the website's map that says where Tallinn Tastebuds was last seen on a bike. Sent only by the account `GET /api/account` answers `shares: true` to, which is the website's own; at most once for every twenty seconds of riding, never from within 200 m of where the ride began or was paused, and never the last 200 m before Pause or Finish. Nothing is read of the answer and nothing is sent again (`Core/Live.swift`) |
 
 A line longer than 3,500 points, about forty kilometres, is thinned evenly
 before it is sent, and points outside the four boxes the server counts rides in — Tallinn, Tartu,
@@ -699,6 +700,7 @@ Rattatee/
             Ride.swift          a ride, a point, the sums, and the summary sent with it
             Insight.swift       a ride's kilometres and speeds, and what the website kept of it
             Store.swift         every ride on the phone, and sending them
+            Live.swift          which spot of a ride may go on the website's map, for its own account alone
             AccountTotals.swift what the account's rides add up to, from the website
             Search.swift        places, streets, Google, and the way there and its turns
             Guide.swift         the voice that says the turns
