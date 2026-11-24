@@ -95,7 +95,7 @@ struct RideMap: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        MapCanvas(lines: lines, goal: goal, here: here, follow: follow, whole: points.count > 1,
+        MapCanvas(lines: lines, stations: stations, goal: goal, here: here, follow: follow, whole: points.count > 1,
                   bikePaths: bikePaths,
                   // The lines are coloured when they are made, so a change
                   // of colour or of light and dark has to make them again.
@@ -135,6 +135,14 @@ struct RideMap: View {
                 .padding(.vertical, 2)
                 .background(Theme.card.opacity(0.85), in: Capsule())
         }
+    }
+
+    /// The two stations of the way chosen, where it goes by train: named at
+    /// the ends of its rail. A way by train still on offer has none, since
+    /// a faint line is not yet where anybody is going.
+    private var stations: [(name: String, at: CLLocationCoordinate2D)] {
+        guard case .found(let way) = goal?.way, let train = way.train else { return [] }
+        return train.stations
     }
 
     /// Everything drawn as a line, the bottom one first.
@@ -359,6 +367,92 @@ private final class Stroke: MKPolyline {
     var way: Int?
 }
 
+/// A station of a way by train, at one end of its rail.
+private final class RailStation: NSObject, MKAnnotation {
+    let coordinate: CLLocationCoordinate2D
+    let title: String?
+
+    init(name: String, at coordinate: CLLocationCoordinate2D) {
+        self.coordinate = coordinate
+        title = name
+    }
+}
+
+/// A station on the map: a white dot ringed in the rail's darker edge,
+/// standing on the end of the rail, and the station's name beside it.
+///
+/// THE STATIONS ARE NAMED
+///
+/// The rail of a way by train ran from nowhere to nowhere: orange between
+/// two rides, and which station it began at was on the card alone. Google's
+/// map marks the stops at the ends of a bus's line and names them, and the
+/// owner, sending that picture on 2026-11-23, asked for the same. So the two
+/// ends of the rail of the way chosen are a dot each, with the name the
+/// website gave the station: where to ride to, and where to get off.
+///
+/// The name is written twice: first its outline, wide, in the card's own
+/// colour, and then the letters over it in ink. That is how a map letters a
+/// name so it can be read over a road or a park, and it is white round dark
+/// by day and dark round light by night with no more said. The dot is white
+/// in both, as a stop is on every map.
+///
+/// The view is the dot and the name side by side, so its middle is not the
+/// station: `centerOffset` moves it until the dot is. It cannot be tapped,
+/// since a tap there is for the line or for nothing, and it stands under
+/// the pin where the two are close, which a station and a café beside it
+/// are.
+private final class StationView: MKAnnotationView {
+    private static let dot: CGFloat = 14
+    private static let gap: CGFloat = 4
+    /// How far round the letters their outline reaches, in points.
+    private static let halo: CGFloat = 3
+    private static let font = UIFont.systemFont(ofSize: 12, weight: .bold)
+
+    private var name = ""
+
+    override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
+        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .clear
+        isEnabled = false
+        displayPriority = .required
+        zPriority = .min
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError("StationView is made in code") }
+
+    func show(_ name: String) {
+        self.name = name
+        let text = (name as NSString).size(withAttributes: [.font: Self.font])
+        let size = CGSize(width: Self.dot + Self.gap + ceil(text.width) + Self.halo,
+                          height: max(Self.dot, ceil(text.height)) + Self.halo * 2)
+        bounds = CGRect(origin: .zero, size: size)
+        centerOffset = CGPoint(x: (size.width - Self.dot) / 2, y: 0)
+        setNeedsDisplay()
+    }
+
+    override func draw(_ rect: CGRect) {
+        // Half the ring's width in from the dot's edge, so the ring is
+        // inside the fourteen points and not round them.
+        let ring = UIBezierPath(ovalIn: CGRect(x: 0, y: (bounds.height - Self.dot) / 2, width: Self.dot, height: Self.dot)
+            .insetBy(dx: 1.5, dy: 1.5))
+        ring.lineWidth = 3
+        UIColor.white.setFill()
+        ring.fill()
+        UIColor(Theme.trainEdge).setStroke()
+        ring.stroke()
+
+        // A stroke's width is a share of the font's size, in hundredths,
+        // and half of it falls outside the letter.
+        let at = CGPoint(x: Self.dot + Self.gap, y: (bounds.height - Self.font.lineHeight) / 2)
+        let outline = Self.halo * 2 / Self.font.pointSize * 100
+        UIGraphicsGetCurrentContext()?.setLineJoin(.round)
+        (name as NSString).draw(at: at, withAttributes: [.font: Self.font, .strokeColor: UIColor(Theme.card),
+                                                         .strokeWidth: outline])
+        (name as NSString).draw(at: at, withAttributes: [.font: Self.font, .foregroundColor: UIColor(Theme.ink)])
+    }
+}
+
 /// An `MKMapView` that says when it first has a size, which is the first
 /// moment a frame can be set on it.
 private final class SizedMap: MKMapView {
@@ -378,6 +472,8 @@ private final class SizedMap: MKMapView {
 /// time any of it changes.
 private struct MapCanvas: UIViewRepresentable {
     let lines: [MapLine]
+    /// The stations of a way by train, to name at the ends of its rail.
+    let stations: [(name: String, at: CLLocationCoordinate2D)]
     let goal: Goal?
     let here: CLLocationCoordinate2D?
     let follow: Bool
@@ -458,10 +554,13 @@ private struct MapCanvas: UIViewRepresentable {
         weak var hold: UILongPressGestureRecognizer?
 
         /// What is on the map now: the lines by their marks, bottom first,
-        /// the bike paths, and the pin.
+        /// the bike paths, the pin, and the stations with what they were
+        /// made from.
         private var drawn: [(mark: Int, stroke: Stroke)] = []
         private var paths: BikePaths?
         private var pin: MKPointAnnotation?
+        private var stations: [RailStation] = []
+        private var stationsFrom = ""
         private var look = ""
 
         /// What the camera last answered to, so it moves on a change and
@@ -543,6 +642,17 @@ private struct MapCanvas: UIViewRepresentable {
                 self.pin = nil
             }
 
+            // The stations of a way by train. Two at the most and seldom
+            // there, so both come off and go on again when either changes
+            // — or the colours do, which they are drawn in.
+            let from = canvas.stations.reduce(canvas.look) { $0 + "|\($1.name) \($1.at.latitude) \($1.at.longitude)" }
+            if from != stationsFrom {
+                stationsFrom = from
+                map.removeAnnotations(stations)
+                stations = canvas.stations.map { RailStation(name: $0.name, at: $0.at) }
+                map.addAnnotations(stations)
+            }
+
             // The colours of what is not a line.
             if look != canvas.look {
                 look = canvas.look
@@ -622,6 +732,13 @@ private struct MapCanvas: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            if let station = annotation as? RailStation {
+                let view = mapView.dequeueReusableAnnotationView(withIdentifier: "station") as? StationView
+                    ?? StationView(annotation: station, reuseIdentifier: "station")
+                view.annotation = station
+                view.show(station.title ?? "")
+                return view
+            }
             // The rider's dot and the places Apple draws are the map's own.
             guard let pin, annotation === pin else { return nil }
             let view = mapView.dequeueReusableAnnotationView(withIdentifier: "goal") as? MKMarkerAnnotationView

@@ -123,6 +123,12 @@ struct Way: Equatable {
 
     enum Style: String { case ridden, fastest, safest, quietest, shortest }
 
+    /// About how long it takes, in whole minutes and never none: what the
+    /// card's row and the buttons say.
+    var minutes: Int { Self.minutes(Double(seconds)) }
+
+    static func minutes(_ seconds: Double) -> Int { max(1, Int((seconds / 60).rounded())) }
+
     /// Further than this from the line is not on it: the turns stop, and
     /// `Store.follow` says the rider is off the way and, if they stay off,
     /// finds a new one.
@@ -207,18 +213,41 @@ struct Way: Equatable {
 /// end, so how much is left, the turns and being off the way all work along
 /// it as along any way; this is what is said and drawn differently.
 struct Train: Equatable {
-    /// Which train, from and to which station, when it leaves, and when to
-    /// set off to catch it — the clock in Tallinn, as the website says it.
+    /// Which train, from and to which station, when it leaves and when it
+    /// gets in, and when to set off to catch it — the clock in Tallinn, as
+    /// the website says it. `until` is empty from an answer without one.
     let name: String
     let from: String
     let to: String
     let at: String
+    let until: String
     let leave: String
-    /// The legs in order, to draw: a ride as any way, the rail orange.
-    let legs: [(bike: Bool, line: [CLLocationCoordinate2D])]
+    /// The legs in order, to draw: a ride as any way, the rail orange. And
+    /// how long each ride takes, in whole minutes, for the card's row: nil
+    /// for the rail, and for a ride the website gave no time for.
+    let legs: [(bike: Bool, line: [CLLocationCoordinate2D], minutes: Int?)]
     /// Where along the way's line the rail runs. A point kept there would
     /// be the train's, not the bike's, and `Store.add` keeps none.
     let rail: ClosedRange<Double>
+
+    /// The two stations, where the rail begins and where it ends: what the
+    /// map names (`StationView` in RideMap.swift).
+    var stations: [(name: String, at: CLLocationCoordinate2D)] {
+        guard let track = legs.first(where: { !$0.bike })?.line, let first = track.first, let last = track.last else {
+            return []
+        }
+        return [(name: from, at: first), (name: to, at: last)].filter { !$0.name.isEmpty }
+    }
+
+    /// When the rider is at the door: `leave` and the way's minutes on —
+    /// the very minutes the card says beside it, so the two agree. Nil
+    /// where `leave` is not a clock time.
+    func arrive(after minutes: Int) -> String? {
+        let clock = leave.split(separator: ":").compactMap { Int($0) }
+        guard clock.count == 2 else { return nil }
+        let then = (clock[0] * 60 + clock[1] + minutes) % 1440
+        return String(format: "%02d:%02d", then / 60, then % 60)
+    }
 
     static func == (a: Train, b: Train) -> Bool {
         a.name == b.name && a.at == b.at && a.from == b.from && a.to == b.to
@@ -457,9 +486,15 @@ enum Search {
             start += length
         }
         var way = Way(metres: metres, seconds: Int(seconds), line: line, steps: steps.sorted { $0.along < $1.along })
+        // A ride's `seconds` and the train's `until` are for the card's row:
+        // how long each ride is, and when the train gets in.
+        let shown: [(bike: Bool, line: [CLLocationCoordinate2D], minutes: Int?)] = legs.map { leg in
+            let took = leg.bike ? leg.raw["seconds"] as? Double : nil
+            return (bike: leg.bike, line: leg.line, minutes: took.map { Way.minutes($0) })
+        }
         way.train = Train(name: said["line"] ?? "", from: rail.raw["from"] as? String ?? "", to: said["to"] ?? "",
-                          at: said["at"] ?? "", leave: leave, legs: legs.map { (bike: $0.bike, line: $0.line) },
-                          rail: railFrom...railTo)
+                          at: said["at"] ?? "", until: rail.raw["until"] as? String ?? "", leave: leave,
+                          legs: shown, rail: railFrom...railTo)
         return way
     }
 
