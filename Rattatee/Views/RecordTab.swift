@@ -496,10 +496,7 @@ struct RideDash: View {
 
     private func line(_ recording: Bool) -> String {
         if !recording { return L.t("ridePausedLine") }
-        if ride.points.isEmpty { return L.t("rideWaiting") }
-        // The one account the website's map shows is told so while it is
-        // being shown — `Live`.
-        return store.shares ? L.t("rideRecordingShown") : L.t("rideRecording")
+        return ride.points.isEmpty ? L.t("rideWaiting") : L.t("rideRecording")
     }
 }
 

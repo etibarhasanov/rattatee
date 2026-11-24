@@ -827,12 +827,6 @@
     "et": "Salvestan",
     "ru": "Идёт запись"
   },
-  "rideRecordingShown": {
-    "az": "Yazılır · tallinntastebuds.ee-də görünür",
-    "en": "Recording · shown on tallinntastebuds.ee",
-    "et": "Salvestan · näha saidil tallinntastebuds.ee",
-    "ru": "Идёт запись · видно на tallinntastebuds.ee"
-  },
   "rideRemove": {
     "az": "Bu telefondan sil",
     "en": "Remove from this phone",

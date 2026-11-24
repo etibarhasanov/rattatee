@@ -54,13 +54,6 @@ designed with its frequency in mind before it is written:
 6. **Rerouting is bounded by distance and, after a miss, by time** —
    `rerouteEvery` in `Core/Store.swift`. A new rule that asks more often
    says how often, in requests per ridden hour.
-7. **Only one account sends while riding.** `Core/Live.swift` sends where
-   the rider was 200 m ago to `/api/seen`, for the pin on the website's map,
-   at most 180 times a ridden hour — and only for the account the site
-   answers `shares: true` to, which is its own. That multiplies by one
-   phone, not by a thousand, and it must stay so: a spot from anybody else
-   is a request the site refuses and a ride nobody asked to have shown.
-   Nothing it sends is tried again.
 
 **A query run by hand is priced too.** The Cloudflare tool a session holds
 reaches the site's production database from here as well, so

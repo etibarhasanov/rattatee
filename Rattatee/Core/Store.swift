@@ -60,10 +60,6 @@ final class Store {
     /// `GET /api/account`. A button is drawn only where its flag is true.
     var googleOffered = false
     var appleOffered = false
-    /// Whether this account's rides are shown on the website's map as "last
-    /// seen here, on a bike": `shares` on `GET /api/account`, which the site
-    /// says to its own account and to no other — `Live`.
-    var shares = false
 
     // MARK: Rides
 
@@ -89,9 +85,6 @@ final class Store {
     @ObservationIgnored var demo = false
 
     @ObservationIgnored private var unwritten = 0
-    /// Which spot of the ride being recorded may be sent to the website's
-    /// map, for the one account that `shares`.
-    @ObservationIgnored private var live = Live()
     @ObservationIgnored private var sendingNow = false
     /// Finish is asking the phone what was not ridden: a second press waits.
     @ObservationIgnored private var finishing = false
@@ -167,7 +160,6 @@ final class Store {
         let ride = Ride(id: UUID().uuidString.lowercased(), started: Date(), status: .recording, since: Date())
         rides.insert(ride, at: 0)
         shown = nil
-        live = Live()
         write(ride)
         // The radio first, if it was on last ride, so the greeting finds it
         // on and is said over it: a stream takes a second or two to come,
@@ -184,7 +176,6 @@ final class Store {
     func pause() {
         guard let i = currentIndex, rides[i].status == .recording else { return }
         recorder.stop()
-        live.stop()
         rides[i].before = rides[i].seconds()
         rides[i].since = nil
         rides[i].pausedAt = Date().timeIntervalSince1970
@@ -522,11 +513,6 @@ final class Store {
         rides[i].points.append(point)
         if case .found = goal?.way {
             follow(point, after: before, ridden: rides[i].metres)
-        }
-        // The website's own account, on the website's map: where it was
-        // 200 m of riding ago, and never where the ride began or ends.
-        if shares, !demo, let spot = live.passed(point) {
-            Task { await Live.send(spot) }
         }
         unwritten += 1
         if unwritten >= Self.writeEvery { write(rides[i]) }
