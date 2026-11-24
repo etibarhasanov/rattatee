@@ -428,10 +428,13 @@ struct RideDash: View {
                     .padding(.top, 8)
             }
 
+            // On a train no turn is a turn to take: only a way by train's
+            // own row, which says where to get off (CARRIED, NOT RIDDEN in
+            // Store.swift).
             if let lost = store.goal?.lost {
                 Divider().overlay(Theme.hairline).padding(.top, 10)
                 LostRow(lost: lost).padding(.top, 10)
-            } else if let next {
+            } else if let next, !store.carried || next.step.turn == .train {
                 Divider().overlay(Theme.hairline).padding(.top, 10)
                 TurnRow(step: next.step, metres: next.metres).padding(.top, 10)
             }
@@ -479,12 +482,27 @@ struct RideDash: View {
     /// says "away" instead of "left".
     private var toGo: String? {
         guard let goal = store.goal else { return nil }
-        guard let last = ride.points.last else { return L.t("goalTo", ["name": goal.spot.name]) }
-        let crow = Geo.metres(last, Point(lat: goal.spot.lat, lng: goal.spot.lng, t: 0, acc: 0))
+        guard let at else { return L.t("goalTo", ["name": goal.spot.name]) }
+        let crow = Geo.metres(at, Point(lat: goal.spot.lat, lng: goal.spot.lng, t: 0, acc: 0))
         if goal.lost?.kind == .off { return L.t("goalAway", ["name": goal.spot.name, "dist": L.distance(crow)]) }
         var left = crow
-        if case .found(let way) = goal.way { left = way.left(from: last.coordinate) }
+        if case .found(let way) = goal.way { left = way.left(from: at.coordinate) }
         return L.t("goalLeft", ["name": goal.spot.name, "dist": L.distance(left)])
+    }
+
+    /// Where that is measured from: the ride's last point — or, once the
+    /// phone is a gap from it with nothing kept since, where the phone last
+    /// said it was, however sure. On a train no point is kept, and the line
+    /// said "3.7 km away" of a place the train was pulling in beside. The
+    /// next corner is still found from the last point: on the train of a
+    /// way by train that is the station's row, which says where to get off.
+    /// A staged ride is measured from its own points, wherever the
+    /// simulator says it is.
+    private var at: Point? {
+        guard let last = ride.points.last else { return nil }
+        guard !store.demo, let here = store.recorder.here else { return last }
+        let phone = Point(lat: here.latitude, lng: here.longitude, t: 0, acc: 0)
+        return Geo.metres(last, phone) > Geo.gap ? phone : last
     }
 
     /// The corner coming up on the way there, where the website said where

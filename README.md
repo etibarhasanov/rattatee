@@ -372,12 +372,42 @@ then it took the 250 m alone, most of a minute a street away from a way
 the app had already said was not being ridden (`Store.lostSeconds`). The
 new way takes the old one's place and its first turn is said
 as any way's is. With no signal the row says "No new way yet" and it asks
-again thirty seconds later. The question carries which way the rider is
-going — `heading`, worked out from the last thirty metres of the ride —
-and the website answers a way that sets off that way, so somebody who
-rode on past "Going the wrong way" is taken on from where they are headed
-and not told to turn around a second time (`Store.follow`,
+again thirty seconds later — and never sooner than thirty seconds after it
+last asked, answered or not, which is a hundred and twenty requests a
+ridden hour at the very worst (`Store.rerouteEvery`). The question carries
+which way the rider is going — `heading`, worked out from the last thirty
+metres of the ride — and the website answers a way that sets off that way,
+so somebody who rode on past "Going the wrong way" is taken on from where
+they are headed and not told to turn around a second time (`Store.follow`,
 `Store.reroute`).
+
+**On a train, the way waits.** A way by bike cannot be followed from a
+train, a bus or a car, and until 2026-11-25 the app could not tell one from
+a bike. A train going under 60 km/h between two fixes was riding to it, so
+every point was judged against the way: off it, a new way asked from the
+moving train, its first turn shown and said, the train past that one too —
+a new way every 150 m and a left or a right with each. And where the
+carriage gave no fix good enough to keep, the opposite: on 2026-11-24 the
+last point was on the platform at Balti jaam, and the row said "You're off
+the way · 100 m from it" for the whole train.
+
+Now the phone's own speed decides, which it measures from the satellites
+with every fix, far better than two positions can: three fixes in a row
+faster than 40 km/h, and the rider is carried, until two minutes after the
+last — a train standing at a station is still a train. While carried, the
+way waits. No turn is shown or said, but for a way by train's own row, which
+says where to get off; nothing is asked of the website; and the row says
+only how far from the way the phone is, once that is plainly far — 150 m
+beyond the fix's own accuracy, twice running. The line over it says how far
+the place is from where the phone is, not from the last point ridden.
+Riding again, the first point is followed as any is, and off the way a new
+way is asked from there, once and with no heading, since the way the train
+went says nothing of the way the rider will. So a train costs one request,
+where it cost one every 150 m. Where the phone gives no speed — inside a
+carriage it may know where it is only to a kilometre — nothing is kept to
+follow either, and the same waiting holds. What is recorded does not
+change: a slow train is still kept as riding (`Store.moving`, `Store.note`,
+`Recorder.onSpeed`, CARRIED, NOT RIDDEN in `Core/Store.swift`).
 
 **And where there is more than one, the bike chooses.** The website may
 answer a new way with up to two others beside it — often it has none, since

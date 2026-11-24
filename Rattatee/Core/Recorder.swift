@@ -24,7 +24,10 @@ import Observation
 /// as the activity, the best accuracy there is, and never pausing on its own
 /// (`pausesLocationUpdatesAutomatically` would stop a ride at a long red
 /// light and not start it again until the app was opened). Which fixes are
-/// good enough to keep is decided in `Store.add`, the same as the website's.
+/// good enough to keep is decided in `Store.add`, the same as the website's;
+/// one too unsure even to be considered is handed on apart (`onUnsure`),
+/// for the one thing it can still say — that the phone is nowhere near the
+/// way it was following.
 @MainActor
 @Observable
 final class Recorder: NSObject {
@@ -43,6 +46,17 @@ final class Recorder: NSObject {
 
     /// Every fix good enough to consider, in order.
     @ObservationIgnored var onPoint: (@MainActor (Point) -> Void)?
+    /// And every fix that is not, in order: worse than `sure`, so never a
+    /// point of a ride, but still about where the phone is. Inside a train
+    /// they are all there is, and they are how the Store learns the rider
+    /// has been carried off the way (`Store.note`).
+    @ObservationIgnored var onUnsure: (@MainActor (Point) -> Void)?
+    /// And how fast the phone measured itself going, with every fix that
+    /// says, sure or not: the slowest it could have been, in metres a
+    /// second. The satellites give it apart from the position and far
+    /// better than two positions can, and it is how the Store tells a train
+    /// from a bike (CARRIED, NOT RIDDEN in Store.swift).
+    @ObservationIgnored var onSpeed: (@MainActor (Double) -> Void)?
 
     @ObservationIgnored private let manager = CLLocationManager()
     /// Start was pressed before iOS had asked the question; start once it is
@@ -124,16 +138,20 @@ extension Recorder: CLLocationManagerDelegate {
             if let last = locations.last, last.horizontalAccuracy >= 0 { here = last.coordinate }
             for fix in locations {
                 // A negative accuracy is no fix at all.
-                guard fix.horizontalAccuracy >= 0, fix.horizontalAccuracy <= Self.sure else { continue }
+                guard fix.horizontalAccuracy >= 0 else { continue }
+                // And a negative speed, or speed accuracy, no speed. Heard
+                // before the point, so the point is judged knowing it.
+                if fix.speed >= 0, fix.speedAccuracy >= 0 { onSpeed?(fix.speed - fix.speedAccuracy) }
                 // The height comes with the fix, above mean sea level; a
                 // vertical accuracy of zero or less means there is none.
                 // How sure it is decides nothing: a point is kept for where
                 // it was, and its height is only ever read as a trend.
-                onPoint?(Point(lat: Geo.round5(fix.coordinate.latitude),
-                               lng: Geo.round5(fix.coordinate.longitude),
-                               t: fix.timestamp.timeIntervalSince1970,
-                               acc: (fix.horizontalAccuracy * 10).rounded() / 10,
-                               alt: fix.verticalAccuracy > 0 ? (fix.altitude * 10).rounded() / 10 : nil))
+                let point = Point(lat: Geo.round5(fix.coordinate.latitude),
+                                  lng: Geo.round5(fix.coordinate.longitude),
+                                  t: fix.timestamp.timeIntervalSince1970,
+                                  acc: (fix.horizontalAccuracy * 10).rounded() / 10,
+                                  alt: fix.verticalAccuracy > 0 ? (fix.altitude * 10).rounded() / 10 : nil)
+                if fix.horizontalAccuracy <= Self.sure { onPoint?(point) } else { onUnsure?(point) }
             }
         }
     }

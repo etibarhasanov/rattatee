@@ -346,9 +346,20 @@ enum Geo {
     /// The way a line is going at its end, in whole degrees from north:
     /// from the last point at least `over` metres behind its end to the
     /// end, so one fix wandering sideways does not turn it. Nil for a line
-    /// that has not gone that far yet.
+    /// that has not gone that far yet — counted back no further than the
+    /// last gap, since across one is a train, a walk or a lost signal, and
+    /// the way from the platform to the far station is not the way the
+    /// rider is going.
     static func heading(_ points: [Point], over: Double = 30) -> Int? {
-        guard let end = points.last, let from = points.last(where: { metres($0, end) >= over }) else { return nil }
+        guard let end = points.last else { return nil }
+        var later = end
+        var found: Point?
+        for p in points.dropLast().reversed() {
+            if metres(p, later) > gap { break }
+            if metres(p, end) >= over { found = p; break }
+            later = p
+        }
+        guard let from = found else { return nil }
         let rad = Double.pi / 180
         let east = (end.lng - from.lng) * cos((from.lat + end.lat) / 2 * rad)
         let north = end.lat - from.lat

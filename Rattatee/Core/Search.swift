@@ -276,6 +276,20 @@ struct Goal: Equatable {
     var along = 0.0
     var back = 0.0
     var astray = 0
+    /// And how many fixes in a row the way was not followed by — too
+    /// unsure, too fast, or on a train — were plainly far from it:
+    /// `Store.note`.
+    var adrift = 0
+    /// Got onto a train or into a car since the last new way was asked: the
+    /// next is asked with no heading, since the way the train went says
+    /// nothing of the way the rider will. Cleared once a new way is asked,
+    /// or the rider is on the way again (CARRIED, NOT RIDDEN in Store.swift).
+    var alighted = false
+    /// When the website was last asked for a new way off this one, answered
+    /// or not: it is not asked again sooner than `Store.rerouteEvery`. Kept
+    /// through every new way, since the wait is between two questions and
+    /// not about either way.
+    var asked: Date?
     /// After a new way off the old one, while its others are still a choice:
     /// how far the ride was, in metres, when it opened. Nil the rest of the
     /// time, which is before a ride, after the choice is made, and whenever
@@ -302,6 +316,10 @@ struct Goal: Equatable {
 /// the new way and go (`Store.lostSeconds`). Where the website has
 /// more than one new way, all of them are offered, quietly, and the one the
 /// rider rides on is the one they get: `Goal.picking`.
+///
+/// On a train or in a car it is the same row with how far, and no more:
+/// nothing is said, and no new way is asked until the rider is riding
+/// again (`Store.note`).
 struct Lost: Equatable {
     enum Kind: Equatable { case off, back }
     var kind: Kind
@@ -317,8 +335,8 @@ struct Lost: Equatable {
     var metres: Double
     /// Asking the website for a new way right now.
     var finding = false
-    /// The last time it was asked and answered nothing: tried again after
-    /// `Store.rerouteEvery`.
+    /// The last time it was asked and answered nothing, which the row then
+    /// says. When it is asked again is `Goal.asked`'s to say.
     var failed: Date?
 }
 
