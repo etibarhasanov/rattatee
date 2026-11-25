@@ -52,11 +52,17 @@ designed with its frequency in mind before it is written:
    `venues.json`, and a failed fetch of it waits `Store.retryWait` like
    everything else.
 6. **Rerouting is bounded by distance, by thirty seconds of riding off the
-   way and, after a miss, by time** — `lostSeconds` and `rerouteEvery` in
-   `Core/Store.swift`. Under 120 requests a ridden hour by the seconds,
-   from a rider who never rides the way they are given; WHAT IT ASKS, IN
-   REQUESTS A RIDDEN HOUR there is the sum. A new rule that asks more often
-   says how often, in requests per ridden hour.
+   way, and by time.** Riding, a new way is asked for 150 m off the old one
+   or thirty seconds ridden off it — `lostSeconds` — and never sooner than
+   thirty seconds after the last was asked, answered or not —
+   `rerouteEvery`, both in `Core/Store.swift`. 120 requests a ridden hour at
+   the very worst, from a rider who never rides the way they are given;
+   WHAT IT ASKS, IN REQUESTS A RIDDEN HOUR there is the sum. On a train or
+   in a car — the phone measuring itself past 40 km/h, `carriedSpeed` —
+   nothing is asked, and riding again one new way is. Until 2026-11-24 the
+   time held only after a miss, and a slow train whose points were kept as
+   riding asked every 150 m it went. A new rule that asks more often says
+   how often, in requests per ridden hour.
 
 **A query run by hand is priced too.** The Cloudflare tool a session holds
 reaches the site's production database from here as well, so

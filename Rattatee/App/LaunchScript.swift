@@ -39,8 +39,9 @@ enum LaunchScript {
     }
 
     /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides,
-    /// and goal and going, which have somewhere to ride to, and train, which
-    /// is goal with a way by train chosen.
+    /// and goal and going, which have somewhere to ride to, train, which
+    /// is goal with a way by train chosen, and boarding, which is riding
+    /// that way to its station.
     @MainActor
     static func stage(_ store: Store) {
         guard let demo = UserDefaults.standard.string(forKey: "kDemo") else { return }
@@ -102,6 +103,14 @@ enum LaunchScript {
             goal.ways.append(byTrain(ahead.map(\.coordinate)))
             goal.chosen = goal.ways.count - 1
             goal.way = .found(goal.ways[goal.chosen])
+            store.goal = goal
+        case "boarding":
+            // Riding to the station of a way by train, half way there: the
+            // train's line under where the rider is going, and the station
+            // as the next corner.
+            store.pretend([ride(.recording, metres: 300, seconds: 90)])
+            goal.ways = [byTrain(ahead.map(\.coordinate))]
+            goal.way = .found(goal.ways[0])
             store.goal = goal
         case "going":
             store.pretend([ride(.recording, metres: 1300, seconds: 312)])
@@ -180,10 +189,14 @@ enum LaunchScript {
         let first = Array(line[...on]), last = Array(line[off...])
         var way = Way(metres: 2600, seconds: 480, line: first + rail + last)
         let from = way.place(of: line[on]).along, to = way.place(of: line[off]).along
-        way.train = Train(name: "RE34", from: "Ülemiste", to: "Kitseküla", at: "09:47", until: "09:50", leave: "09:43",
+        let train = Train(name: "RE34", from: "Ülemiste", to: "Kitseküla", at: "09:47", until: "09:50", leave: "09:43",
+                          toward: "Tallinn",
                           legs: [(bike: true, line: first, minutes: 2), (bike: false, line: rail, minutes: nil),
                                  (bike: true, line: last, minutes: 1)],
                           rail: min(from, to)...max(from, to))
+        way.train = train
+        // The station is its one corner, as the website's first ride ends.
+        way.steps = [Step(turn: .train, name: "", exit: 0, along: train.rail.lowerBound, train: train.gaps)]
         return way
     }
 
