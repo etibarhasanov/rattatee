@@ -1283,6 +1283,24 @@
     "et": "Tippkiirus",
     "ru": "Макс. скорость"
   },
+  "trainGetOff": {
+    "az": "{to} stansiyasında düş",
+    "en": "Get off at {to}",
+    "et": "Välju jaamas {to}",
+    "ru": "Выходите на станции {to}"
+  },
+  "trainLeaves": {
+    "az": "{at} yola düşür · {to} stansiyasında düş",
+    "en": "Leaves {at} · get off at {to}",
+    "et": "Väljub {at} · välju jaamas {to}",
+    "ru": "Отправление в {at} · выходите на станции {to}"
+  },
+  "trainTake": {
+    "az": "{sign} qatarına min",
+    "en": "Take the {sign}",
+    "et": "Mine rongile {sign}",
+    "ru": "Садитесь на поезд {sign}"
+  },
   "tryNow": {
     "az": "İndi yoxla",
     "en": "Try now",

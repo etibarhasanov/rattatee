@@ -69,6 +69,10 @@ final class Guide {
     static let soon: ClosedRange<Double> = 120...220
     /// And how near is "now".
     static let now: Double = 40
+    /// How far before the station to get off at it is said: half a minute
+    /// or so of a train, where a corner's two hundred metres would be ten
+    /// seconds, with the bike still to be lifted off its hook.
+    static let alightBefore: Double = 600
 
     /// One recording. The raw value is the file's name after the language.
     enum Clip: String, CaseIterable {
@@ -130,7 +134,9 @@ final class Guide {
     /// where it has one for the language.
     ///
     /// Twice, as a corner is: from `soon`'s far end, whatever corners are
-    /// still between, and again within `now` of the station. Until
+    /// still between, and again at the station — within `now` of it, or
+    /// on arriving within `Store.stationNear`, where the way waits and this
+    /// is not asked, by `station`. Until
     /// 2026-11-25 it was the second alone, and only once the station was
     /// the next corner — on the platform, after the choice of platform was
     /// made, and mostly not at all, since a point that near the rail is the
@@ -172,6 +178,27 @@ final class Guide {
                 say([.soon, turn], L.t("turnSoon") + ", " + next.step.words)
             }
         }
+    }
+
+    /// At the station of a way by train, where the way waits for the rider
+    /// to find the platform (`Store.platform`): which train, where it is
+    /// going and where to get off, once — and not at all where `board` has
+    /// already said it at the station.
+    func station(on way: Way) {
+        guard voice, !talking, let station = way.steps.first(where: { $0.turn == .train }),
+              said.insert("train-now").inserted else { return }
+        speak(station.said)
+    }
+
+    /// On the train of a way by train, `along` its rail: "Get off at
+    /// Ülemiste", once, `alightBefore` the station. The phone's own voice,
+    /// as the train's other sentences are. Until 2026-11-25 nothing was
+    /// said on the train at all, and the first word after it was the first
+    /// turn of the ride on.
+    func alight(_ along: Double, on way: Way) {
+        guard voice, !talking, let train = way.train, train.rail.upperBound - along <= Self.alightBefore,
+              said.insert("train-off").inserted else { return }
+        speak(L.t("trainGetOff", ["to": train.to]))
     }
 
     /// The rider has left the way: said once when the Store first sees it,

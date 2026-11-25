@@ -470,12 +470,23 @@ struct RideDash: View {
                 TrainLine(train: train).padding(.top, 6)
             }
 
-            // On a train no turn is a turn to take: only a way by train's
-            // own row, which says where to get off (CARRIED, NOT RIDDEN in
-            // Store.swift).
-            if let lost = store.goal?.lost {
+            // At the station of a way by train, which train to take, and
+            // nothing about turns (AT THE STATION in Store.swift). On the
+            // train, how far to the station to get off at. On any other
+            // train no turn is a turn to take (CARRIED, NOT RIDDEN there).
+            if let train = boarding, store.goal?.atStation == true {
+                Divider().overlay(Theme.hairline).padding(.top, 10)
+                TrainRow(title: L.t("trainTake", ["sign": train.sign]),
+                         words: L.t("trainLeaves", ["at": train.at, "to": train.to]))
+                    .padding(.top, 10)
+            } else if let lost = store.goal?.lost {
                 Divider().overlay(Theme.hairline).padding(.top, 10)
                 LostRow(lost: lost).padding(.top, 10)
+            } else if let train = boarding, let along = store.goal?.railAlong {
+                Divider().overlay(Theme.hairline).padding(.top, 10)
+                TrainRow(title: L.distance(max(0, train.rail.upperBound - along)),
+                         words: L.t("trainGetOff", ["to": train.to]))
+                    .padding(.top, 10)
             } else if let next, !store.carried || next.step.turn == .train {
                 Divider().overlay(Theme.hairline).padding(.top, 10)
                 TurnRow(step: next.step, metres: next.metres).padding(.top, 10)
@@ -556,19 +567,13 @@ struct RideDash: View {
     }
 
     /// The corner coming up on the way there, where the website said where
-    /// the way turns and the rider is still on it. On the train of a way by
-    /// train, the train's own row, with how far it is to the station to get
-    /// off at (`Goal.railAlong`). Until 2026-11-25 the row was worked out
-    /// from the last point ridden alone, and no point on the rail is ridden,
-    /// so for the whole of the train it said the last turn before the
-    /// platform: "60 m · Turn left", half a kilometre out of Ülemiste.
+    /// the way turns and the rider is still on it, from the last point
+    /// ridden. On the train of a way by train no point is ridden, and until
+    /// 2026-11-25 this said the last turn before the platform for the whole
+    /// train — "60 m · Turn left", half a kilometre out of Ülemiste — where
+    /// the row is now the train's own (`TrainRow`).
     private var next: (step: Step, metres: Double)? {
-        guard case .found(let way) = store.goal?.way else { return nil }
-        if let along = store.goal?.railAlong, let train = way.train,
-           let board = way.steps.first(where: { $0.turn == .train }) {
-            return (board, max(0, train.rail.upperBound - along))
-        }
-        guard let last = ride.points.last else { return nil }
+        guard case .found(let way) = store.goal?.way, let last = ride.points.last else { return nil }
         return way.next(from: last.coordinate)
     }
 
@@ -603,6 +608,38 @@ struct TurnRow: View {
             }
             Spacer(minLength: 0)
         }
+    }
+}
+
+/// The row of a way by train where a turn's would be, on the train's own
+/// orange as its pill is. At its station, which train to take — "Take the
+/// RE33 Narva", the sign on the platform's board — when it leaves and where
+/// to get off; on it, how far to the station to get off at. Never a
+/// distance to the platform: nobody rides to the point the router ends at,
+/// and that is what went wrong at Ülemiste (AT THE STATION in
+/// Store.swift).
+struct TrainRow: View {
+    let title: String
+    let words: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: Turn.train.symbol)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(Theme.onTrain)
+                .frame(width: 44, height: 44)
+                .background(Theme.train, in: RoundedRectangle(cornerRadius: 12))
+            VStack(alignment: .leading, spacing: 0) {
+                Text(title).font(.title3.weight(.bold)).monospacedDigit()
+                    .foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.8)
+                // Two lines where one will not do: in Russian the station
+                // to get off at, the one word that matters, was cut off.
+                Text(words).font(.subheadline).foregroundStyle(Theme.muted)
+                    .lineLimit(2).fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

@@ -40,8 +40,9 @@ enum LaunchScript {
 
     /// `-kDemo <state>`: recording, paused, save, short, saved, kept, rides,
     /// and goal and going, which have somewhere to ride to, train, which
-    /// is goal with a way by train chosen, and boarding, which is riding
-    /// that way to its station.
+    /// is goal with a way by train chosen, boarding, which is riding that
+    /// way to its station, station, which is at it, and aboard, which is
+    /// on its train.
     @MainActor
     static func stage(_ store: Store) {
         guard let demo = UserDefaults.standard.string(forKey: "kDemo") else { return }
@@ -111,6 +112,25 @@ enum LaunchScript {
             store.pretend([ride(.recording, metres: 300, seconds: 90)])
             goal.ways = [byTrain(ahead.map(\.coordinate))]
             goal.way = .found(goal.ways[0])
+            store.goal = goal
+        case "station":
+            // At that way's station: the way waits, and the row says which
+            // train to take, when it leaves and where to get off.
+            store.pretend([ride(.recording, metres: 600, seconds: 150)])
+            goal.ways = [byTrain(ahead.map(\.coordinate))]
+            goal.way = .found(goal.ways[0])
+            goal.atStation = true
+            store.goal = goal
+        case "aboard":
+            // On its train, two fifths of the way down the rail: the row is
+            // how far it is to the station to get off at.
+            store.pretend([ride(.recording, metres: 600, seconds: 150)])
+            let train = byTrain(ahead.map(\.coordinate))
+            goal.ways = [train]
+            goal.way = .found(train)
+            if let rail = train.train?.rail {
+                goal.railAlong = rail.lowerBound + (rail.upperBound - rail.lowerBound) * 0.4
+            }
             store.goal = goal
         case "going":
             store.pretend([ride(.recording, metres: 1300, seconds: 312)])

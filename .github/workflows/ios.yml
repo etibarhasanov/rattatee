@@ -168,6 +168,11 @@ jobs:
           # going, under where the rider is going, in English and Estonian.
           shot 42-boarding -kDemo boarding
           shot 43-boarding-et -kDemo boarding -AppleLanguages '(et)'
+          # At its station, where the way waits and the row says which train
+          # to take; and on the train, where to get off.
+          shot 44-station -kDemo station
+          shot 45-station-ru -kDemo station -AppleLanguages '(ru)'
+          shot 46-aboard -kDemo aboard
           # The radio: on, with no signal, and its list of stations.
           shot 26-radio -kDemo going -kRadio playing
           shot 27-radio-lost -kDemo recording -kRadio lost
