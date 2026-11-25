@@ -360,10 +360,17 @@ turn, and the voice says it once; riding the way backwards for forty
 metres, it says "Going the wrong way". A few dozen metres off is often on
 purpose — a shop, a shortcut, a closed path — so nothing more happens yet,
 and back on the way the turns come back. Once the rider is plainly going
-wrong — 150 m from the way, 150 m ridden backwards along it, or 250 m
-ridden since it was said — the app asks the website for a new way from
-where they are, by itself and with no button, since the phone is in a
-pocket. The new way takes the old one's place and its first turn is said
+wrong — 150 m from the way, 150 m ridden backwards along it, or thirty
+seconds or 250 m ridden since it was said — the app asks the website for a
+new way from where they are, by itself and with no button, since the phone
+is in a pocket. The thirty seconds are the owner's, from 2026-11-25:
+somebody riding somewhere else for longer than that is not at a shop, it
+is ongoing, so just find the new way and go. They are seconds of riding —
+standing at the shop, or at a light a street over, is not counted, and a
+rider who stops off the way and comes back keeps the way they had. Until
+then it took the 250 m alone, most of a minute a street away from a way
+the app had already said was not being ridden (`Store.lostSeconds`). The
+new way takes the old one's place and its first turn is said
 as any way's is. With no signal the row says "No new way yet" and it asks
 again thirty seconds later. The question carries which way the rider is
 going — `heading`, worked out from the last thirty metres of the ride —

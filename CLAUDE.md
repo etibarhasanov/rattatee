@@ -51,8 +51,11 @@ designed with its frequency in mind before it is written:
 5. **Keep what does not change.** The places roll is kept a week in
    `venues.json`, and a failed fetch of it waits `Store.retryWait` like
    everything else.
-6. **Rerouting is bounded by distance and, after a miss, by time** —
-   `rerouteEvery` in `Core/Store.swift`. A new rule that asks more often
+6. **Rerouting is bounded by distance, by thirty seconds of riding off the
+   way and, after a miss, by time** — `lostSeconds` and `rerouteEvery` in
+   `Core/Store.swift`. Under 120 requests a ridden hour by the seconds,
+   from a rider who never rides the way they are given; WHAT IT ASKS, IN
+   REQUESTS A RIDDEN HOUR there is the sum. A new rule that asks more often
    says how often, in requests per ridden hour.
 
 **A query run by hand is priced too.** The Cloudflare tool a session holds

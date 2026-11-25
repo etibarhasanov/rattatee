@@ -335,6 +335,31 @@ final class Store {
     static let farOff: Double = 150
     static let farBack: Double = 150
     static let lostFor: Double = 250
+    /// Or this long ridden since it was said, in seconds, and the rider
+    /// still not back — `Lost.seconds`, which leaves out a leg spent
+    /// standing. The owner's word on 2026-11-25: somebody riding somewhere
+    /// else for more than thirty seconds is not at a shop and not cutting a
+    /// corner, it is ongoing, so just find the new way and go. Until then a
+    /// rider who stayed between `Way.astray` and `farOff` of the way was
+    /// told they were off it and then left with the old way for 250 m —
+    /// most of a minute at a bike's pace, and nearer a minute and a half on
+    /// a path. At thirty kilometres an hour and faster `lostFor` still
+    /// comes first.
+    ///
+    /// WHAT IT ASKS, IN REQUESTS A RIDDEN HOUR
+    ///
+    /// One request each time, the website's question with a `heading`: the
+    /// router's own way, no row read for it, and two rows by key for a
+    /// rider who is signed in. By this rule it cannot be asked sooner than
+    /// thirty seconds of riding after it was said, and it is said two
+    /// points off a way that set off the way the rider was going, so under
+    /// 120 a ridden hour from somebody who never once rides the way they
+    /// are given — nearer 70 at 18 km/h, a street over from every way,
+    /// where the 250 m it comes before made 50. That is the worst of it and
+    /// not the ride: an ordinary ride gains one request for each time its
+    /// rider left the way for longer than half a minute and would have been
+    /// back on it within 250 m. `farOff` and `farBack` are as they were.
+    static let lostSeconds: TimeInterval = 30
     /// Not asked again sooner than this after it answered nothing, so a
     /// tunnel or a dead signal is not a request every point.
     static let rerouteEvery: TimeInterval = 30
@@ -382,16 +407,20 @@ final class Store {
         }
 
         let kind: Lost.Kind = off ? .off : .back
+        // How long it has gone on since it was said, counted in riding: the
+        // leg to this point, unless it was spent standing. Nothing to add
+        // to at the point it is first said.
+        if let before, !Timeline.still(before, point) { goal.lost?.seconds += point.t - before.t }
         if goal.lost == nil || goal.lost?.kind != kind {
-            goal.lost = Lost(kind: kind, since: goal.lost?.since ?? ridden, metres: spot.off,
-                             failed: goal.lost?.failed)
+            goal.lost = Lost(kind: kind, since: goal.lost?.since ?? ridden, seconds: goal.lost?.seconds ?? 0,
+                             metres: spot.off, failed: goal.lost?.failed)
             guide.warn(kind)
         }
         goal.lost?.metres = spot.off
 
         if let lost = goal.lost, !demo {
             let wrong = off ? spot.off >= Self.farOff : goal.back >= Self.farBack
-            let long = ridden - lost.since >= Self.lostFor
+            let long = ridden - lost.since >= Self.lostFor || lost.seconds >= Self.lostSeconds
             let waited = lost.failed.map { Date().timeIntervalSince($0) >= Self.rerouteEvery } ?? true
             if (wrong || long) && waited {
                 // Marked before the question goes, so the points that arrive
