@@ -632,8 +632,10 @@ struct TrainRow: View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(title).font(.title3.weight(.bold)).monospacedDigit()
                     .foregroundStyle(Theme.ink).lineLimit(1).minimumScaleFactor(0.8)
+                // Two lines where one will not do: in Russian the station
+                // to get off at, the one word that matters, was cut off.
                 Text(words).font(.subheadline).foregroundStyle(Theme.muted)
-                    .lineLimit(1).minimumScaleFactor(0.8)
+                    .lineLimit(2).fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
         }
