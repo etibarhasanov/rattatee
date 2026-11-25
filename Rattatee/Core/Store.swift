@@ -330,6 +330,7 @@ final class Store {
         goal.back = 0
         goal.astray = 0
         goal.adrift = 0
+        goal.railAlong = nil
         guide.forget()
     }
 
@@ -397,6 +398,10 @@ final class Store {
     /// the slowing, the doors and the setting off again, and after the last
     /// station the walk off the platform.
     static let carriedFor: TimeInterval = 120
+    /// The widest circle a fix may have and still say where along the rail
+    /// of a way by train the train is: wider, and the kilometres the row
+    /// counts down would jump about by as much.
+    static let railSure: Double = 300
     /// After a new way, how far the rider may ride before its others stop
     /// being a choice and the first is simply the way. By then the ways
     /// have long parted, or are so nearly one that it makes no difference.
@@ -409,8 +414,10 @@ final class Store {
     /// point first.
     private func follow(_ point: Point, after before: Point?, ridden: Double) {
         guard var goal = self.goal, goal.lost?.finding != true else { return }
-        // A point kept knows better than the fixes that were not (`note`).
+        // A point kept knows better than the fixes that were not (`note`),
+        // and is not on a train.
         goal.adrift = 0
+        goal.railAlong = nil
         if pick(point, in: &goal, ridden: ridden) { self.goal = goal; return }
         // Read after `pick`, which may have made another of the ways the way.
         guard case .found(let way) = goal.way else { return }
@@ -537,12 +544,21 @@ final class Store {
     ///
     /// The train of a way by train is not weighed by it until the rail is
     /// behind: the rail is the way, and a fix a kilometre wrong, twice,
-    /// would say the rider sitting on it was off it.
+    /// would say the rider sitting on it was off it. Where its circle takes
+    /// in the rail, and is no wider than `railSure`, it says where along the
+    /// rail the train is, for the row (`Goal.railAlong`).
     private func unsure(_ fix: Point) {
         guard !demo, let i = currentIndex, rides[i].status == .recording, let since = rides[i].since,
               fix.t >= since.timeIntervalSince1970 - 1 else { return }
-        if let goal, case .found(let way) = goal.way, let train = way.train,
-           goal.along <= train.rail.upperBound { return }
+        if var goal, case .found(let way) = goal.way, let train = way.train,
+           goal.along <= train.rail.upperBound {
+            let spot = way.place(of: fix.coordinate)
+            if fix.acc <= Self.railSure, spot.off <= fix.acc + Way.astray, train.rail.contains(spot.along) {
+                goal.railAlong = spot.along
+                self.goal = goal
+            }
+            return
+        }
         note(fix)
     }
 
@@ -678,7 +694,13 @@ final class Store {
         // train as a train.
         if case .found(let way) = goal?.way, let train = way.train {
             let spot = way.place(of: point.coordinate)
-            if spot.off <= Way.astray && train.rail.contains(spot.along) { carry(point, in: i); return }
+            if spot.off <= Way.astray && train.rail.contains(spot.along) {
+                // Not riding, but where along the rail the train is, for
+                // the row (`Goal.railAlong`).
+                goal?.railAlong = spot.along
+                carry(point, in: i)
+                return
+            }
         }
         let before = rides[i].points.last
         rides[i].points.append(point)

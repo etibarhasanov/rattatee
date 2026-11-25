@@ -274,7 +274,11 @@ name beside it, before the ride and during it. A way by train still on
 offer has none (THE STATIONS ARE NAMED, in the same file). While riding, the station is a corner
 like any other, with a train in the row in place of an arrow — *Train RE34
 at 09:31 to Kitseküla* — read once by the phone's own voice on the platform,
-since no recording says which train. On the train nothing is recorded: a
+since no recording says which train. On the train the row stays the
+train's, counting down the kilometres to the station to get off at, from
+every fix on the rail good to 300 m; until 2026-11-25 it stayed at the last
+turn before the platform, since it was worked out from the last point
+ridden. Nothing is recorded there: a
 point on the rail stretch of the way is not kept, so a saved ride is never
 a railway, and it goes on from the far station. The clock keeps running, as
 it does at a red light. A website from before the trains answers without

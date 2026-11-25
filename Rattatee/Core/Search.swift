@@ -285,6 +285,11 @@ struct Goal: Equatable {
     /// nothing of the way the rider will. Cleared once a new way is asked,
     /// or the rider is on the way again (CARRIED, NOT RIDDEN in Store.swift).
     var alighted = false
+    /// Where along the way the rider is on the train of a way by train,
+    /// from the last fix placed on its rail: what the row counts down to
+    /// the station to get off at. Nil off the rail, and cleared by the
+    /// first point ridden after it (`Store.follow`).
+    var railAlong: Double?
     /// When the website was last asked for a new way off this one, answered
     /// or not: it is not asked again sooner than `Store.rerouteEvery`. Kept
     /// through every new way, since the wait is between two questions and

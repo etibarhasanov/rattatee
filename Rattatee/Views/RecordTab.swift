@@ -506,9 +506,19 @@ struct RideDash: View {
     }
 
     /// The corner coming up on the way there, where the website said where
-    /// the way turns and the rider is still on it.
+    /// the way turns and the rider is still on it. On the train of a way by
+    /// train, the train's own row, with how far it is to the station to get
+    /// off at (`Goal.railAlong`). Until 2026-11-25 the row was worked out
+    /// from the last point ridden alone, and no point on the rail is ridden,
+    /// so for the whole of the train it said the last turn before the
+    /// platform: "60 m · Turn left", half a kilometre out of Ülemiste.
     private var next: (step: Step, metres: Double)? {
-        guard case .found(let way) = store.goal?.way, let last = ride.points.last else { return nil }
+        guard case .found(let way) = store.goal?.way else { return nil }
+        if let along = store.goal?.railAlong, let train = way.train,
+           let board = way.steps.first(where: { $0.turn == .train }) {
+            return (board, max(0, train.rail.upperBound - along))
+        }
+        guard let last = ride.points.last else { return nil }
         return way.next(from: last.coordinate)
     }
 
