@@ -296,7 +296,10 @@ struct Goal: Equatable {
 /// from where the rider is and setting off the way they are riding, by
 /// itself and with no button, since the phone is in a pocket. That is the
 /// owner's word: say it, then recalculate once the rider is really going
-/// wrong, in the direction they plainly want to go. Where the website has
+/// wrong, in the direction they plainly want to go. And half a minute of
+/// riding somewhere else is going wrong, however near the way it is — the
+/// owner's word again, on 2026-11-25: by then it is ongoing, so just find
+/// the new way and go (`Store.lostSeconds`). Where the website has
 /// more than one new way, all of them are offered, quietly, and the one the
 /// rider rides on is the one they get: `Goal.picking`.
 struct Lost: Equatable {
@@ -304,6 +307,12 @@ struct Lost: Equatable {
     var kind: Kind
     /// How far the ride was, in metres, when it was first said.
     let since: Double
+    /// How long the rider has ridden since it was first said, in seconds:
+    /// the time between the points kept since, but for a leg spent standing
+    /// (`Timeline.still`). Ridden and not on the clock, because a stop off
+    /// the way is a shop or a door, which is what saying it first and
+    /// waiting was for, and not somebody riding somewhere else.
+    var seconds = 0.0
     /// How far from the way the rider is, for "80 m from it".
     var metres: Double
     /// Asking the website for a new way right now.
