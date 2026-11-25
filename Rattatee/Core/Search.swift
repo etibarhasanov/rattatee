@@ -101,6 +101,13 @@ struct Step: Equatable {
         case .train: return L.t("turnTrain", train)
         }
     }
+
+    /// What is said aloud where there is no recording: the row's words, and
+    /// for a train where it is going as well, which the row leaves to the
+    /// line over it (`TrainLine`).
+    var said: String {
+        turn == .train ? Train.sentence(train) : words
+    }
 }
 
 /// A suggested way by bike, from /api/route.
@@ -222,6 +229,11 @@ struct Train: Equatable {
     let at: String
     let until: String
     let leave: String
+    /// Where the train itself is going — the website's `headsign`, the word
+    /// on the platform's board and on the front of the train. It is rarely
+    /// where the rider gets off: the RE33 ridden two stops to Ülemiste says
+    /// Narva. Empty from a website that does not say.
+    var toward = ""
     /// The legs in order, to draw: a ride as any way, the rail orange. And
     /// how long each ride takes, in whole minutes, for the card's row: nil
     /// for the rail, and for a ride the website gave no time for.
@@ -237,6 +249,35 @@ struct Train: Equatable {
             return []
         }
         return [(name: from, at: first), (name: to, at: last)].filter { !$0.name.isEmpty }
+    }
+
+    /// The train as its own front says it, "RE33 Narva": the line and where
+    /// it is going, which is the sign to follow at the station. What the
+    /// orange pill reads wherever it is drawn.
+    var sign: String {
+        [name, toward].filter { !$0.isEmpty }.joined(separator: " ")
+    }
+
+    /// "17:34 Kitseküla → 17:39 Tallinn": the train alone, each time beside
+    /// its station. A website that does not say when it gets in leaves that
+    /// one time out.
+    var journey: String {
+        [[at, from], [until, to]]
+            .map { $0.filter { !$0.isEmpty }.joined(separator: " ") }
+            .joined(separator: " → ")
+    }
+
+    /// The gaps of the train's sentences, as `Step.train` carries them.
+    var gaps: [String: String] {
+        ["line": name, "at": at, "to": to, "toward": toward]
+    }
+
+    /// The train as a sentence, for the voice and for VoiceOver: with where
+    /// it is going, unless the website did not say or it is the very
+    /// station the rider gets off at, which would only say it twice.
+    static func sentence(_ gaps: [String: String]) -> String {
+        let toward = gaps["toward"] ?? ""
+        return toward.isEmpty || toward == gaps["to"] ? L.t("turnTrain", gaps) : L.t("turnTrainToward", gaps)
     }
 
     /// When the rider is at the door: `leave` and the way's minutes on —
@@ -497,7 +538,7 @@ enum Search {
         var railFrom = 0.0, railTo = 0.0
         var steps: [Step] = []
         let said = ["line": rail.raw["name"] as? String ?? "", "at": rail.raw["at"] as? String ?? "",
-                    "to": rail.raw["to"] as? String ?? ""]
+                    "to": rail.raw["to"] as? String ?? "", "toward": rail.raw["headsign"] as? String ?? ""]
         for (i, leg) in legs.enumerated() {
             let length = Geo.length(leg.line.map { Point(lat: $0.latitude, lng: $0.longitude, t: 0, acc: 0) })
             if leg.bike {
@@ -526,7 +567,7 @@ enum Search {
         }
         way.train = Train(name: said["line"] ?? "", from: rail.raw["from"] as? String ?? "", to: said["to"] ?? "",
                           at: said["at"] ?? "", until: rail.raw["until"] as? String ?? "", leave: leave,
-                          legs: shown, rail: railFrom...railTo)
+                          toward: said["toward"] ?? "", legs: shown, rail: railFrom...railTo)
         return way
     }
 

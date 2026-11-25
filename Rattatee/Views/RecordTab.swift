@@ -264,7 +264,7 @@ struct WayRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(times(train)).font(.headline).foregroundStyle(Theme.ink)
                     legs(train)
-                    Text(stations(train)).font(.footnote).foregroundStyle(Theme.muted).lineLimit(1)
+                    Text(train.journey).font(.footnote).foregroundStyle(Theme.muted).lineLimit(1)
                 }
             } else {
                 Text(L.distance(way.metres)).font(.headline).foregroundStyle(Theme.ink)
@@ -284,16 +284,9 @@ struct WayRow: View {
         return train.leave + " – " + arrive
     }
 
-    /// "17:34 Kitseküla → 17:39 Tallinn": the train alone, each time beside
-    /// its station. A website that does not say when it gets in leaves that
-    /// one time out.
-    private func stations(_ train: Train) -> String {
-        [[train.at, train.from], [train.until, train.to]]
-            .map { $0.filter { !$0.isEmpty }.joined(separator: " ") }
-            .joined(separator: " → ")
-    }
-
-    /// A ride, the train, a ride, with an arrow between: each a pill.
+    /// A ride, the train, a ride, with an arrow between: each a pill. The
+    /// train's says where it is going after its name, "RE33 Narva", as the
+    /// front of the train does (`Train.sign`).
     private func legs(_ train: Train) -> some View {
         HStack(spacing: 5) {
             ForEach(Array(train.legs.enumerated()), id: \.offset) { index, leg in
@@ -301,25 +294,13 @@ struct WayRow: View {
                     Image(systemName: "chevron.right").font(.caption2.weight(.semibold)).foregroundStyle(Theme.muted)
                 }
                 if leg.bike {
-                    pill("bicycle", leg.minutes.map { String($0) } ?? "", ink: Theme.ink, ground: Theme.wash)
+                    LegPill(symbol: "bicycle", text: leg.minutes.map { String($0) } ?? "",
+                            ink: Theme.ink, ground: Theme.wash)
                 } else {
-                    pill("tram.fill", train.name, ink: Theme.onTrain, ground: Theme.train)
+                    LegPill(symbol: "tram.fill", text: train.sign, ink: Theme.onTrain, ground: Theme.train)
                 }
             }
         }
-    }
-
-    /// One leg: what it is by, and beside it how many minutes or which
-    /// train. The picture alone, where the website did not say.
-    private func pill(_ symbol: String, _ text: String, ink: Color, ground: Color) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: symbol).font(.caption)
-            if !text.isEmpty { Text(text).font(.footnote.weight(.semibold)) }
-        }
-        .padding(.horizontal, 8)
-        .frame(minHeight: 24)
-        .foregroundStyle(ink)
-        .background(ground, in: Capsule())
     }
 
     /// What VoiceOver reads in the row's place: the whole of it, as the
@@ -329,6 +310,63 @@ struct WayRow: View {
         guard let train = way.train else { return L.t("goalWay", ["dist": L.distance(way.metres), "min": min]) }
         return L.t("goalTrain", ["leave": train.leave, "from": train.from, "line": train.name,
                                  "at": train.at, "to": train.to, "min": min])
+    }
+}
+
+/// One leg of a way by train: what it is by, and beside it how many minutes
+/// or which train. The picture alone, where the website did not say.
+struct LegPill: View {
+    let symbol: String
+    let text: String
+    let ink: Color
+    let ground: Color
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: symbol).font(.caption)
+            if !text.isEmpty { Text(text).font(.footnote.weight(.semibold)).lineLimit(1) }
+        }
+        .padding(.horizontal, 8)
+        .frame(minHeight: 24)
+        .foregroundStyle(ink)
+        .background(ground, in: Capsule())
+    }
+}
+
+/// Which train, under where the rider is going, for as long as it is still
+/// ahead or being ridden: the train's pill as the card had it, "RE33 Narva",
+/// and its two times and stations.
+///
+///     (train RE33 Narva)  06:25 Tallinn → 06:33 Ülemiste
+///
+/// WHAT THE PLATFORM SAYS
+///
+/// The card says all of this before Go and then it was gone: riding to the
+/// station, the screen had an arrow and a distance. And what it had said of
+/// the train was where to get off, which no sign at a station says. The
+/// board over a platform and the front of a train name where the train is
+/// going — Narva, for somebody riding two stops to Ülemiste — and at a
+/// station whose platforms are a subway apart that word is the one to
+/// follow. The owner asked for it from a station on 2026-11-25: say which
+/// sign, the direction or the train's number. This is both, and the time,
+/// for the whole ride there, since whether the train will be caught is the
+/// other thing worth a glance.
+///
+/// Nothing in it is a sentence, as nothing on the card is. VoiceOver reads
+/// the sentence the voice says (`Train.sentence`).
+struct TrainLine: View {
+    let train: Train
+
+    var body: some View {
+        HStack(spacing: 8) {
+            LegPill(symbol: "tram.fill", text: train.sign, ink: Theme.onTrain, ground: Theme.train)
+            Text(train.journey).font(.footnote).foregroundStyle(Theme.muted)
+                .lineLimit(1).minimumScaleFactor(0.8)
+            Spacer(minLength: 0)
+        }
+        .monospacedDigit()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Train.sentence(train.gaps))
     }
 }
 
@@ -428,6 +466,10 @@ struct RideDash: View {
                     .padding(.top, 8)
             }
 
+            if let train = boarding {
+                TrainLine(train: train).padding(.top, 6)
+            }
+
             // On a train no turn is a turn to take: only a way by train's
             // own row, which says where to get off (CARRIED, NOT RIDDEN in
             // Store.swift).
@@ -488,6 +530,14 @@ struct RideDash: View {
         var left = crow
         if case .found(let way) = goal.way { left = way.left(from: at.coordinate) }
         return L.t("goalLeft", ["name": goal.spot.name, "dist": L.distance(left)])
+    }
+
+    /// The train of the way being ridden, until its rail is behind: on the
+    /// ride to the station and on the train itself.
+    private var boarding: Train? {
+        guard let goal = store.goal, case .found(let way) = goal.way, let train = way.train,
+              goal.along <= train.rail.upperBound else { return nil }
+        return train
     }
 
     /// Where that is measured from: the ride's last point — or, once the

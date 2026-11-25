@@ -1355,6 +1355,12 @@
     "et": "Rong {line} kell {at} jaama {to}",
     "ru": "Поезд {line} в {at} до {to}"
   },
+  "turnTrainToward": {
+    "az": "{at} {toward} istiqamətində {line} qatarı, {to} stansiyasında düş",
+    "en": "Train {line} towards {toward} at {at}, get off at {to}",
+    "et": "Rong {line} suunal {toward} kell {at}, välju jaamas {to}",
+    "ru": "Поезд {line} на {toward} в {at}, выходите на станции {to}"
+  },
   "turnTunnel": {
     "az": "Tunelə gir",
     "en": "Enter the tunnel",

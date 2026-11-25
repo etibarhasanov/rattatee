@@ -271,10 +271,27 @@ THE RIDES ARE NOT in `Views/RideMap.swift`). The two stations of the way
 chosen are on the map as Google's map marks a bus's stops: a white dot at
 each end of the rail, ringed in the rail's darker edge, with the station's
 name beside it, before the ride and during it. A way by train still on
-offer has none (THE STATIONS ARE NAMED, in the same file). While riding, the station is a corner
+offer has none (THE STATIONS ARE NAMED, in the same file).
+
+**Which sign to follow.** The board over a platform and the front of a train
+name where the train is going, not where the rider gets off: the RE33 ridden
+two stops from Balti jaam to Ülemiste says *Narva*. From a station on
+2026-11-25 the owner asked for the app to say which sign to follow, the
+direction or the train's number. So the train's pill reads both, *RE33
+Narva*, as the front of the train does — on the card, and while riding as a
+line of its own under where the rider is going, with the train's two times
+and stations beside it, *06:25 Tallinn → 06:33 Ülemiste*, from Go until the
+rail is behind. The word is the website's `headsign`; where it sends none
+the pill is the line alone, as it was. The voice says it too, about two
+hundred metres before the station and again at it, whatever corners lie
+between: *Train RE33 towards Narva at 06:25, get off at Ülemiste*. It is the
+phone's own voice, since no recording says which train, so it is said in
+English and Russian and only shown in Estonian and Azerbaijani, which iOS
+has no voice for (`TrainLine` in `Views/RecordTab.swift`, `Guide.board`).
+
+While riding, the station is a corner
 like any other, with a train in the row in place of an arrow — *Train RE34
-at 09:31 to Kitseküla* — read once by the phone's own voice on the platform,
-since no recording says which train. On the train the row stays the
+at 09:31 to Kitseküla*. On the train the row stays the
 train's, counting down the kilometres to the station to get off at, from
 every fix on the rail good to 300 m; until 2026-11-25 it stayed at the last
 turn before the platform, since it was worked out from the last point
