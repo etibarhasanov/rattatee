@@ -343,6 +343,17 @@ enum Geo {
         return (x * x + y * y).squareRoot() * 6_371_000
     }
 
+    /// The same between two places that are not points of a ride: a corner
+    /// of a way, a station.
+    static func metres(_ a: CLLocationCoordinate2D, _ b: CLLocationCoordinate2D) -> Double {
+        metres(Point(lat: a.latitude, lng: a.longitude, t: 0, acc: 0),
+               Point(lat: b.latitude, lng: b.longitude, t: 0, acc: 0))
+    }
+
+    /// Metres to a degree of latitude on that same earth, for the sums that
+    /// work in flat metres (`Way.place`) and have to agree with `metres`.
+    static let degree = 6_371_000 * Double.pi / 180
+
     /// The way a line is going at its end, in whole degrees from north:
     /// from the last point at least `over` metres behind its end to the
     /// end, so one fix wandering sideways does not turn it. Nil for a line

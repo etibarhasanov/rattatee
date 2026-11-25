@@ -145,28 +145,40 @@ struct Way: Equatable {
     /// on it is, and how far off the point is from that spot. Measured to
     /// the segments and not the vertices, because a straight street is two
     /// vertices however long it is.
+    ///
+    /// In flat metres around each segment, on `Geo.metres`' own earth, so
+    /// `along` is the line's own length up to the spot wherever on it the
+    /// point is, and agrees with `length(of:)`. Until 2026-11-25 the whole
+    /// line was laid flat around the point, which is good to centimetres
+    /// across a city and was fifty metres out at the far end of a train to
+    /// Keila.
     func place(of here: CLLocationCoordinate2D) -> (along: Double, off: Double) {
         guard line.count > 1 else { return (0, .infinity) }
-        // Flat metres around the point: good to a few centimetres across a city.
-        let north = 111_320.0, east = 111_320.0 * cos(here.latitude * .pi / 180)
-        func flat(_ p: CLLocationCoordinate2D) -> (x: Double, y: Double) {
-            ((p.longitude - here.longitude) * east, (p.latitude - here.latitude) * north)
-        }
         var best = (along: 0.0, off: Double.infinity)
         var run = 0.0
-        var a = flat(line[0])
         for i in 1..<line.count {
-            let b = flat(line[i])
-            let dx = b.x - a.x, dy = b.y - a.y
+            let a = line[i - 1], b = line[i]
+            let east = Geo.degree * cos((a.latitude + b.latitude) / 2 * .pi / 180)
+            let dx = (b.longitude - a.longitude) * east, dy = (b.latitude - a.latitude) * Geo.degree
+            let hx = (here.longitude - a.longitude) * east, hy = (here.latitude - a.latitude) * Geo.degree
             let length = (dx * dx + dy * dy).squareRoot()
-            let t = length > 0 ? min(1, max(0, -(a.x * dx + a.y * dy) / (length * length))) : 0
-            let px = a.x + t * dx, py = a.y + t * dy
-            let off = (px * px + py * py).squareRoot()
+            let t = length > 0 ? min(1, max(0, (hx * dx + hy * dy) / (length * length))) : 0
+            let ox = hx - t * dx, oy = hy - t * dy
+            let off = (ox * ox + oy * oy).squareRoot()
             if off < best.off { best = (run + t * length, off) }
             run += length
-            a = b
         }
         return best
+    }
+
+    /// How long a line is, every step of it counted. Not `Geo.length`, which
+    /// is a ride's and leaves out any step past `Geo.gap` as a walk or a
+    /// lost signal: a railway is drawn with a point at each bend, a
+    /// kilometre apart on a straight, and measured that way the 7.8 km of
+    /// rail from Tallinn to Nõmme came to 4.0.
+    static func length(of line: [CLLocationCoordinate2D]) -> Double {
+        guard line.count > 1 else { return 0 }
+        return (1..<line.count).reduce(0.0) { $0 + Geo.metres(line[$1 - 1], line[$1]) }
     }
 
     /// The corner coming up from a point, and how far along the way it is —
@@ -192,26 +204,14 @@ struct Way: Equatable {
             && a.train == b.train
     }
 
-    /// How much of the way is left from a point: the way from its vertex
-    /// nearest the point to its end. Good to a street's width, which is all
-    /// "1.1 km left" claims.
+    /// How much of the way is left from a point: from the point to the
+    /// nearest spot on the line, and the line from there to its end. Until
+    /// 2026-11-25 it was from the nearest vertex, which on a railway drawn
+    /// a point a kilometre could be half a kilometre out.
     func left(from here: CLLocationCoordinate2D) -> Double {
         guard line.count > 1 else { return 0 }
-        func metres(_ a: CLLocationCoordinate2D, _ b: CLLocationCoordinate2D) -> Double {
-            Geo.metres(Point(lat: a.latitude, lng: a.longitude, t: 0, acc: 0),
-                       Point(lat: b.latitude, lng: b.longitude, t: 0, acc: 0))
-        }
-        var nearest = 0
-        var best = Double.infinity
-        for (i, p) in line.enumerated() {
-            let d = metres(here, p)
-            if d < best { best = d; nearest = i }
-        }
-        var rest = best
-        if nearest + 1 < line.count {
-            for i in (nearest + 1)..<line.count { rest += metres(line[i - 1], line[i]) }
-        }
-        return rest
+        let spot = place(of: here)
+        return spot.off + max(0, Self.length(of: line) - spot.along)
     }
 }
 
@@ -249,6 +249,24 @@ struct Train: Equatable {
             return []
         }
         return [(name: from, at: first), (name: to, at: last)].filter { !$0.name.isEmpty }
+    }
+
+    /// Where the rail begins: the station the train leaves from, where the
+    /// way waits for the rider to find it (`Store.platform`).
+    var boards: CLLocationCoordinate2D? { legs.first(where: { !$0.bike })?.line.first }
+
+    /// The moment the train leaves: `at` on Tallinn's clock, on whichever
+    /// day puts it nearest the moment given, since the website says a time
+    /// and no date and a train a little after midnight is asked for before
+    /// it. Nil where `at` is not a clock time.
+    func leaves(near now: Date) -> Date? {
+        let clock = at.split(separator: ":").compactMap { Int($0) }
+        guard clock.count == 2, let tallinn = TimeZone(identifier: "Europe/Tallinn") else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = tallinn
+        guard let day = calendar.date(bySettingHour: clock[0], minute: clock[1], second: 0, of: now) else { return nil }
+        let apart = day.timeIntervalSince(now)
+        return abs(apart) <= 12 * 3600 ? day : day.addingTimeInterval(apart > 0 ? -86_400 : 86_400)
     }
 
     /// The train as its own front says it, "RE33 Narva": the line and where
@@ -326,6 +344,9 @@ struct Goal: Equatable {
     /// nothing of the way the rider will. Cleared once a new way is asked,
     /// or the rider is on the way again (CARRIED, NOT RIDDEN in Store.swift).
     var alighted = false
+    /// At the station of a way by train, looking for the platform: the way
+    /// waits, and the row says which train to take (`Store.platform`).
+    var atStation = false
     /// Where along the way the rider is on the train of a way by train,
     /// from the last fix placed on its rail: what the row counts down to
     /// the station to get off at. Nil off the rail, and cleared by the
@@ -540,7 +561,15 @@ enum Search {
         let said = ["line": rail.raw["name"] as? String ?? "", "at": rail.raw["at"] as? String ?? "",
                     "to": rail.raw["to"] as? String ?? "", "toward": rail.raw["headsign"] as? String ?? ""]
         for (i, leg) in legs.enumerated() {
-            let length = Geo.length(leg.line.map { Point(lat: $0.latitude, lng: $0.longitude, t: 0, acc: 0) })
+            // Where the leg begins along the whole line, as `Way.place`
+            // measures it: every step of the legs before it — a rail's long
+            // straights too, which `Geo.length` left out until 2026-11-25,
+            // so the turns of the ride on from Keila were placed eighteen
+            // kilometres early, in the middle of the train, and none was
+            // shown or said once the rider got off — and the step from one
+            // leg's end to the next one's start.
+            if let last = line.last { start += Geo.metres(last, leg.line[0]) }
+            let length = Way.length(of: leg.line)
             if leg.bike {
                 // Each ride's turns placed on that ride alone, so a turn
                 // cannot snap to another part of the trip that passes by.

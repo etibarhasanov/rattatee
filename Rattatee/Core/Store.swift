@@ -331,6 +331,7 @@ final class Store {
         goal.astray = 0
         goal.adrift = 0
         goal.railAlong = nil
+        goal.atStation = false
         guide.forget()
     }
 
@@ -402,6 +403,16 @@ final class Store {
     /// of a way by train the train is: wider, and the kilometres the row
     /// counts down would jump about by as much.
     static let railSure: Double = 300
+    /// The station of a way by train is this near, as the crow flies, and
+    /// the rider is at it (`platform`); and this far, and they have left it.
+    static let stationNear: Double = 250
+    static let stationLeft: Double = 500
+    /// Carried this far down the rail, and the train has left with the
+    /// rider on it.
+    static let boardedAfter: Double = 300
+    /// And this long after the train was to leave, a rider still at the
+    /// station has missed it, and the way is followed again.
+    static let missedAfter: TimeInterval = 300
     /// After a new way, how far the rider may ride before its others stop
     /// being a choice and the first is simply the way. By then the ways
     /// have long parted, or are so nearly one that it makes no difference.
@@ -535,6 +546,7 @@ final class Store {
             goal.adrift = 0
             goal.back = 0
             goal.alighted = true
+            goal.atStation = false
             self.goal = goal
         }
         carriedAt = Date()
@@ -550,16 +562,81 @@ final class Store {
     private func unsure(_ fix: Point) {
         guard !demo, let i = currentIndex, rides[i].status == .recording, let since = rides[i].since,
               fix.t >= since.timeIntervalSince1970 - 1 else { return }
-        if var goal, case .found(let way) = goal.way, let train = way.train,
+        if let goal, case .found(let way) = goal.way, let train = way.train,
            goal.along <= train.rail.upperBound {
             let spot = way.place(of: fix.coordinate)
             if fix.acc <= Self.railSure, spot.off <= fix.acc + Way.astray, train.rail.contains(spot.along) {
-                goal.railAlong = spot.along
-                self.goal = goal
+                onRail(spot.along, of: way)
             }
             return
         }
         note(fix)
+    }
+
+    /// The train of a way by train is `along` its rail: what the row counts
+    /// down to the station to get off at, the end of waiting at the first
+    /// one once the train has carried the rider off, and "Get off at" said
+    /// before the last (`Guide.alight`).
+    private func onRail(_ along: Double, of way: Way) {
+        guard var goal, let train = way.train else { return }
+        goal.railAlong = along
+        if along - train.rail.lowerBound >= Self.boardedAfter { goal.atStation = false }
+        self.goal = goal
+        guide.alight(along, on: way)
+    }
+
+    /// AT THE STATION
+    ///
+    /// Riding to the station of a way by train, the way is the router's to
+    /// a point on the platform, and nobody rides to that point. They lock
+    /// up nowhere, wheel the bike through the station, find the subway,
+    /// take the lift, stand on a platform — at Ülemiste across the tracks
+    /// from where the router ends. On 2026-11-25 the owner reported what
+    /// the app made of it: the last turns of the ride there, then "You're
+    /// off the way", then, after half a minute of wheeling the bike, a new
+    /// way — by bike, since a new way leaves trains out — which pointed
+    /// somewhere else entirely. Their words: it can be silent and let
+    /// people find the train, and give an instruction there.
+    ///
+    /// So within `stationNear` of the station, the way waits. No turn is
+    /// said or shown, nobody is told they are off the way, and no new way
+    /// is asked, nor taken if one asked on the way there comes back now.
+    /// The row says which train to take — its line and where it is going,
+    /// the sign on the platform's board — when it leaves, and where to get
+    /// off; and the voice says the same once, on arriving (`Guide.station`).
+    ///
+    /// It waits until the train has the rider — the phone fast enough to
+    /// be carried, or `boardedAfter` along the rail — or until they are
+    /// `stationLeft` from the station, or `missedAfter` past the time the
+    /// train was to leave. Then the way is followed as any is: on the train
+    /// as CARRIED, NOT RIDDEN says, and anywhere else as a ride, which off
+    /// the way asks a new one in time. It asks nothing of its own.
+    ///
+    /// True while the way waits, when `add` has nothing more to do with
+    /// the point.
+    private func platform(_ point: Point) -> Bool {
+        guard var goal, case .found(let way) = goal.way, let train = way.train,
+              let station = train.boards else { return false }
+        let near = Geo.metres(point.coordinate, station)
+        let moved = goal.railAlong.map { $0 - train.rail.lowerBound >= Self.boardedAfter } ?? false
+        let gone = train.leaves(near: Date(timeIntervalSince1970: point.t))
+            .map { point.t - $0.timeIntervalSince1970 > Self.missedAfter } ?? false
+        let waits = !carried && !moved && !gone
+        if goal.atStation {
+            if waits && near <= Self.stationLeft { return true }
+            goal.atStation = false
+            self.goal = goal
+            return false
+        }
+        // Only on the way there: after the train the rail is behind.
+        guard waits, near <= Self.stationNear, goal.along <= train.rail.lowerBound else { return false }
+        goal.atStation = true
+        goal.lost = nil
+        goal.astray = 0
+        goal.back = 0
+        self.goal = goal
+        guide.station(on: way)
+        return true
     }
 
     /// Where the phone is, from a fix the way is not followed by: too
@@ -642,6 +719,14 @@ final class Store {
         let ways = await Search.ways(from: here, to: asked.spot.coordinate, heading: heading)
             .filter { $0.train == nil }
         guard var goal = self.goal, goal.spot.id == asked.spot.id else { return }
+        // Asked on the way to the station of a way by train and answered
+        // once the rider is at it: the train is what they came for, and a
+        // way by bike from the platform is the wrong direction (`platform`).
+        guard !goal.atStation else {
+            goal.lost = nil
+            self.goal = goal
+            return
+        }
         guard !ways.isEmpty else {
             goal.lost?.finding = false
             goal.lost?.failed = Date()
@@ -684,7 +769,18 @@ final class Store {
             // phone guessing. Not riding either way, but carried rather
             // than dropped: Finish tells the two apart (`Timeline.runs`).
             // It still says where the phone is: `note`.
-            if d / max(1, point.t - last.t) > Self.jump { carry(point, in: i); note(point); return }
+            //
+            // Judged from the last fix taken, kept or carried. Until
+            // 2026-11-25 it was the last one kept, which after a train is
+            // the platform it left from, so off any train quicker than
+            // 60 km/h door to door every point was still "faster than a
+            // bike", on the average of the whole journey, until that
+            // average fell: by the sum, forty minutes of riding after the
+            // two-hour express from Tallinn to Tartu, carried and never
+            // followed.
+            var from = last
+            if let carried = rides[i].carried?.last, carried.t > last.t { from = carried }
+            if Geo.metres(from, point) / max(1, point.t - from.t) > Self.jump { carry(point, in: i); note(point); return }
         }
         // On the train of a way by train, the phone is moving and the bike
         // is not being ridden: a point kept there would save the railway as
@@ -696,8 +792,10 @@ final class Store {
             let spot = way.place(of: point.coordinate)
             if spot.off <= Way.astray && train.rail.contains(spot.along) {
                 // Not riding, but where along the rail the train is, for
-                // the row (`Goal.railAlong`).
-                goal?.railAlong = spot.along
+                // the row (`Goal.railAlong`) — and, on the platform, where
+                // the rider waits for it (`platform`).
+                onRail(spot.along, of: way)
+                _ = platform(point)
                 carry(point, in: i)
                 return
             }
@@ -707,7 +805,12 @@ final class Store {
         if case .found = goal?.way {
             // On a train or in a car the way waits: the point says where
             // the phone is, and no more (CARRIED, NOT RIDDEN).
-            if carried { note(point) } else { follow(point, after: before, ridden: rides[i].metres) }
+            // At the station of a way by train it waits too (`platform`).
+            if carried {
+                note(point)
+            } else if !platform(point) {
+                follow(point, after: before, ridden: rides[i].metres)
+            }
         }
         unwritten += 1
         if unwritten >= Self.writeEvery { write(rides[i]) }

@@ -291,15 +291,53 @@ has no voice for (`TrainLine` in `Views/RecordTab.swift`, `Guide.board`).
 
 While riding, the station is a corner
 like any other, with a train in the row in place of an arrow — *Train RE34
-at 09:31 to Kitseküla*. On the train the row stays the
-train's, counting down the kilometres to the station to get off at, from
-every fix on the rail good to 300 m; until 2026-11-25 it stayed at the last
-turn before the platform, since it was worked out from the last point
-ridden. Nothing is recorded there: a
+at 09:31 to Kitseküla* — until the rider is at it.
+
+**At the station, the way waits.** The way there is the router's, to a point
+on the platform, and nobody rides to that point: they wheel the bike through
+the station, find the subway or the lift, and stand on a platform — at
+Ülemiste across the tracks from where the router ends. On 2026-11-25 the
+owner reported what the app made of that: the last turns of the ride there,
+then *You're off the way*, then, after half a minute of wheeling the bike, a
+new way by bike, since a new way leaves trains out, pointing somewhere else
+entirely. Their words: it can be silent and let people find the train, and
+give an instruction there. So within 250 m of the station, as the crow
+flies, no turn is shown or said, nobody is told they are off the way, and
+no new way is asked — nor taken, if one asked on the way there comes back
+then. The row is the train's, on its orange: *Take the RE33 Narva* and
+*Leaves 06:25 · get off at Ülemiste*, the sign on the platform's board, the
+time and the stop. The voice says the train once on arriving. It waits
+until the train has the rider — the phone fast enough to be carried, or
+300 m along the rail — or until they are 500 m from the station, or five
+minutes past the time the train was to leave; then the way is followed as
+any is, and a rider who missed the train and rides off is given a new way
+by bike in time. It asks nothing of its own (`Store.platform`, AT THE
+STATION in `Core/Store.swift`).
+
+**On the train, where to get off.** The row counts down to the station to
+get off at — *3.9 km · Get off at Nõmme* — from every fix on the rail good
+to 300 m, and the phone's voice says *Get off at Nõmme* once, 600 m before
+it, with the bike still to be lifted off its hook (`Guide.alight`). Until
+2026-11-25 the row was the train's sentence again and nothing was said on
+the train at all. Nothing is recorded there: a
 point on the rail stretch of the way is not kept, so a saved ride is never
 a railway, and it goes on from the far station. The clock keeps running, as
 it does at a red light. A website from before the trains answers without
 them, and the app offers the bike ways as it always did.
+
+**The rail is measured whole.** A railway is drawn with a point at each
+bend, a kilometre apart on a straight, and until 2026-11-25 a way by train
+was measured as a ride is, by `Geo.length`, which leaves out any step over
+250 m as a walk or a lost signal. Asked for the train from Tallinn to Nõmme,
+the website answered 7.8 km of rail, and the app made it 4.0; to Keila,
+26.7 km made 8.7. Everything after the rail was placed that much early: the
+turns of the ride on from Keila eighteen kilometres back, in the middle of
+the train, so none was shown or said once the rider got off, and the far
+half of the rail was not the rail, so the station to get off at was nowhere
+on it. A leg is measured whole now, with the step from one leg to the next
+(`Way.length`), and a point is placed on a way in the same metres wherever
+on it the point is (`Way.place`), which until then was fifty metres out at
+the far end of the train to Keila.
 
 **The turns, shown and said.** The website says where the way turns, and
 under the numbers a row shows the next corner: an arrow, how far, what to
@@ -537,7 +575,9 @@ phone.
 
 - A point is kept when it is at least **12 m** from the last kept point and
   the fix is accurate to **30 m** or better.
-- A jump faster than **60 km/h** between two kept points is dropped.
+- A step faster than **60 km/h** from the last fix taken, kept or carried,
+  is not riding: it is carried, not kept (**A ride is the session it
+  was**).
 - Coordinates are rounded to **5 decimals**.
 - Every kept point also carries its **time** and its **accuracy**.
 - Core Location is asked for the `fitness` activity and the best accuracy,
@@ -602,8 +642,11 @@ by train or car, waiting, stopped — each with when it began, how far, how
 long, and the speed where it moved.
 
 - **A train is carried, not dropped.** A point too fast for a bike (over
-  60 km/h from the last one kept), or on the rails of a way by train, goes
-  into `Ride.carried`, one every 50 m. At Finish the carried points are
+  60 km/h from the last fix taken, kept or carried), or on the rails of a
+  way by train, goes into `Ride.carried`, one every 50 m. Until 2026-11-25
+  it was from the last one kept, which after a train is the platform it
+  left from, so off one quicker than 60 km/h door to door the riding was
+  carried too, and never followed, until the average fell. At Finish the carried points are
   gathered into the journeys they were — cut where two are more than two
   minutes apart, and only runs of four points and 300 m, since less is the
   fix jumping — and each goes to `Ride.aside` marked `vehicle` in
