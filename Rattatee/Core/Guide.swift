@@ -117,17 +117,43 @@ final class Guide {
 
     /// One point of the ride, on the way being ridden.
     func hear(_ here: CLLocationCoordinate2D, on way: Way) {
+        guard voice else { return }
+        turns(here, on: way)
+        board(here, on: way)
+    }
+
+    /// The train of a way by train, said on the way to its station: which
+    /// train, where it is going and where to get off — "Train RE33 towards
+    /// Narva at 06:25, get off at Ülemiste" — since the platform's board
+    /// names where the train is going and not the rider's stop. No
+    /// recording can say which train, so the phone's own voice reads it,
+    /// where it has one for the language.
+    ///
+    /// Twice, as a corner is: from `soon`'s far end, whatever corners are
+    /// still between, and again within `now` of the station. Until
+    /// 2026-11-25 it was the second alone, and only once the station was
+    /// the next corner — on the platform, after the choice of platform was
+    /// made, and mostly not at all, since a point that near the rail is the
+    /// train's and never reaches here. After the corner at this point and
+    /// never over one being said, though a corner just after may cut it
+    /// short, which is what the second time is for.
+    private func board(_ here: CLLocationCoordinate2D, on way: Way) {
+        guard !talking, let station = way.steps.first(where: { $0.turn == .train }) else { return }
+        let spot = way.place(of: here)
+        let left = station.along - spot.along
+        guard spot.off <= Way.astray, left >= 0, left <= Self.soon.upperBound else { return }
+        guard said.insert(left <= Self.now ? "train-now" : "train-soon").inserted else { return }
+        speak(station.said)
+    }
+
+    /// The corner coming up, said about two hundred metres before it and
+    /// at it.
+    private func turns(_ here: CLLocationCoordinate2D, on way: Way) {
         // A roundabout is shown and not said, at the owner's word: a bike
         // is mostly on a path beside one, and "take the second exit" is a
-        // sentence for a car.
-        guard voice, let next = way.next(from: here) else { return }
+        // sentence for a car. A station is `board`'s to say.
+        guard let next = way.next(from: here) else { return }
         let corner = "\(Int(next.step.along))"
-        // The station of a way by train: no recording says which train, so
-        // the phone's own voice reads the row, once, on the platform.
-        if next.step.turn == .train {
-            if next.metres <= Self.now, said.insert(corner + "-now").inserted { speak(next.step.words) }
-            return
-        }
         guard let turn = clip(next.step) else { return }
         if next.metres <= Self.now {
             guard said.insert(corner + "-now").inserted else { return }

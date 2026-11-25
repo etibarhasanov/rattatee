@@ -69,6 +69,16 @@ final class Store {
     /// search, drawn on the map, and gone when the ride is saved or thrown
     /// away. Kept in memory only; a ride does not need one.
     var goal: Goal?
+    /// When the phone last measured itself going faster than any bike, for
+    /// `carriedFixes` fixes running (`moving`). Less than `carriedFor` ago,
+    /// the rider is on a train or in a car, and the way waits — CARRIED,
+    /// NOT RIDDEN, below.
+    private(set) var carriedAt: Date?
+    @ObservationIgnored private var fastFixes = 0
+
+    var carried: Bool {
+        carriedAt.map { Date().timeIntervalSince($0) < Self.carriedFor } ?? false
+    }
 
     /// The ride whose save the Record tab is showing the outcome of.
     var shown: String?
@@ -126,6 +136,8 @@ final class Store {
         }
 
         recorder.onPoint = { [weak self] point in self?.add(point) }
+        recorder.onUnsure = { [weak self] fix in self?.unsure(fix) }
+        recorder.onSpeed = { [weak self] slowest in self?.moving(slowest) }
         guide.radio = radio
         radio.guide = guide
 
@@ -159,6 +171,8 @@ final class Store {
         guard recorder.precise else { return }
         let ride = Ride(id: UUID().uuidString.lowercased(), started: Date(), status: .recording, since: Date())
         rides.insert(ride, at: 0)
+        carriedAt = nil
+        fastFixes = 0
         shown = nil
         write(ride)
         // The radio first, if it was on last ride, so the greeting finds it
@@ -240,6 +254,8 @@ final class Store {
     /// is, if it had not yet.
     func head(to spot: Spot) {
         goal = Goal(spot: spot)
+        // Chosen on a train: the way the train is going is not the rider's.
+        goal?.alighted = carried
         // Where to? opens on where the rider has been (`Recents`).
         if !demo { Recents.shared.add(spot) }
         guide.forget()
@@ -282,7 +298,7 @@ final class Store {
         // going, as a new way off the old one does (`reroute`): nil before
         // a ride, when there is no line to take a heading from.
         let riding = current.map { [.recording, .paused].contains($0.status) } ?? false
-        let heading = riding ? Geo.heading(current?.points ?? []) : nil
+        let heading = riding && !carried ? Geo.heading(current?.points ?? []) : nil
         let ways = await Search.ways(from: here, to: goal.spot.coordinate, heading: heading)
         // Only if it is still the place that was asked about.
         // By id: a pin's address may have arrived meanwhile.
@@ -313,6 +329,8 @@ final class Store {
         goal.along = 0
         goal.back = 0
         goal.astray = 0
+        goal.adrift = 0
+        goal.railAlong = nil
         guide.forget()
     }
 
@@ -335,9 +353,55 @@ final class Store {
     static let farOff: Double = 150
     static let farBack: Double = 150
     static let lostFor: Double = 250
-    /// Not asked again sooner than this after it answered nothing, so a
-    /// tunnel or a dead signal is not a request every point.
+    /// Or this long ridden since it was said, in seconds, and the rider
+    /// still not back — `Lost.seconds`, which leaves out a leg spent
+    /// standing. The owner's word on 2026-11-25: somebody riding somewhere
+    /// else for more than thirty seconds is not at a shop and not cutting a
+    /// corner, it is ongoing, so just find the new way and go. Until then a
+    /// rider who stayed between `Way.astray` and `farOff` of the way was
+    /// told they were off it and then left with the old way for 250 m —
+    /// most of a minute at a bike's pace, and nearer a minute and a half on
+    /// a path. At thirty kilometres an hour and faster `lostFor` still
+    /// comes first.
+    ///
+    /// WHAT IT ASKS, IN REQUESTS A RIDDEN HOUR
+    ///
+    /// One request each time, the website's question with a `heading`: the
+    /// router's own way, no row read for it, and two rows by key for a
+    /// rider who is signed in. By this rule it cannot be asked sooner than
+    /// thirty seconds of riding after it was said, and it is said two
+    /// points off a way that set off the way the rider was going, so under
+    /// 120 a ridden hour from somebody who never once rides the way they
+    /// are given — nearer 70 at 18 km/h, a street over from every way,
+    /// where the 250 m it comes before made 50. That is the worst of it and
+    /// not the ride: an ordinary ride gains one request for each time its
+    /// rider left the way for longer than half a minute and would have been
+    /// back on it within 250 m. `farOff` and `farBack` are as they were.
+    static let lostSeconds: TimeInterval = 30
+    /// Not asked again sooner than this after it was last asked, whatever
+    /// came back, so a tunnel or a dead signal is not a request every
+    /// point — and neither is a bus or a slow train whose points are kept
+    /// as riding, which leaves each new way within seconds of getting it.
+    /// Until 2026-11-24 it held only after an answer of nothing. A hundred
+    /// and twenty requests a ridden hour at the very worst, from somebody
+    /// who never once rides the way they are given.
     static let rerouteEvery: TimeInterval = 30
+    /// Faster than this, as the phone measures itself, is not a bike: a
+    /// train, a bus or a car. 40 km/h, which a bike in Tallinn sees only
+    /// downhill, and an Elron train between two stations is well past.
+    static let carriedSpeed: Double = 40 / 3.6
+    /// Fixes in a row that fast before it counts, a second or so apart, so
+    /// one fix the satellites got wrong is not a train.
+    static let carriedFixes = 3
+    /// And for how long after the last of them the rider is still carried:
+    /// a train standing at a station is still a train. Two minutes covers
+    /// the slowing, the doors and the setting off again, and after the last
+    /// station the walk off the platform.
+    static let carriedFor: TimeInterval = 120
+    /// The widest circle a fix may have and still say where along the rail
+    /// of a way by train the train is: wider, and the kilometres the row
+    /// counts down would jump about by as much.
+    static let railSure: Double = 300
     /// After a new way, how far the rider may ride before its others stop
     /// being a choice and the first is simply the way. By then the ways
     /// have long parted, or are so nearly one that it makes no difference.
@@ -350,6 +414,10 @@ final class Store {
     /// point first.
     private func follow(_ point: Point, after before: Point?, ridden: Double) {
         guard var goal = self.goal, goal.lost?.finding != true else { return }
+        // A point kept knows better than the fixes that were not (`note`),
+        // and is not on a train.
+        goal.adrift = 0
+        goal.railAlong = nil
         if pick(point, in: &goal, ridden: ridden) { self.goal = goal; return }
         // Read after `pick`, which may have made another of the ways the way.
         guard case .found(let way) = goal.way else { return }
@@ -376,31 +444,148 @@ final class Store {
         if !surelyOff && !back {
             // On the way, or not yet surely off it.
             goal.lost = nil
+            goal.alighted = false
             self.goal = goal
             if !off { guide.hear(point.coordinate, on: way) }
             return
         }
 
         let kind: Lost.Kind = off ? .off : .back
+        // How long it has gone on since it was said, counted in riding: the
+        // leg to this point, unless it was spent standing. Nothing to add
+        // to at the point it is first said.
+        if let before, !Timeline.still(before, point) { goal.lost?.seconds += point.t - before.t }
         if goal.lost == nil || goal.lost?.kind != kind {
-            goal.lost = Lost(kind: kind, since: goal.lost?.since ?? ridden, metres: spot.off,
-                             failed: goal.lost?.failed)
+            goal.lost = Lost(kind: kind, since: goal.lost?.since ?? ridden, seconds: goal.lost?.seconds ?? 0,
+                             metres: spot.off, failed: goal.lost?.failed)
             guide.warn(kind)
         }
         goal.lost?.metres = spot.off
 
         if let lost = goal.lost, !demo {
             let wrong = off ? spot.off >= Self.farOff : goal.back >= Self.farBack
-            let long = ridden - lost.since >= Self.lostFor
-            let waited = lost.failed.map { Date().timeIntervalSince($0) >= Self.rerouteEvery } ?? true
+            let long = ridden - lost.since >= Self.lostFor || lost.seconds >= Self.lostSeconds
+            let waited = goal.asked.map { Date().timeIntervalSince($0) >= Self.rerouteEvery } ?? true
             if (wrong || long) && waited {
                 // Marked before the question goes, so the points that arrive
                 // while it is out do not ask it again.
                 goal.lost?.finding = true
+                goal.asked = Date()
                 let here = point.coordinate
-                let heading = Geo.heading(current?.points ?? [])
+                // Just off a train, the way it was going says nothing.
+                let heading = goal.alighted ? nil : Geo.heading(current?.points ?? [])
+                goal.alighted = false
                 Task { await reroute(from: here, heading: heading) }
             }
+        }
+        self.goal = goal
+    }
+
+    // MARK: Carried, not ridden
+
+    /// CARRIED, NOT RIDDEN
+    ///
+    /// A train, a bus or a car with the bike in it is not riding, and a way
+    /// by bike cannot be followed from one. Until 2026-11-25 the app could
+    /// not tell. A train going under 60 km/h between two fixes was riding to
+    /// it, so `follow` judged every point: off the way, a new way asked from
+    /// the moving train, its first turn shown and said, the train past it
+    /// and off that way too — a new way every 150 m and a left or a right
+    /// with each, which is what the owner reported from a train. And where
+    /// the carriage gave no fix good enough to keep, the opposite: on
+    /// 2026-11-24 the last point was on the platform at Balti jaam, a
+    /// hundred metres from the way, and the row said "You're off the way ·
+    /// 100 m from it" for the whole train.
+    ///
+    /// So the phone's own speed is listened to (`Recorder.onSpeed`). It
+    /// measures it from the satellites, fix by fix, far better than two
+    /// positions can; `carriedFixes` fixes in a row faster than any bike
+    /// (`carriedSpeed`) and the rider is carried, until `carriedFor` after
+    /// the last. While carried the way waits. No point is followed, no turn
+    /// is shown or said — but a way by train's own row, which says where to
+    /// get off — and nothing is asked of the website. The row says only how
+    /// far from the way the phone is, once that is plainly far (`note`),
+    /// and the line over it how far from the place, from where the phone
+    /// is. Riding again, the first point kept is followed as any is, and
+    /// off the way a new way is asked from there, once, with no heading:
+    /// the way the train went says nothing of the way the rider will
+    /// (`Goal.alighted`).
+    ///
+    /// Where the phone gives no speed — inside a carriage it may know where
+    /// it is only to a kilometre — nothing is kept to follow either, and
+    /// the fixes it does give move the row (`unsure`). A new way then waits
+    /// for the first point ridden after it, as above.
+    ///
+    /// What is recorded does not change: a slow train is still kept as
+    /// riding, and Finish still sets apart only what was too fast or what
+    /// the coprocessor says was driven.
+
+    /// The phone's own speed, from `Recorder.onSpeed`: the slowest a fix
+    /// could have been going, in metres a second.
+    private func moving(_ slowest: Double) {
+        guard !demo, let i = currentIndex, rides[i].status == .recording else { return }
+        guard slowest >= Self.carriedSpeed else { fastFixes = 0; return }
+        fastFixes += 1
+        guard fastFixes >= Self.carriedFixes else { return }
+        if !carried, var goal = self.goal {
+            // On board: what the row said of the platform is not true of
+            // the train, and whatever comes next starts from nothing.
+            if goal.lost?.finding != true { goal.lost = nil }
+            goal.astray = 0
+            goal.adrift = 0
+            goal.back = 0
+            goal.alighted = true
+            self.goal = goal
+        }
+        carriedAt = Date()
+    }
+
+    /// A fix too unsure to be a point of the ride, from `Recorder.onUnsure`.
+    ///
+    /// The train of a way by train is not weighed by it until the rail is
+    /// behind: the rail is the way, and a fix a kilometre wrong, twice,
+    /// would say the rider sitting on it was off it. Where its circle takes
+    /// in the rail, and is no wider than `railSure`, it says where along the
+    /// rail the train is, for the row (`Goal.railAlong`).
+    private func unsure(_ fix: Point) {
+        guard !demo, let i = currentIndex, rides[i].status == .recording, let since = rides[i].since,
+              fix.t >= since.timeIntervalSince1970 - 1 else { return }
+        if var goal, case .found(let way) = goal.way, let train = way.train,
+           goal.along <= train.rail.upperBound {
+            let spot = way.place(of: fix.coordinate)
+            if fix.acc <= Self.railSure, spot.off <= fix.acc + Way.astray, train.rail.contains(spot.along) {
+                goal.railAlong = spot.along
+                self.goal = goal
+            }
+            return
+        }
+        note(fix)
+    }
+
+    /// Where the phone is, from a fix the way is not followed by: too
+    /// unsure to keep (`unsure`), too fast for a bike between two points
+    /// (`add`), or any point while the rider is carried. It moves the row
+    /// and nothing else. Plainly far from the way — `farOff` once the fix's
+    /// own accuracy is taken off, so one good to 600 m has to be 750 m off —
+    /// two fixes running, and the row says so and how far. Nothing is said
+    /// aloud and no way is asked from here: a new way waits for a point
+    /// that is ridden (`follow`).
+    private func note(_ fix: Point) {
+        guard var goal = self.goal, goal.lost?.finding != true, case .found(let way) = goal.way else { return }
+        // Far from the way, and from every other still on offer.
+        let ways = goal.picking == nil ? [way] : goal.ways
+        let off = ways.map { $0.place(of: fix.coordinate).off }.min() ?? .infinity
+        guard off - fix.acc >= Self.farOff else {
+            if goal.adrift > 0 { goal.adrift = 0; self.goal = goal }
+            return
+        }
+        goal.adrift += 1
+        if goal.adrift >= Self.astrayPoints {
+            if goal.lost?.kind != .off {
+                goal.lost = Lost(kind: .off, since: goal.lost?.since ?? (current?.metres ?? 0), metres: off,
+                                 failed: goal.lost?.failed)
+            }
+            goal.lost?.metres = off
         }
         self.goal = goal
     }
@@ -442,9 +627,10 @@ final class Store {
     /// A new way to the same place, from where the rider is now and setting
     /// off the way they are going: somebody who has ridden this far past
     /// "Going the wrong way" means it, and a new way that began "Turn
-    /// around" would only say it again. It takes the place of the old one,
-    /// turns and all, and the voice starts over on it; with no answer, the
-    /// old one stays and it is asked again later.
+    /// around" would only say it again. Just off a train (`Goal.alighted`)
+    /// nobody is going any way yet, and it is asked with no heading. It takes the place
+    /// of the old one, turns and all, and the voice starts over on it; with
+    /// no answer, the old one stays and it is asked again later.
     ///
     /// Where the website answers more than one — up to five — the first
     /// is the way and the others are drawn faint beside it with a button
@@ -497,7 +683,8 @@ final class Store {
             // Too fast for a bike is a train, a bus or a car — or the
             // phone guessing. Not riding either way, but carried rather
             // than dropped: Finish tells the two apart (`Timeline.runs`).
-            if d / max(1, point.t - last.t) > Self.jump { carry(point, in: i); return }
+            // It still says where the phone is: `note`.
+            if d / max(1, point.t - last.t) > Self.jump { carry(point, in: i); note(point); return }
         }
         // On the train of a way by train, the phone is moving and the bike
         // is not being ridden: a point kept there would save the railway as
@@ -507,12 +694,20 @@ final class Store {
         // train as a train.
         if case .found(let way) = goal?.way, let train = way.train {
             let spot = way.place(of: point.coordinate)
-            if spot.off <= Way.astray && train.rail.contains(spot.along) { carry(point, in: i); return }
+            if spot.off <= Way.astray && train.rail.contains(spot.along) {
+                // Not riding, but where along the rail the train is, for
+                // the row (`Goal.railAlong`).
+                goal?.railAlong = spot.along
+                carry(point, in: i)
+                return
+            }
         }
         let before = rides[i].points.last
         rides[i].points.append(point)
         if case .found = goal?.way {
-            follow(point, after: before, ridden: rides[i].metres)
+            // On a train or in a car the way waits: the point says where
+            // the phone is, and no more (CARRIED, NOT RIDDEN).
+            if carried { note(point) } else { follow(point, after: before, ridden: rides[i].metres) }
         }
         unwritten += 1
         if unwritten >= Self.writeEvery { write(rides[i]) }

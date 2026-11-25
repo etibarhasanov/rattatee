@@ -164,6 +164,10 @@ jobs:
           # by night.
           shot 40-goal-train -kDemo train
           shot 41-goal-train-dark -kDemo train -look dark -hue green
+          # Riding that way to its station: which train and where it is
+          # going, under where the rider is going, in English and Estonian.
+          shot 42-boarding -kDemo boarding
+          shot 43-boarding-et -kDemo boarding -AppleLanguages '(et)'
           # The radio: on, with no signal, and its list of stations.
           shot 26-radio -kDemo going -kRadio playing
           shot 27-radio-lost -kDemo recording -kRadio lost
