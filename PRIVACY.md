@@ -8,7 +8,9 @@ sends goes to [tallinntastebuds.ee](https://tallinntastebuds.ee), whose
 [privacy page](https://tallinntastebuds.ee/privacy) covers what that site
 keeps. This page says what the app does.
 
-For anything about your data, write to info@avidatech.eu.
+The data is kept by tallinntastebuds.ee, which Etibar Hasanov runs, and he is
+the data controller. For anything about your data, write to
+hasanovetibar@gmail.com.
 
 ## What stays on your phone
 
