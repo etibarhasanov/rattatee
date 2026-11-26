@@ -1,6 +1,6 @@
 # Rattatee privacy policy
 
-*Last updated 23 November 2026.*
+*Last updated 26 November 2026.*
 
 Rattatee is an iPhone app that records bike rides. It is published on the
 App Store by Avida TECH OU, and it has no server of its own: everything it
@@ -48,9 +48,10 @@ the app then cannot record a ride.
   account: the way you rode with the first and last 200 metres taken off,
   so where you start and stop is not kept; its length, times and name; and
   the numbers of the whole ride, such as distance, riding time and top
-  speed, which it adds up into totals only you can see. Anyone can ask the
-  site for the way of a ride, but never with your username or the ride's
-  name.
+  speed, which it adds up into totals only you can see. Nobody else can ask
+  the site for a ride: the way of one is read only by you, signed in, and by
+  the site's owner, who sees it without your username or the ride's name
+  when looking for shortcuts the map does not know.
 
 ## Accounts
 
