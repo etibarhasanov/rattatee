@@ -932,3 +932,9 @@ Connect refuses an icon that has one, even a fully opaque one.
 
 None of the three can be checked from a cloud session. CI proves the app
 compiles and draws its screens; the ride itself needs a phone and a bike.
+
+## Licence
+
+Open source under the MIT licence (`LICENSE`), © 2026 Etibar Hasanov, who
+writes it. Rattatee is published on the App Store by Avida TECH OÜ under that
+licence. The name and the icon are the app's own and not part of the licence.
