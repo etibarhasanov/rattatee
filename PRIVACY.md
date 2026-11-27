@@ -1,6 +1,15 @@
 # Rattatee privacy policy
 
-*Last updated 26 November 2026.*
+*Last updated 27 November 2026.*
+
+**On this page:**
+[What this project is for](#what-this-project-is-for) ·
+[What stays on your phone](#what-stays-on-your-phone) ·
+[Location](#location) ·
+[What is sent, and when](#what-is-sent-and-when) ·
+[Accounts](#accounts) ·
+[What the app does not do](#what-the-app-does-not-do) ·
+[Changes](#changes)
 
 Rattatee is an iPhone app that records bike rides. It is published on the
 App Store by Avida TECH OU, and it has no server of its own: everything it
@@ -9,6 +18,19 @@ sends goes to [tallinntastebuds.ee](https://tallinntastebuds.ee), whose
 keeps. This page says what the app does.
 
 For anything about your data, write to info@avidatech.eu.
+
+## What this project is for
+
+Rattatee is part of Tallinn Tastebuds, a free resource: nothing in it costs
+anything to use. It was started by
+[Etibar Ädalät](https://tallinntastebuds.ee/u/etibar) for Tallinn
+Tastebuds.
+
+It is here to help restaurants, by bringing people to the places on
+[the map](https://tallinntastebuds.ee); to help people who ride a bike, with
+ways across the city and this app, which records a ride — in the hope that
+riders will use it to deliver food too; and to help people learn Estonian,
+with flashcards of the words a restaurant and a menu use, and more besides.
 
 ## What stays on your phone
 
