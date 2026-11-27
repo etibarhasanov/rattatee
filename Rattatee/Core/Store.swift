@@ -294,11 +294,11 @@ final class Store {
 
     func findWay() async {
         guard !demo, let goal, goal.way == .looking, let here = recorder.here else { return }
-        // Chosen mid-ride, the way sets off the way the rider is already
-        // going, as a new way off the old one does (`reroute`): nil before
-        // a ride, when there is no line to take a heading from.
-        let riding = current.map { [.recording, .paused].contains($0.status) } ?? false
-        let heading = riding && !carried ? Geo.heading(current?.points ?? []) : nil
+        // Chosen while going, the way sets off the way the rider is going,
+        // as a new way off the old one does (`reroute`). Standing still,
+        // paused or before a ride it is asked with no heading — STANDING,
+        // NOT GOING, below.
+        let heading = Self.going(current, carried: carried) ? Geo.heading(current?.points ?? []) : nil
         let ways = await Search.ways(from: here, to: goal.spot.coordinate, heading: heading)
         // Only if it is still the place that was asked about.
         // By id: a pin's address may have arrived meanwhile.
@@ -490,6 +490,39 @@ final class Store {
             }
         }
         self.goal = goal
+    }
+
+    // MARK: Standing, not going
+
+    /// STANDING, NOT GOING
+    ///
+    /// A way asked with a `heading` is the router's, set off that way, and
+    /// the website reads no rides for it: it cannot be the way people ride,
+    /// and none of its buttons is ever *Ridden*. That is right for a new way
+    /// off the old one, asked of a rider going somewhere. Until 2026-11-27
+    /// it was also how a place picked in the search was asked for whenever
+    /// a ride was recording or paused, so a rider who stopped, took the
+    /// phone out and picked where to go was given the router's ways and
+    /// never the way they and others ride: the owner, standing at Magasini
+    /// with a ride running, was offered three ways to Balti jaam and none up
+    /// Kentmanni, which was ridden five to seven times that way.
+    ///
+    /// So the heading goes only with a rider going: a ride recording, not
+    /// carried, whose last point was kept less than `stillFor` ago. A point
+    /// is kept every `step` metres, every few seconds at any pace a bike
+    /// keeps, so a rider who has kept none for that long is standing. It
+    /// asks nothing more often: one request for each place picked, as
+    /// before, which is now the website's dearer question — BRouter's ways
+    /// and up to six hundred keys of rides — where it was the cheaper one.
+
+    /// A rider who has kept no point for this long is standing. Twenty
+    /// seconds is two `step`s at walking pace, ten at an easy ride's.
+    static let stillFor: TimeInterval = 20
+
+    /// Whether the rider of `ride` is going somewhere — STANDING, NOT GOING.
+    static func going(_ ride: Ride?, carried: Bool, at now: Date = Date()) -> Bool {
+        guard let ride, ride.status == .recording, !carried, let last = ride.points.last else { return false }
+        return now.timeIntervalSince1970 - last.t < stillFor
     }
 
     // MARK: Carried, not ridden
