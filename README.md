@@ -189,8 +189,12 @@ Where to? (SOMEWHERE CHOSEN IS HARDER TO MOVE, in the same file).
 to go: **Where to?** stays over the map while riding, under the numbers, and
 a place chosen there, or a touch on the map, is somewhere to go exactly as
 before a ride. The recording goes on underneath; the way is asked for from
-where the rider is and setting off the way they are going (`heading`, as a
-new way off the old one is), and as soon as it arrives the way's line is
+where the rider is and, while they are going, setting off the way they are
+going (`heading`, as a new way off the old one is). Standing still — no
+point kept for twenty seconds — or paused, it is asked with no heading, as
+before a ride, so its ways can be the ones people ride and a button can say
+*Ridden*: with a heading the website reads no rides at all
+(`Store.going`, STANDING, NOT GOING). As soon as it arrives the way's line is
 under the ridden one, the card says how much is left and the turns are shown
 and said. The website's first way is taken, with no choice of others, since
 the rider is moving. A touch chooses only while there is nowhere to go yet —
